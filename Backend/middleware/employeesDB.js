@@ -2,17 +2,52 @@ import db from '../config/db.js'
 
 // sql to add new employee
 
-export const addEmployee = async (employee) =>{
-    // sql query still needs to be fixed 
-    try{
-        const sql = 'INSERT INTO employees (first_name, email) VALUES (?, ?)'
-        const [result] = await db.pool.execute(sql, [employee.name, employee.email])
-        return {id: result.insertId, ...employee}       
+import { pool } from '../config/db.js'; // adjust path if needed
+
+export const addEmployee = async (employee) => {
+    try {
+        const sql = `
+            INSERT INTO employees (
+                first_name, 
+                last_name, 
+                contact_no, 
+                email, 
+                address, 
+                id, 
+                is_admin, 
+                employment_status, 
+                date_hired, 
+                supervisor_name, 
+                leave_balance, 
+                username, 
+                password
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        const [result] = await pool.execute(sql, [
+            employee.first_name,
+            employee.last_name,
+            employee.contact_no,
+            employee.email,
+            employee.address,
+            employee.id,
+            employee.is_admin,
+            employee.employment_status,
+            employee.date_hired,
+            employee.supervisor_name,
+            employee.leave_balance,
+            employee.username,
+            employee.password
+        ]);
+
+        console.log(`Successfully added employee: ${employee.first_name} ${employee.last_name}`);
+        return { id: result.insertId, ...employee };
+
     } catch (error) {
-        console.error('Error adding employee:', error)
-        throw error 
+        console.error('Error adding employee:', error);
+        throw error;
     }
-}
+};
 
 // sql query to remove/delete employee 
 

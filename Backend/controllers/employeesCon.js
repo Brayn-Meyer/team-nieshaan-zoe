@@ -1,14 +1,16 @@
 import { addEmployee } from '../middleware/employeesDB.js';
 // function to add employee
 
-export const addEmployeeCon = async (req, res)=>{
+export const addEmployeeCon = async (req, res) => {
     try {
         const employee = await addEmployee(req.body);
         res.json({ employee });
     } catch (error) {
+        console.error('Error in addEmployeeCon:', error);
         res.status(500).json({ error: 'Failed to add employee' });
-    }       
-}
+    }
+};
+
 
 
 // function to remove/delete employee
