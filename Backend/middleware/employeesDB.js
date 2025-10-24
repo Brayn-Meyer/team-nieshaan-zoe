@@ -71,4 +71,16 @@ export const deleteEmployee = async (em_id) => {
     }
 }
 
+export const updatedEmployeesList = async () => {
+
+    try{
+        const [employees] = await pool.query('SELECT * FROM employees');
+        return employees;
+    }catch(error){
+        console.error('Error fetching employees:', error);
+        throw error;
+    }
+
+}
+
 

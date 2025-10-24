@@ -1,15 +1,21 @@
-import { addEmployee, deleteEmployee } from '../middleware/employeesDB.js';
+import { addEmployee, deleteEmployee, updatedEmployeesList } from '../middleware/employeesDB.js';
+
 
 // function to add employee
-
 export const addEmployeeCon = async (req, res) => {
     try {
         const employee = await addEmployee(req.body);
         res.json({ employee });
+
+        const io = req.app.get('io');
+        const  employeesList  = await updatedEmployeesList();
+        io.emit('employees:update', employeesList);
+        
     } catch (error) {
         console.error('Error in addEmployeeCon:', error);
         res.status(500).json({ error: 'Failed to add employee' });
     }
+
 };
 
 
@@ -26,6 +32,10 @@ export const deleteEmployeeCon = async (req, res) => {
         } else {
             res.status(404).json({ error: `No employee found with id: ${id}` });
         }
+
+        const io = req.app.get('io');
+        const  employeesList  = await updatedEmployeesList();
+        io.emit('employees:update', employeesList);
 
     } catch (error) {
         console.error('Error in deleteEmployeeCon:', error);

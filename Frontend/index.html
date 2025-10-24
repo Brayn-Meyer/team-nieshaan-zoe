@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO Test</title>
+  </head>
+  <body>
+    <h1>Socket.IO Test</h1>
+    <pre id="output"></pre>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+      const socket = io("http://localhost:9090");
+
+      const log = (msg) => {
+        console.log(msg);
+        document.getElementById("output").textContent += msg + "\n";
+      };
+
+      socket.on("connect", () => {
+        log("✅ Connected to backend: " + socket.id);
+      });
+
+      socket.on("employees:update", (employees) => {
+        log("🧑‍💼 Employees updated:");
+        log(JSON.stringify(employees, null, 2));
+      });
+
+      socket.on("disconnect", () => {
+        log("❌ Disconnected from server");
+      });
+    </script>
+  </body>
+</html>
