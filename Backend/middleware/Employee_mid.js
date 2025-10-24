@@ -1,9 +1,8 @@
 import {pool} from "../config/db.js"
 
-
 export const UpdateEmp = async (employeeData) => {
   try {
-    await pool.query(
+    const [result] = await pool.query(
       `UPDATE tracker_db.employees 
        SET last_name = ?, 
            contact_no = ?, 
