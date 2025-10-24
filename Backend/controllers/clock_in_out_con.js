@@ -1,4 +1,4 @@
-import { getClockInOutData } from "../middleware/clock_in_out_mid"
+import { getClockInOutData } from "../middleware/clock_in_out_mid.js"
 
 export const getClockInOutDataCon = async (req, res) => {
     try {

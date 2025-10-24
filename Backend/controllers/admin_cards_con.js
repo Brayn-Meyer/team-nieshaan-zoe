@@ -1,4 +1,4 @@
-import { getTotalEmployeesData, getTotalCheckedInData, getTotalCheckedOutData, getTotalAbsentData } from "../middleware/admin_cards_mid"
+import { getTotalEmployeesData, getTotalCheckedInData, getTotalCheckedOutData, getTotalAbsentData } from "../middleware/admin_cards_mid.js"
 
 export const getTotalEmployeesDataCon = async (req, res) => {
     try {
