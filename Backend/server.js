@@ -1,7 +1,13 @@
 import express from 'express';
 import { config } from 'dotenv';        
 
+import { } from './server';
+
 import cors from 'cors';
+
+import { addEmployeeCon, deleteEmployeeCon } from './controllers/employeesCon.js';
+// import { getfilterAll } from './controller/filterAllCon.js'
+// import { getfilter } from './controller/filterCon.js'
 
 config();
 
@@ -12,13 +18,15 @@ app.use(cors());
 app.use(express.json());
 
 
-import { getfilterAllCon } from "./controllers/filterAllCon.js";
-import {getfilterCon} from './controllers/filterCon.js';
+import {"getfilterAll"} from "./controller/filterAllCon"
+import {"getfilter"} from "./controller/filterCon"
 
 
 app.get('/filter', getfilterCon );
 app.get('/filterAll', getfilterAllCon );
 
-app.listen(PORT, () => {
-    console.log(`http://localhost:${PORT}`);
-});
+app.listen(PORT , () => {
+    console.log('http//localhost:${PORT}')
+}
+
+)
