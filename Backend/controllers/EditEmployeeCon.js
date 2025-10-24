@@ -1,4 +1,4 @@
-import { UpdateEmp } from "../middleware/EmpModel.js";
+import { UpdateEmp } from "../middleware/Employee_mid.js";
 
 export const EditEmpCon = async (req, res) => {
   try {
@@ -8,7 +8,6 @@ export const EditEmpCon = async (req, res) => {
       return res.status(400).json({ success: false, message: "Missing employee id in params" });
     }
 
-    // Map incoming request body to the fields expected by EmpModel.UpdateEmp
     const {
       last_name,
       contact_no,
