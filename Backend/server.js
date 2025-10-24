@@ -1,13 +1,10 @@
 import express from 'express';
-import { config } from 'dotenv';        
-
-import { } from './server';
-
+import { config } from 'dotenv';
 import cors from 'cors';
 
 import { addEmployeeCon, deleteEmployeeCon } from './controllers/employeesCon.js';
-// import { getfilterAll } from './controller/filterAllCon.js'
-// import { getfilter } from './controller/filterCon.js'
+import { getfilterAllCon } from './controllers/filterAllCon.js';
+import { getfilterCon } from './controllers/filterCon.js';
 
 config();
 
@@ -17,16 +14,9 @@ const PORT = process.env.PORT || 9090;
 app.use(cors());
 app.use(express.json());
 
+app.get('/filter', getfilterCon);
+app.get('/filterAll', getfilterAllCon);
 
-import {"getfilterAll"} from "./controller/filterAllCon"
-import {"getfilter"} from "./controller/filterCon"
-
-
-app.get('/filter', getfilterCon );
-app.get('/filterAll', getfilterAllCon );
-
-app.listen(PORT , () => {
-    console.log('http//localhost:${PORT}')
-}
-
-)
+app.listen(PORT, () => {
+  console.log(`http://localhost:${PORT}`);
+});
