@@ -1,4 +1,5 @@
-import { addEmployee } from '../middleware/employeesDB.js';
+import { addEmployee, deleteEmployee } from '../middleware/employeesDB.js';
+
 // function to add employee
 
 export const addEmployeeCon = async (req, res) => {
@@ -15,18 +16,19 @@ export const addEmployeeCon = async (req, res) => {
 
 // function to remove/delete employee
 
-export const deleteEmployeeCon = async (req, res)=>{
-    try{
-        const id = req.params.id
-        res.json({
-            message: `Employee with id ${id} removed successfully`
-        })
+export const deleteEmployeeCon = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const deletedRows = await deleteEmployee(id);
+
+        if (deletedRows > 0) {
+            res.json({ message: `Employee with id ${id} removed successfully` });
+        } else {
+            res.status(404).json({ error: `No employee found with id: ${id}` });
+        }
 
     } catch (error) {
-        res.status(500).json({ error: 'Failed to remove employee' });
-        res.status(500).json({
-        error: 'Failed to delete employee'
-        });
+        console.error('Error in deleteEmployeeCon:', error);
+        res.status(500).json({ error: 'Failed to delete employee' });
     }
-}
-
+};

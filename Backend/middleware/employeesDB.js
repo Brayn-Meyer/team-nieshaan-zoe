@@ -1,8 +1,8 @@
-import db from '../config/db.js'
+import {pool} from '../config/db.js';
 
 // sql to add new employee
 
-import { pool } from '../config/db.js'; // adjust path if needed
+
 
 export const addEmployee = async (employee) => {
     try {
@@ -20,8 +20,9 @@ export const addEmployee = async (employee) => {
                 supervisor_name, 
                 leave_balance, 
                 username, 
-                password
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                password,
+                classification_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const [result] = await pool.execute(sql, [
@@ -37,7 +38,8 @@ export const addEmployee = async (employee) => {
             employee.supervisor_name,
             employee.leave_balance,
             employee.username,
-            employee.password
+            employee.password,
+            employee.classification_id
         ]);
 
         console.log(`Successfully added employee: ${employee.first_name} ${employee.last_name}`);
@@ -54,13 +56,14 @@ export const addEmployee = async (employee) => {
 export const deleteEmployee = async (em_id) => { 
     try {
         const sql = 'DELETE FROM employees WHERE employee_id = ?';
-        const [result] = await db.execute(sql, [em_id]);
+        const [result] = await pool.execute(sql, [em_id]);
 
         if (result.affectedRows > 0) {
             console.log(`Successfully removed employee with id ${em_id}`);
         } else {
-            console.log(`No employee found with id : ${em_id}`);
+            console.log(`No employee found with id: ${em_id}`);
         }
+        return result.affectedRows;
 
     } catch (error) {
         console.error('Error deleting employee:', error);
@@ -68,4 +71,4 @@ export const deleteEmployee = async (em_id) => {
     }
 }
 
-// deleteEmployee(11)
+
