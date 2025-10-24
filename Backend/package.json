@@ -1,16 +1,12 @@
 {
-<<<<<<< HEAD
   "name": "backend",
   "version": "1.0.0",
   "description": "Backend for digital attendance tracking system",
-  "main": "index.js",
-  "type": "module",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
-=======
->>>>>>> 66a38b741be74b987eb5e1f09f943a6ea0e51fff
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
@@ -20,7 +16,4 @@
     "mysql2": "^3.15.3"
   }
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 66a38b741be74b987eb5e1f09f943a6ea0e51fff
