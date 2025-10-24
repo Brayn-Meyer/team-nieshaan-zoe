@@ -7,7 +7,6 @@ import { getfilterAllCon } from './controllers/filterAllCon.js';
 import { getfilterCon } from './controllers/filterCon.js';
 import editEmployeeRoutes from './routes/EditEmployee.js';
 
-=======
 import { getClockInOutDataCon } from './controllers/clock_in_out_con.js';
 import {
   getTotalEmployeesDataCon,
@@ -15,7 +14,6 @@ import {
   getTotalCheckedOutDataCon,
   getTotalAbsentDataCon,
 } from './controllers/admin_cards_con.js';
->>>>>>> 926bb8208f08d4bec390de30a8ccf3d0a650df19
 
 config();
 
