@@ -5,6 +5,10 @@ import { } from './server';
 
 import cors from 'cors';
 
+import { addEmployeeCon, deleteEmployeeCon } from './controllers/employeesCon.js';
+// import { getfilterAll } from './controller/filterAllCon.js'
+// import { getfilter } from './controller/filterCon.js'
+
 config();
 
 const app = express();
