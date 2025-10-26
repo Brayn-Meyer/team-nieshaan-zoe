@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import { getClockInOutDataCon } from './controllers/clock_in_out_con.js';
 import { getTotalCheckedOutDataCon, getTotalAbsentDataCon, getTotalEmployeesDataCon, getTotalCheckedInDataCon } from './controllers/admin_cards_con.js';
 import { addEmployeeCon, deleteEmployeeCon } from './controllers/employeesCon.js';
+import { EditEmpCon } from './controllers/EditEmployeeCon.js';
 import { getfilterAllCon } from './controllers/filterAllCon.js';
 import { getfilterCon } from './controllers/filterCon.js';
 
@@ -21,10 +22,11 @@ const io = new Server(httpServer, {
   cors: {origin: '*'}
 });
 
-const router = express.Router();
-
 app.use(cors());
 app.use(express.json());
+
+// Serve static frontend files
+app.use(express.static('../Frontend'));
 
 app.set('io', io);
 
@@ -41,10 +43,10 @@ app.get("/absent", getTotalAbsentDataCon)
 
 app.get("/clockInOut", getClockInOutDataCon)
 
-
-// route to add a new employee
-router.post('/addEmployee', addEmployeeCon);
-router.delete('/removeEmployee/:id', deleteEmployeeCon);
+// Employee add/delete routes
+app.post('/addEmployee', addEmployeeCon);
+app.delete('/removeEmployee/:id', deleteEmployeeCon);
+app.put('/editEmployee/:employee_id', EditEmpCon);
 
 io.on('connection', (socket) => {
 
