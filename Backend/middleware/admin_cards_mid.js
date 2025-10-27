@@ -35,3 +35,5 @@ export const getTotalAbsentData = async () => {
     throw new Error('Database error: ' + err.message);
   }
 }
+
+

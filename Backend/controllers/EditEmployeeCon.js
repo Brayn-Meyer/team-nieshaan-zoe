@@ -1,5 +1,5 @@
 import { UpdateEmp } from "../middleware/Employee_mid.js";
-import { updatedEmployeesList } from "../middleware/employeesDB.js";
+import { emitKPIUpdates } from "./admin_cards_con.js";
 
 export const EditEmpCon = async (req, res) => {
   try {
@@ -38,17 +38,10 @@ export const EditEmpCon = async (req, res) => {
       employee: employeeData
     });
 
-    // Emit Socket.IO event after successful update
-    try {
-      const io = req.app.get('io');
-      if (io) {
-        const employeesList = await updatedEmployeesList();
-        io.emit('employees:update', employeesList);
-        console.log('📡 Socket.IO: Employee update broadcasted');
-      }
-    } catch (socketError) {
-      console.error('Socket.IO emission error:', socketError);
-    }
+    // Emit updated KPI data after successful update
+    const io = req.app.get('io');
+    emitKPIUpdates(io);
+
   } catch (error) {
     console.error('Update error:', error);
     res.status(500).json({

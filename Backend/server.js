@@ -25,9 +25,6 @@ const io = new Server(httpServer, {
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend files
-app.use(express.static('../Frontend'));
-
 app.set('io', io);
 
 app.get('/filter', getfilterCon);
@@ -43,7 +40,6 @@ app.get("/absent", getTotalAbsentDataCon)
 
 app.get("/clockInOut", getClockInOutDataCon)
 
-// Employee add/delete routes
 app.post('/addEmployee', addEmployeeCon);
 app.delete('/removeEmployee/:id', deleteEmployeeCon);
 app.put('/editEmployee/:employee_id', EditEmpCon);

@@ -2,8 +2,6 @@ import {pool} from '../config/db.js';
 
 // sql to add new employee
 
-
-
 export const addEmployee = async (employee) => {
     try {
         const sql = `
@@ -69,18 +67,6 @@ export const deleteEmployee = async (em_id) => {
         console.error('Error deleting employee:', error);
         throw error;
     }
-}
-
-export const updatedEmployeesList = async () => {
-
-    try{
-        const [employees] = await pool.query('SELECT * FROM employees');
-        return employees;
-    }catch(error){
-        console.error('Error fetching employees:', error);
-        throw error;
-    }
-
 }
 
 
