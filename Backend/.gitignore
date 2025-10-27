@@ -1,7 +1,56 @@
-<<<<<<< HEAD
+# ========================
+# Node.js & Environment
+# ========================
+node_modules/
 .env
-=======
->>>>>>> 66a38b741be74b987eb5e1f09f943a6ea0e51fff
-node_modules
-.package-lock.json
-.package-json
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================
+# Google Service Account & Secrets
+# ========================
+google.json
+service-account.json
+*.json  # Ignore all JSON keys unless specifically needed
+
+# ========================
+# Build Artifacts / Output
+# ========================
+dist/
+build/
+coverage/
+
+# ========================
+# OS Specific / IDE files
+# ========================
+# macOS
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# VSCode / JetBrains
+.vscode/
+.idea/
+*.swp
+
+# ========================
+# Logs
+# ========================
+logs/
+*.log
+
+# ========================
+# Backups / Exports / SQL
+# ========================
+backups/
+exports/
+*.sql

@@ -23,5 +23,5 @@ app.delete('/employees/:id', deleteEmployeeCon);
 // app.get('/filterAll', getfilterAllCon);
 
 app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
