@@ -5,7 +5,7 @@ import cors from 'cors';
 import { addEmployeeCon, deleteEmployeeCon } from './controllers/employeesCon.js';
 import { getfilterAllCon } from './controllers/filterAllCon.js';
 import { getfilterCon } from './controllers/filterCon.js';
-import editEmployeeRoutes from './routes/EditEmployee.js';
+// import { editEmployeeRoutes } from './routes/EditEmployeeCon.js';
 
 import { getClockInOutDataCon } from './controllers/clock_in_out_con.js';
 import {
@@ -28,7 +28,7 @@ app.use(express.json());
 // Filters
 app.get('/filter', getfilterCon);
 app.get('/filterAll', getfilterAllCon);
-app.use('/employee', editEmployeeRoutes);
+// app.use('/employee', editEmployeeRoutes);
 
 
 
