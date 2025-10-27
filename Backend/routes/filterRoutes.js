@@ -32,6 +32,10 @@ const getfiltertea_in= async(tea_in) => {
     let [row] = await pool.query('SELECT * FROM record_backups WHERE tea_in = ? ', [tea_in]);
     return row;
 }
+const getfilterlunch_in = async(lunch_in) => {
+    let [row] = await pool.query('SELECT * FROM record_backups WHERE lunch_in = ? ', [lunch_in]);
+    return row;
+}
 const getfilterlunch_out = async(lunch_out) => {
     let [row] = await pool.query('SELECT * FROM record_backups WHERE lunch_out = ? ', [lunch_out]);
     return row;
@@ -46,4 +50,4 @@ const getfilterfull_name = async(full_name) => {
 
 
 
-export {getfilter, getfilterstatus, getfilterfull_name, getfilterlunch_out, getfiltertea_in, getfiltertea_out, getfilterclock_out, getfilterclock_in, getfilterdate};
+export {getfilter, getfilterstatus, getfilterfull_name, getfilterlunch_out, getfilterlunch_in, getfiltertea_in, getfiltertea_out, getfilterclock_out, getfilterclock_in, getfilterdate};
