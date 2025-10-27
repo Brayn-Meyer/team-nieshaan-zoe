@@ -1,10 +1,24 @@
 <template>
   <div>
-  <!-- add employee search bar and history -->
-  
+    <!-- Updated search bar and buttons layout -->
     <div class="search-add-container mb-4">
       <div class="row g-3 align-items-center">
-        <div class="col-12 col-md-8 col-lg-9">
+        <!-- History and Map buttons on the left -->
+        <div class="col-auto">
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary small-btn" @click="openHistoryModal">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              History
+            </button>
+            <button class="btn btn-primary small-btn" @click="openMapModal">
+              <i class="fa-solid fa-map-location-dot"></i>
+              Map
+            </button>
+          </div>
+        </div>
+        
+        <!-- Search bar in the middle -->
+        <div class="col">
           <div class="search-container">
             <input 
               type="text" 
@@ -14,9 +28,11 @@
             >
           </div>
         </div>
-        <div class="col-12 col-md-4 col-lg-3">
-          <button class="btn btn-primary w-100 add-employee-btn" @click="openAddEmployeeModal">
-            <i class="fa-solid fa-plus me-2"></i>
+        
+        <!-- Add Employee button on the right -->
+        <div class="col-auto">
+          <button class="btn btn-primary small-btn" @click="openAddEmployeeModal">
+            <i class="fa-solid fa-plus me-1"></i>
             Add Employee
           </button>
         </div>
@@ -32,7 +48,7 @@
             <span class="employee-id">{{ employee.employeeId }}</span>
           </div>
           <div class="status-indicator">
-            <i class="fa-solid fa-circle-dot" style="color: #00ffb3;"></i>
+            <i class="fa-solid fa-circle-dot" :style="{ color: employee.status === 'on-site' ? '#00ffb3' : '#6c757d' }"></i>
           </div>
         </div>
         <div class="card-body">
@@ -44,6 +60,10 @@
             <div class="detail-item">
               <span class="label">Department:</span>
               <span class="value">{{ employee.department }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Status:</span>
+              <span class="value">{{ employee.status }}</span>
             </div>
           </div>
         </div>
@@ -132,7 +152,6 @@
                     id="employeeId" 
                     v-model="newEmployee.employeeId"
                     required
-                    placeholder="EMP001"
                   >
                 </div>
                 
@@ -144,7 +163,6 @@
                     id="classificationId" 
                     v-model="newEmployee.classificationId"
                     required
-                    placeholder="CL001"
                   >
                 </div>
 
@@ -156,7 +174,6 @@
                     id="firstName" 
                     v-model="newEmployee.firstName"
                     required
-                    placeholder="John"
                   >
                 </div>
 
@@ -168,7 +185,6 @@
                     id="lastName" 
                     v-model="newEmployee.lastName"
                     required
-                    placeholder="Doe"
                   >
                 </div>
 
@@ -180,7 +196,6 @@
                     id="contactNo" 
                     v-model="newEmployee.contactNo"
                     required
-                    placeholder="+1 (555) 123-4567"
                   >
                 </div>
 
@@ -192,8 +207,7 @@
                     id="email" 
                     v-model="newEmployee.email"
                     required
-                    placeholder="john.doe@company.com"
-                  >
+                                      >
                 </div>
 
                 <div class="col-12">
@@ -216,7 +230,6 @@
                     id="idNumber" 
                     v-model="newEmployee.idNumber"
                     required
-                    placeholder="123456789"
                   >
                 </div>
 
@@ -243,7 +256,6 @@
                     class="form-control" 
                     id="supervisorName" 
                     v-model="newEmployee.supervisorName"
-                    placeholder="Sarah Wilson"
                   >
                 </div>
 
@@ -256,7 +268,6 @@
                     v-model="newEmployee.leaveBalance"
                     required
                     min="0"
-                    placeholder="20"
                   >
                 </div>
 
@@ -300,7 +311,6 @@
                     id="username" 
                     v-model="newEmployee.username"
                     required
-                    placeholder="johndoe"
                   >
                 </div>
 
@@ -360,39 +370,6 @@
                     <option value="unemployed">Unemployed</option>
                   </select>
                 </div>
-
-                <!-- Status -->
-                <div class="col-12 mt-4">
-                  <h6 class="section-title">Status</h6>
-                </div>
-
-                <div class="col-12">
-                  <div class="form-check form-check-inline">
-                    <input 
-                      class="form-check-input" 
-                      type="radio" 
-                      id="statusActive" 
-                      value="on-site" 
-                      v-model="newEmployee.status"
-                      checked
-                    >
-                    <label class="form-check-label" for="statusActive">
-                      <i class="fa-solid fa-circle-dot text-success me-1"></i> On-site
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input 
-                      class="form-check-input" 
-                      type="radio" 
-                      id="statusInactive" 
-                      value="remote" 
-                      v-model="newEmployee.status"
-                    >
-                    <label class="form-check-label" for="statusInactive">
-                      <i class="fa-solid fa-circle-dot text-secondary me-1"></i> Remote
-                    </label>
-                  </div>
-                </div>
               </div>
             </form>
           </div>
@@ -406,7 +383,7 @@
 
     <!-- Edit Employee Modal -->
     <div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
@@ -414,21 +391,237 @@
           </div>
           <div class="modal-body">
             <form v-if="selectedEmployee">
-              <div class="mb-3">
-                <label for="employeeName" class="form-label">Name</label>
-                <input type="text" class="form-control" id="employeeName" v-model="selectedEmployee.name">
-              </div>
-              <div class="mb-3">
-                <label for="employeeId" class="form-label">Employee ID</label>
-                <input type="text" class="form-control" id="employeeId" v-model="selectedEmployee.employeeId">
-              </div>
-              <div class="mb-3">
-                <label for="employeeRoles" class="form-label">Roles</label>
-                <input type="text" class="form-control" id="employeeRoles" v-model="selectedEmployee.roles">
-              </div>
-              <div class="mb-3">
-                <label for="employeeDepartment" class="form-label">Department</label>
-                <input type="text" class="form-control" id="employeeDepartment" v-model="selectedEmployee.department">
+              <div class="row g-3">
+                <!-- Personal Information -->
+                <div class="col-12">
+                  <h6 class="section-title">Personal Information</h6>
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="editEmployeeId" class="form-label">Employee ID <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="editEmployeeId" 
+                    v-model="selectedEmployee.employeeId"
+                    required
+                  >
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="editClassificationId" class="form-label">Classification ID <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="editClassificationId" 
+                    v-model="selectedEmployee.classificationId"
+                    required
+                  >
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editFirstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="editFirstName" 
+                    v-model="selectedEmployee.firstName"
+                    required
+                  >
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editLastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="editLastName" 
+                    v-model="selectedEmployee.lastName"
+                    required
+                  >
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editContactNo" class="form-label">Contact Number <span class="text-danger">*</span></label>
+                  <input 
+                    type="tel" 
+                    class="form-control" 
+                    id="editContactNo" 
+                    v-model="selectedEmployee.contactNo"
+                    required
+                  >
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editEmail" class="form-label">Email Address <span class="text-danger">*</span></label>
+                  <input 
+                    type="email" 
+                    class="form-control" 
+                    id="editEmail" 
+                    v-model="selectedEmployee.email"
+                    required
+                  >
+                </div>
+
+                <div class="col-12">
+                  <label for="editAddress" class="form-label">Address <span class="text-danger">*</span></label>
+                  <textarea 
+                    class="form-control" 
+                    id="editAddress" 
+                    v-model="selectedEmployee.address"
+                    required
+                    placeholder="Enter full address"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editIdNumber" class="form-label">ID Number <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="editIdNumber" 
+                    v-model="selectedEmployee.idNumber"
+                    required
+                  >
+                </div>
+
+                <!-- Employment Information -->
+                <div class="col-12 mt-4">
+                  <h6 class="section-title">Employment Information</h6>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editDateHired" class="form-label">Date Hired <span class="text-danger">*</span></label>
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    id="editDateHired" 
+                    v-model="selectedEmployee.dateHired"
+                    required
+                  >
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editSupervisorName" class="form-label">Supervisor Name</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="editSupervisorName" 
+                    v-model="selectedEmployee.supervisorName"
+                  >
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editLeaveBalance" class="form-label">Leave Balance <span class="text-danger">*</span></label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="editLeaveBalance" 
+                    v-model="selectedEmployee.leaveBalance"
+                    required
+                    min="0"
+                  >
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">User Type <span class="text-danger">*</span></label>
+                  <div class="user-type-container">
+                    <div class="form-check form-check-inline">
+                      <input 
+                        class="form-check-input" 
+                        type="radio" 
+                        id="editUserTypeEmployee" 
+                        value="Employee" 
+                        v-model="selectedEmployee.userType"
+                      >
+                      <label class="form-check-label" for="editUserTypeEmployee">Employee</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input 
+                        class="form-check-input" 
+                        type="radio" 
+                        id="editUserTypeAdmin" 
+                        value="Admin" 
+                        v-model="selectedEmployee.userType"
+                      >
+                      <label class="form-check-label" for="editUserTypeAdmin">Admin</label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Login Credentials -->
+                <div class="col-12 mt-4">
+                  <h6 class="section-title">Login Credentials</h6>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editUsername" class="form-label">Username <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="editUsername" 
+                    v-model="selectedEmployee.username"
+                    required
+                  >
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editPassword" class="form-label">Password</label>
+                  <div class="password-input-group">
+                    <input 
+                      :type="showEditPassword ? 'text' : 'password'" 
+                      class="form-control" 
+                      id="editPassword" 
+                      v-model="selectedEmployee.password"
+                      placeholder="Leave blank to keep current password"
+                    >
+                    <button 
+                      type="button" 
+                      class="btn btn-outline-secondary password-toggle"
+                      @click="showEditPassword = !showEditPassword"
+                    >
+                      <i :class="showEditPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                    </button>
+                  </div>
+                  <div class="form-text">Leave password field blank to keep the current password</div>
+                </div>
+
+                <!-- Roles and Department -->
+                <div class="col-12 mt-4">
+                  <h6 class="section-title">Roles & Department</h6>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editRoles" class="form-label">Roles <span class="text-danger">*</span></label>
+                  <select class="form-select" id="editRoles" v-model="selectedEmployee.roles" required>
+                    <option value="" disabled>Select a role</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Developer">Developer</option>
+                    <option value="Designer">Designer</option>
+                    <option value="Analyst">Analyst</option>
+                    <option value="Administrator">Administrator</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Coordinator">Coordinator</option>
+                    <option value="unemployed">Unemployed</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editDepartment" class="form-label">Department <span class="text-danger">*</span></label>
+                  <select class="form-select" id="editDepartment" v-model="selectedEmployee.department" required>
+                    <option value="" disabled>Select a department</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Design">Design</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Sales">Sales</option>
+                    <option value="HR">Human Resources</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Operations">Operations</option>
+                    <option value="IT">Information Technology</option>
+                    <option value="unemployed">Unemployed</option>
+                  </select>
+                </div>
               </div>
             </form>
           </div>
@@ -440,7 +633,7 @@
       </div>
     </div>
 
-
+    <!-- View Times Modal -->
     <div class="modal fade" id="viewTimesModal" tabindex="-1" aria-labelledby="viewTimesModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -521,6 +714,7 @@ export default {
       dateQuery: '',
       selectedEmployee: null,
       showPassword: false,
+      showEditPassword: false,
       newEmployee: {
         employeeId: '',
         classificationId: '',
@@ -545,48 +739,63 @@ export default {
           id: 1,
           name: 'John Doe',
           employeeId: 'EMP001',
-          roles: 'unemployed',
-          department: 'unemployed',
-          status: 'on-site',
+          classificationId: 'CL001',
+          firstName: 'John',
+          lastName: 'Doe',
+          contactNo: '+1 (555) 123-4567',
+          email: 'john.doe@company.com',
+          address: '123 Main St, New York, NY',
+          idNumber: '123456789',
+          userType: 'Employee',
+          dateHired: '2023-01-15',
+          supervisorName: 'Sarah Wilson',
+          leaveBalance: 20,
+          username: 'johndoe',
+          password: 'password123',
+          roles: 'Developer',
+          department: 'Engineering',
+          status: 'On-site',
         },
         {
           id: 2,
-          name: 'Jane SMite',
+          name: 'Jane Smith',
           employeeId: 'EMP002',
-          roles: 'unemployed',
-          department: 'unemployed',
-          status: 'on-site',
+          classificationId: 'CL002',
+          firstName: 'Jane',
+          lastName: 'Smith',
+          contactNo: '+1 (555) 234-5678',
+          email: 'jane.smith@company.com',
+          address: '456 Oak Ave, Los Angeles, CA',
+          idNumber: '234567890',
+          userType: 'Employee',
+          dateHired: '2023-02-20',
+          supervisorName: 'Mike Johnson',
+          leaveBalance: 18,
+          username: 'janesmith',
+          password: 'password123',
+          roles: 'Designer',
+          department: 'Design',
+          status: 'remote',
         },
         {
           id: 3,
           name: 'Mike Jordan',
           employeeId: 'EMP003',
-          roles: 'unemployed',
-          department: 'unemployed',
-          status: 'on-site',
-        },
-        {
-          id: 4,
-          name: 'Sarah Adams',
-          employeeId: 'EMP004',
-          roles: 'unemployed',
-          department: 'unemployed',
-          status: 'on-site',
-        },
-        {
-          id: 5,
-          name: 'David johnson',
-          employeeId: 'EMP005',
-          roles: 'unemployed',
-          department: 'unemployed',
-          status: 'on-site',
-        },
-        {
-          id: 6,
-          name: 'Emily Moe lester',
-          employeeId: 'EMP006',
-          roles: 'unemployed',
-          department: 'unemployed',
+          classificationId: 'CL003',
+          firstName: 'Mike',
+          lastName: 'Jordan',
+          contactNo: '+1 (555) 345-6789',
+          email: 'mike.jordan@company.com',
+          address: '789 Pine Rd, Chicago, IL',
+          idNumber: '345678901',
+          userType: 'Admin',
+          dateHired: '2022-11-10',
+          supervisorName: '',
+          leaveBalance: 22,
+          username: 'mikejordan',
+          password: 'password123',
+          roles: 'Manager',
+          department: 'Operations',
           status: 'on-site',
         }
       ],
@@ -631,14 +840,23 @@ export default {
     filteredList() {
       return this.employees.filter(item => {
         const matchesText = item.name?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                           item.surname?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                           item.employeeId?.toLowerCase().includes(this.searchQuery.toLowerCase());
+                           item.employeeId?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                           item.roles?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                           item.department?.toLowerCase().includes(this.searchQuery.toLowerCase());
       
         return matchesText;
       });
     }
   },
   methods: {
+    openHistoryModal() {
+      console.log('History modal would open here');
+    },
+    
+    openMapModal() {
+      console.log('Map modal would open here');
+    },
+
     clearFilters() {
       this.dateQuery = '';
       this.searchQuery = '';
@@ -648,7 +866,6 @@ export default {
       return new Date(dateString).toLocaleDateString(undefined, options);
     },
     openAddEmployeeModal() {
-      // Reset the form with default values
       this.newEmployee = {
         employeeId: '',
         classificationId: '',
@@ -659,7 +876,7 @@ export default {
         address: '',
         idNumber: '',
         userType: 'Employee',
-        dateHired: new Date().toISOString().split('T')[0], // Today's date as default
+        dateHired: new Date().toISOString().split('T')[0],
         supervisorName: '',
         leaveBalance: 20,
         username: '',
@@ -673,7 +890,6 @@ export default {
       modal.show();
     },
     addNewEmployee() {
-      // Basic validation
       const requiredFields = [
         'employeeId', 'classificationId', 'firstName', 'lastName', 
         'contactNo', 'email', 'address', 'idNumber', 'dateHired',
@@ -687,19 +903,16 @@ export default {
         }
       }
 
-      // Check if employee ID already exists
       if (this.employees.some(emp => emp.employeeId === this.newEmployee.employeeId)) {
         alert('Employee ID already exists. Please use a unique ID.');
         return;
       }
 
-      // Check if username already exists
       if (this.employees.some(emp => emp.username === this.newEmployee.username)) {
         alert('Username already exists. Please choose a different username.');
         return;
       }
 
-      // Create new employee object
       const newEmployee = {
         id: Math.max(...this.employees.map(emp => emp.id)) + 1,
         name: `${this.newEmployee.firstName} ${this.newEmployee.lastName}`,
@@ -722,18 +935,43 @@ export default {
         status: this.newEmployee.status
       };
 
-      // Add to employees array
       this.employees.push(newEmployee);
-
-      // Close modal
       const modal = bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal'));
       modal.hide();
-
-      // Optional: Show success message
       console.log(`Employee ${newEmployee.name} added successfully.`);
     },
     openEditModal(employee) {
-      this.selectedEmployee = {...employee};
+      this.selectedEmployee = JSON.parse(JSON.stringify(employee));
+      
+      const defaultEmployee = {
+        employeeId: '',
+        classificationId: '',
+        firstName: '',
+        lastName: '',
+        contactNo: '',
+        email: '',
+        address: '',
+        idNumber: '',
+        userType: 'Employee',
+        dateHired: new Date().toISOString().split('T')[0],
+        supervisorName: '',
+        leaveBalance: 20,
+        username: '',
+        password: '',
+        roles: '',
+        department: '',
+        status: 'home'
+      };
+      
+      this.selectedEmployee = { ...defaultEmployee, ...this.selectedEmployee };
+      
+      if (this.selectedEmployee.name && !this.selectedEmployee.firstName) {
+        const nameParts = this.selectedEmployee.name.split(' ');
+        this.selectedEmployee.firstName = nameParts[0] || '';
+        this.selectedEmployee.lastName = nameParts.slice(1).join(' ') || '';
+      }
+      
+      this.showEditPassword = false;
       const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
       modal.show();
     },
@@ -756,19 +994,57 @@ export default {
       }
     },
     saveEmployeeChanges() {
+      const requiredFields = [
+        'employeeId', 'classificationId', 'firstName', 'lastName', 
+        'contactNo', 'email', 'address', 'idNumber', 'dateHired',
+        'leaveBalance', 'username', 'roles', 'department'
+      ];
+      
+      for (let field of requiredFields) {
+        if (!this.selectedEmployee[field]) {
+          alert(`Please fill in the ${field.replace(/([A-Z])/g, ' $1').toLowerCase()} field.`);
+          return;
+        }
+      }
+
+      if (this.employees.some(emp => 
+        emp.id !== this.selectedEmployee.id && 
+        emp.employeeId === this.selectedEmployee.employeeId
+      )) {
+        alert('Employee ID already exists. Please use a unique ID.');
+        return;
+      }
+
+      if (this.employees.some(emp => 
+        emp.id !== this.selectedEmployee.id && 
+        emp.username === this.selectedEmployee.username
+      )) {
+        alert('Username already exists. Please choose a different username.');
+        return;
+      }
+
       const index = this.employees.findIndex(emp => emp.id === this.selectedEmployee.id);
       if (index !== -1) {
-        this.employees[index] = {...this.selectedEmployee};
+        this.selectedEmployee.name = `${this.selectedEmployee.firstName} ${this.selectedEmployee.lastName}`;
+        
+        if (!this.selectedEmployee.password) {
+          const originalEmployee = this.employees.find(emp => emp.id === this.selectedEmployee.id);
+          this.selectedEmployee.password = originalEmployee.password;
+        }
+        
+        this.employees[index] = { ...this.selectedEmployee };
       }
+
       const modal = bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal'));
       modal.hide();
+      console.log(`Employee ${this.selectedEmployee.name} updated successfully.`);
     },
   },
 }
 </script>
 
 <style scoped>
-/* Search and Add Container */
+/* Updated styles for the new layout */
 .search-add-container {
   max-width: 100%;
   margin: 0 auto;
@@ -786,24 +1062,30 @@ export default {
   }
 }
 
+/* Small button styles */
+.small-btn {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* Search Container */
 .search-container {
   width: 100%;
-  padding: 15px;
+  padding: 8px 12px;
   border: 1px solid #00C0AA;
   border-radius: 8px;
   background-color: #f8f9fa;
 }
 
-@media (min-width: 576px) {
-  .search-container {
-    padding: 20px;
-  }
-}
-
 .search-input {
   width: 100%;
   border: 1px solid #00C0AA;
+  font-size: 0.875rem;
+  padding: 6px 12px;
 }
 
 .search-input:focus {
@@ -811,24 +1093,29 @@ export default {
   box-shadow: 0 0 0 0.2rem rgba(0, 192, 170, 0.25);
 }
 
-/* Add Employee Button */
-.add-employee-btn {
-  height: 100%;
-  min-height: 60px;
-  padding: 12px 20px;
-  font-weight: 600;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
+/* Button Styles */
+.btn-primary {
+  background-color: #00C0AA;
+  border-color: #00C0AA;
 }
 
-@media (max-width: 767.98px) {
-  .add-employee-btn {
-    min-height: 50px;
-    margin-top: 10px;
-  }
+.btn-primary:hover {
+  background-color: #00a895;
+  border-color: #00a895;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+.text-danger {
+  color: #dc3545 !important;
 }
 
 /* Modal Styles */
@@ -1016,41 +1303,21 @@ export default {
   padding: 1rem;
 }
 
-/* Button Styles */
-.btn-primary {
-  background-color: #00C0AA;
-  border-color: #00C0AA;
+/* Badge Styles */
+.badge {
+  font-size: 0.75em;
+  padding: 0.35em 0.65em;
 }
 
-.btn-primary:hover {
-  background-color: #00a895;
-  border-color: #00a895;
+/* Text and spacing */
+.text-muted {
+  color: #6c757d !important;
 }
 
-.btn-secondary {
-  background-color: #6c757d;
-  border-color: #6c757d;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268;
-  border-color: #545b62;
-}
-
-.text-danger {
-  color: #dc3545 !important;
-}
-
-/* Responsive adjustments for the form */
-@media (max-width: 768px) {
-  .modal-body {
-    padding: 1rem;
-    max-height: 60vh;
-  }
-  
-  .section-title {
-    font-size: 1rem;
-  }
+.form-text {
+  font-size: 0.875em;
+  color: #6c757d;
+  margin-top: 0.25rem;
 }
 
 button.btn.btn-secondary {
@@ -1111,8 +1378,24 @@ button.btn.btn-secondary:hover {
   color: white;
 }
 
-/* Text and spacing */
-.text-muted {
-  color: #6c757d !important;
+/* Responsive adjustments for the form */
+@media (max-width: 768px) {
+  .modal-body {
+    padding: 1rem;
+    max-height: 60vh;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .small-btn {
+    font-size: 0.8rem;
+    padding: 5px 8px;
+  }
+  
+  .search-container {
+    padding: 6px 10px;
+  }
 }
 </style>
