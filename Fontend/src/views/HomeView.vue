@@ -43,16 +43,26 @@
           :isPositive="false"
         />
       </main>
+      <br>
+      <br>
+      <br>
+      <br>
+      <EmployeeTable />
     </div>
   </div>
 </template>
 
 <script>
 import AttendanceCard from "@/components/AttendanceCard.vue";
+import EmployeeTable from "@/components/EmployeeTable.vue";
 
 export default {
   name: "HomeView",
-  components: { AttendanceCard },
+  components: {
+    AttendanceCard,
+    EmployeeTable
+  },
+
 };
 </script>
 
