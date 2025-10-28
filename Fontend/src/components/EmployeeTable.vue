@@ -1,5 +1,4 @@
-
-	components: {
+components: {
 		HistoryView,
 	},<template>
   <div>
@@ -733,6 +732,7 @@ export default {
         department: '',
         status: 'on-site'
       },
+      // keep a local fallback list for offline / initial UX (can be empty)
       employees: [
         {
           id: 1,
@@ -831,20 +831,35 @@ export default {
           lunchclockin: '01:00 PM',
           lunchclockout: '02:00 PM',
           totalHours: 8,
-        },  
+        },
       ]
     }
   },
+  mounted() {
+    // fetch employee_info from Vuex store when component mounts
+    if (this.$store && this.$store.dispatch) {
+      this.$store.dispatch('fetch_employee_info').catch(err => {
+        console.warn('Failed to fetch employee_info from store:', err)
+      })
+    }
+  },
   computed: {
+    // use the store's employee_info if available, otherwise fall back to local `employees`
+    sourceEmployees() {
+      const storeList = this.$store && this.$store.state && Array.isArray(this.$store.state.employee_info)
+        ? this.$store.state.employee_info
+        : []
+      return storeList.length ? storeList : this.employees
+    },
     filteredList() {
-      return this.employees.filter(item => {
-        const matchesText = item.name?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                           item.employeeId?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                           item.roles?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                           item.department?.toLowerCase().includes(this.searchQuery.toLowerCase());
-      
-        return matchesText;
-      });
+      const q = (this.searchQuery || '').toLowerCase()
+      return this.sourceEmployees.filter(item => {
+        const matchesText = item.name?.toLowerCase().includes(q) ||
+                           (item.employeeId || '').toLowerCase().includes(q) ||
+                           (item.roles || '').toLowerCase().includes(q) ||
+                           (item.department || '').toLowerCase().includes(q)
+        return matchesText
+      })
     }
   },
   methods: {
@@ -894,7 +909,7 @@ export default {
       const modal = new bootstrap.Modal(document.getElementById('addEmployeeModal'));
       modal.show();
     },
-    addNewEmployee() {
+    async addNewEmployee() {
       const requiredFields = [
         'employeeId', 'classificationId', 'firstName', 'lastName', 
         'contactNo', 'email', 'address', 'idNumber', 'dateHired',
@@ -908,18 +923,20 @@ export default {
         }
       }
 
-      if (this.employees.some(emp => emp.employeeId === this.newEmployee.employeeId)) {
+      // validate against store-backed list
+      const existing = this.sourceEmployees || [];
+      if (existing.some(emp => emp.employeeId === this.newEmployee.employeeId)) {
         alert('Employee ID already exists. Please use a unique ID.');
         return;
       }
 
-      if (this.employees.some(emp => emp.username === this.newEmployee.username)) {
+      if (existing.some(emp => emp.username === this.newEmployee.username)) {
         alert('Username already exists. Please choose a different username.');
         return;
       }
 
-      const newEmployee = {
-        id: Math.max(...this.employees.map(emp => emp.id)) + 1,
+      // send payload to store action (server should assign id)
+      const payload = {
         name: `${this.newEmployee.firstName} ${this.newEmployee.lastName}`,
         employeeId: this.newEmployee.employeeId,
         classificationId: this.newEmployee.classificationId,
@@ -940,11 +957,18 @@ export default {
         status: this.newEmployee.status
       };
 
-      this.employees.push(newEmployee);
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal'));
-      modal.hide();
-      console.log(`Employee ${newEmployee.name} added successfully.`);
+      try {
+        await this.$store.dispatch('add_employee', payload);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal'));
+        modal.hide();
+        this.newEmployee = {}; // reset
+        console.log(`Employee ${payload.name} added successfully.`)
+      } catch (err) {
+        console.error('Failed to add employee:', err)
+        alert('Failed to add employee. See console for details.')
+      }
     },
+
     openEditModal(employee) {
       this.selectedEmployee = JSON.parse(JSON.stringify(employee));
       
@@ -980,25 +1004,8 @@ export default {
       const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
       modal.show();
     },
-    openViewTimesModal(employee) {
-      this.selectedEmployee = employee;
-      const modal = new bootstrap.Modal(document.getElementById('viewTimesModal'));
-      modal.show();
-    },
-    openDeleteModal(employee) {
-      this.selectedEmployee = employee;
-      const modal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
-      modal.show();
-    },
-    confirmDelete() {
-      if (this.selectedEmployee) {
-        this.employees = this.employees.filter(emp => emp.id !== this.selectedEmployee.id);
-        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
-        modal.hide();
-        console.log(`Employee ${this.selectedEmployee.name} has been deleted.`);
-      }
-    },
-    saveEmployeeChanges() {
+
+    async saveEmployeeChanges() {
       const requiredFields = [
         'employeeId', 'classificationId', 'firstName', 'lastName', 
         'contactNo', 'email', 'address', 'idNumber', 'dateHired',
@@ -1012,7 +1019,8 @@ export default {
         }
       }
 
-      if (this.employees.some(emp => 
+      const existing = this.sourceEmployees || [];
+      if (existing.some(emp => 
         emp.id !== this.selectedEmployee.id && 
         emp.employeeId === this.selectedEmployee.employeeId
       )) {
@@ -1020,7 +1028,7 @@ export default {
         return;
       }
 
-      if (this.employees.some(emp => 
+      if (existing.some(emp => 
         emp.id !== this.selectedEmployee.id && 
         emp.username === this.selectedEmployee.username
       )) {
@@ -1028,22 +1036,40 @@ export default {
         return;
       }
 
-      const index = this.employees.findIndex(emp => emp.id === this.selectedEmployee.id);
-      if (index !== -1) {
-        this.selectedEmployee.name = `${this.selectedEmployee.firstName} ${this.selectedEmployee.lastName}`;
-        
-        if (!this.selectedEmployee.password) {
-          const originalEmployee = this.employees.find(emp => emp.id === this.selectedEmployee.id);
-          this.selectedEmployee.password = originalEmployee.password;
-        }
-        
-        this.employees[index] = { ...this.selectedEmployee };
+      // If password is empty, do not send password field so backend can keep it
+      const payload = { ...this.selectedEmployee };
+      if (!payload.password) {
+        delete payload.password;
       }
+      // ensure name is synced
+      payload.name = `${payload.firstName} ${payload.lastName}`;
 
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal'));
-      modal.hide();
-      console.log(`Employee ${this.selectedEmployee.name} updated successfully.`);
+      try {
+        await this.$store.dispatch('edit_employee', payload);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal'));
+        modal.hide();
+        console.log(`Employee ${payload.name} updated successfully.`);
+      } catch (err) {
+        console.error('Failed to update employee:', err)
+        alert('Failed to update employee. See console for details.')
+      }
     },
+
+    async confirmDelete() {
+      if (this.selectedEmployee) {
+        try {
+          await this.$store.dispatch('delete_employee', this.selectedEmployee.id);
+          const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
+          modal.hide();
+          console.log(`Employee ${this.selectedEmployee.name} has been deleted.`);
+        } catch (err) {
+          console.error('Failed to delete employee:', err)
+          alert('Failed to delete employee. See console for details.')
+        }
+      }
+    },
+
+    // ...existing code...
   },
 }
 </script>

@@ -26,7 +26,13 @@ export default createStore({
     },
 
     async edit_employee({ dispatch }, payload){
-      await axios.patch(`${API_URL}employees`, payload)
+      // expect payload to include id
+      await axios.patch(`${API_URL}employees/${payload.id}`, payload)
+      dispatch("fetch_employee_info")
+    },
+
+    async delete_employee({ dispatch }, id) {
+      await axios.delete(`${API_URL}employees/${id}`)
       dispatch("fetch_employee_info")
     },
   },
