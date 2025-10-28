@@ -1,6 +1,4 @@
-components: {
-		HistoryView,
-	},<template>
+<template>
   <div>
 
     <div class="search-add-container mb-4">
@@ -706,6 +704,9 @@ components: {
 import HistoryView from '@/views/HistoryView.vue'
 
 export default {
+  components: {
+    HistoryView,
+  },
   data() {
     return {
       searchQuery: '',
@@ -1003,6 +1004,36 @@ export default {
       this.showEditPassword = false;
       const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
       modal.show();
+    },
+
+    // Open View Times modal for given employee
+    openViewTimesModal(employee) {
+      this.selectedEmployee = employee || this.selectedEmployee;
+      const el = document.getElementById('viewTimesModal');
+      if (el && typeof window !== 'undefined' && window.bootstrap) {
+        const modal = new window.bootstrap.Modal(el);
+        modal.show();
+      } else if (el && typeof bootstrap !== 'undefined') {
+        const modal = new bootstrap.Modal(el);
+        modal.show();
+      } else {
+        console.warn('Bootstrap modal instance or element not available for #viewTimesModal');
+      }
+    },
+
+    // Open Delete Confirmation modal and set selected employee
+    openDeleteModal(employee) {
+      this.selectedEmployee = employee || this.selectedEmployee;
+      const el = document.getElementById('deleteConfirmationModal');
+      if (el && typeof window !== 'undefined' && window.bootstrap) {
+        const modal = new window.bootstrap.Modal(el);
+        modal.show();
+      } else if (el && typeof bootstrap !== 'undefined') {
+        const modal = new bootstrap.Modal(el);
+        modal.show();
+      } else {
+        console.warn('Bootstrap modal instance or element not available for #deleteConfirmationModal');
+      }
     },
 
     async saveEmployeeChanges() {
