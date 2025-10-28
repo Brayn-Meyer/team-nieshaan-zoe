@@ -31,6 +31,32 @@ export const getTotalCheckedOutDataCon = async (req, res) => {
     }
 }
 
+export const getAllKpiDataCon = async (req, res) => {
+    try {
+        const totalEmployees = await getTotalEmployeesData();
+        const checkedIn = await getTotalCheckedInData();
+        const checkedOut = await getTotalCheckedOutData();
+        const absent = await getTotalAbsentData();
+
+        const kpiData = {
+            total: totalEmployees[0]?.total || 0,
+            checkedIn: checkedIn[0]?.checkedIn || 0,
+            checkedOut: checkedOut[0]?.checkedOut || 0,
+            absent: absent[0]?.absent || 0
+        };
+
+        const io = req.app.get('io');
+        if (io) {
+            io.emit('kpiUpdate', kpiData);
+        }
+
+        res.json(kpiData);
+    } catch (error) {
+        console.error("Error fetching KPI data:", error);
+        res.status(500).json({ error: "Failed to fetch KPI data" });
+    }
+};
+
 export const getTotalAbsentDataCon = async (req, res) => {
     try {
         const absent = await getTotalAbsentData();
@@ -46,8 +72,8 @@ export const getTotalAbsentDataCon = async (req, res) => {
 export const emitKPIUpdates = async (io) => {
     try {
         const [total_employees, checked_in, checked_out, absent] = await Promise.all([
-            getTotalEmployeesData(),
-            getTotalCheckedInData(),
+            getTotalEmployeesData().total,
+            getTotalCheckedInData().checked,
             getTotalCheckedOutData(),
             getTotalAbsentData()
         ]);
@@ -61,4 +87,4 @@ export const emitKPIUpdates = async (io) => {
     } catch (error) {
         console.log('Error emitting KPI updates:', error);
     }
-}  
+}

@@ -1,10 +1,16 @@
 import express from 'express'
 import cors from 'cors'
 
-import { getTotalEmployeesData, getTotalCheckedInData, getTotalCheckedOutDataCon, getTotalAbsentDataCon } from '../controllers/admin_cards_con'
+import { getTotalEmployeesDataCon, getTotalCheckedInDataCon, getTotalCheckedOutDataCon, getTotalAbsentDataCon, getAllKpiDataCon } from '../controllers/admin_cards_con.js'
 import { config } from 'dotenv'
 
-app.get("/totalEmployees", getTotalEmployeesData)
-app.get("/checkedIn", getTotalCheckedInData)
-app.get("/checkedOut", getTotalCheckedOutDataCon)
-app.get("/absent", getTotalAbsentDataCon)
+const router = express.Router()
+
+
+router.get("/totalEmployees", getTotalEmployeesDataCon)
+router.get("/checkedIn", getTotalCheckedInDataCon)
+router.get("/checkedOut", getTotalCheckedOutDataCon)
+router.get("/absent", getTotalAbsentDataCon)
+router.get("/allKpiData", getAllKpiDataCon)
+
+export default router

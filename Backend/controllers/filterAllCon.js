@@ -1,4 +1,4 @@
-import { getfilterAll } from "../routes/filterAllRoutes.js";
+import { getfilterAll } from "../middleware/clock_in_out_mid.js";
 
 const getfilterAllCon = async (req, res) => {
   try {

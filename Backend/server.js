@@ -4,12 +4,13 @@ import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
-import { getClockInOutDataCon } from './controllers/clock_in_out_con.js';
-import { getTotalCheckedOutDataCon, getTotalAbsentDataCon, getTotalEmployeesDataCon, getTotalCheckedInDataCon } from './controllers/admin_cards_con.js';
-import { addEmployeeCon, deleteEmployeeCon } from './controllers/employeesCon.js';
-import { EditEmpCon } from './controllers/EditEmployeeCon.js';
-import { getfilterAllCon } from './controllers/filterAllCon.js';
-import { getfilterCon } from './controllers/filterCon.js';
+// Import all routes instead
+import admin_cards_routes from './routes/admin_cards_routes.js';
+import clock_in_out_routes from './routes/clock_in_out_routes.js';
+import employeesRoutes from './routes/employeesRoutes.js';
+// import filterRoutes from './routes/filterRoutes.js';
+import filterAllRoutes from './routes/filterAllRoutes.js';
+import EditEmployeeRoutes from './routes/EditEmployee.js';
 
 config();
 
@@ -25,27 +26,18 @@ const io = new Server(httpServer, {
 app.use(cors());
 app.use(express.json());
 
+// Make io available to all routes
 app.set('io', io);
 
-app.get('/filter', getfilterCon);
-app.get('/filterAll', getfilterAllCon);
-
-
-
-app.get("/totalEmployees", getTotalEmployeesDataCon)
-app.get("/checkedIn", getTotalCheckedInDataCon)
-app.get("/checkedOut", getTotalCheckedOutDataCon)
-app.get("/absent", getTotalAbsentDataCon)
-
-
-app.get("/clockInOut", getClockInOutDataCon)
-
-app.post('/addEmployee', addEmployeeCon);
-app.delete('/removeEmployee/:id', deleteEmployeeCon);
-app.put('/editEmployee/:employee_id', EditEmpCon);
+// Use routes instead of direct controller calls
+app.use('/api/admin/cards', admin_cards_routes);
+app.use('/api/clock-in-out', clock_in_out_routes);
+app.use('/api/employees', employeesRoutes);
+// app.use('/api/filter', filterRoutes);
+app.use('/api/filter-all', filterAllRoutes);
+app.use('/api/edit-employee', EditEmployeeRoutes);
 
 io.on('connection', (socket) => {
-
   console.log('User connected:', socket.id);
 
   socket.on('disconnect', () => {
