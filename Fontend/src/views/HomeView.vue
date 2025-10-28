@@ -1,4 +1,5 @@
 <template>
+  <NavComp/>
   <!-- DASHBOARD CONTAINER -->
   <div>
     <div class="dashboard-container">
@@ -55,12 +56,14 @@
 <script>
 import AttendanceCard from "@/components/AttendanceCard.vue";
 import EmployeeTable from "@/components/EmployeeTable.vue";
+import NavComp from "@/components/NavComp.vue";
 
 export default {
   name: "HomeView",
   components: {
     AttendanceCard,
-    EmployeeTable
+    EmployeeTable,
+    NavComp
   },
 
 };

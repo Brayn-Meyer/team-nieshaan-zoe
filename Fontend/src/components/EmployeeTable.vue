@@ -1,12 +1,14 @@
-<template>
+
+	components: {
+		HistoryView,
+	},<template>
   <div>
-    <!-- Updated search bar and buttons layout -->
+
     <div class="search-add-container mb-4">
       <div class="row g-3 align-items-center">
-        <!-- History and Map buttons on the left -->
         <div class="col-auto">
           <div class="d-flex gap-2">
-            <button class="btn btn-primary small-btn" @click="openHistoryModal">
+            <button class="btn btn-primary small-btn" @click="HistoryView">
               <i class="fa-solid fa-clock-rotate-left"></i>
               History
             </button>
@@ -17,7 +19,6 @@
           </div>
         </div>
         
-        <!-- Search bar in the middle -->
         <div class="col">
           <div class="search-container">
             <input 
@@ -29,7 +30,6 @@
           </div>
         </div>
         
-        <!-- Add Employee button on the right -->
         <div class="col-auto">
           <button class="btn btn-primary small-btn" @click="openAddEmployeeModal">
             <i class="fa-solid fa-plus me-1"></i>
@@ -39,7 +39,6 @@
       </div>
     </div>
     
-    <!-- Mobile Card View -->
     <div class="d-md-none mobile-employees-container">
       <div class="employee-card" v-for="employee in filteredList" :key="employee.id">
         <div class="card-header">
@@ -85,8 +84,6 @@
         No employees found
       </div>
     </div>
-
-    <!-- Desktop Table View -->
     <div class="d-none d-md-block">
       <div class="table-responsive">
         <table class="table table-striped employee-table">
@@ -707,6 +704,8 @@
 </template>
 
 <script>
+import HistoryView from '@/views/HistoryView.vue'
+
 export default {
   data() {
     return {
@@ -849,6 +848,12 @@ export default {
     }
   },
   methods: {
+     HistoryView() {
+      if (this.$router) {
+        this.$router.push('/history');
+      }
+    },
+    
     openHistoryModal() {
       console.log('History modal would open here');
     },
