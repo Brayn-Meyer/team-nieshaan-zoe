@@ -6,41 +6,37 @@
         <AttendanceCard
           title="Total Employees"
           icon="fa-solid fa-users"
-          :value="120"
+          :value=attendanceData.total
           description="Total registered employees"
           change="+5%"
           type="total"
-          :isPositive="true"
         />
 
         <AttendanceCard
           title="Clock In"
           icon="fa-solid fa-door-open"
-          :value="95"
+          :value=attendanceData.checkedIn
           description="Currently clocked in"
           change="+3%"
           type="checked-in"
-          :isPositive="true"
         />
 
         <AttendanceCard
           title="Clock Out"
           icon="fa-solid fa-door-closed"
-          :value="20"
+          :value=attendanceData.checkedOut
           description="Clocked out today"
           change="-1%"
           type="checked-out"
-          :isPositive="false"
         />
 
         <AttendanceCard
           title="Absent"
           icon="fa-solid fa-user-xmark"
-          :value="5"
+          :value=attendanceData.absent
           description="Not present today"
           change="0%"
           type="absent"
-          :isPositive="false"
         />
       </main>
     </div>
@@ -49,10 +45,46 @@
 
 <script>
 import AttendanceCard from "@/components/AttendanceCard.vue";
+import socket from "@/sockets/socket.js";
+import axios from 'axios';
+import API_URL from "@/API.js";
 
 export default {
   name: "HomeView",
   components: { AttendanceCard },
+
+  data() {
+    return {
+      attendanceData: {
+        total: 0,
+        checkedIn: 0,
+        checkedOut: 0,
+        absent: 0
+      }
+    }
+  },
+
+  async mounted() {
+
+    await this.fetchAttendanceData();
+
+    socket.on("kpiUpdate", (data) => {
+      this.attendanceData = data;
+    });
+  },
+  beforeUnmount(){
+    socket.off("kpiUpdate");
+  },
+  methods:{
+    async fetchAttendanceData() {
+      try {
+        const response = await axios.get(`${API_URL}/api/admin/cards/allKpiData`);
+        this.attendanceData = response.data;
+      } catch (error) {
+        console.error("Error fetching attendance data:", error);
+      }
+    }
+  }
 };
 </script>
 
