@@ -139,28 +139,6 @@
                 </div>
                 
                 <div class="col-md-6">
-                  <label for="employeeId" class="form-label">Employee ID <span class="text-danger">*</span></label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    id="employeeId" 
-                    v-model="newEmployee.employeeId"
-                    required
-                  >
-                </div>
-                
-                <div class="col-md-6">
-                  <label for="classificationId" class="form-label">Classification ID <span class="text-danger">*</span></label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    id="classificationId" 
-                    v-model="newEmployee.classificationId"
-                    required
-                  >
-                </div>
-
-                <div class="col-md-6">
                   <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
                   <input 
                     type="text" 
@@ -178,6 +156,17 @@
                     class="form-control" 
                     id="lastName" 
                     v-model="newEmployee.lastName"
+                    required
+                  >
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="classificationId" class="form-label">Classification ID <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="classificationId" 
+                    v-model="newEmployee.classificationId"
                     required
                   >
                 </div>
@@ -201,7 +190,18 @@
                     id="email" 
                     v-model="newEmployee.email"
                     required
-                                      >
+                  >
+                </div>
+
+                <div class="col-md-6">
+                  <label for="idNumber" class="form-label">ID Number <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="idNumber" 
+                    v-model="newEmployee.idNumber"
+                    required
+                  >
                 </div>
 
                 <div class="col-12">
@@ -214,17 +214,6 @@
                     placeholder="Enter full address"
                     rows="3"
                   ></textarea>
-                </div>
-
-                <div class="col-md-6">
-                  <label for="idNumber" class="form-label">ID Number <span class="text-danger">*</span></label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    id="idNumber" 
-                    v-model="newEmployee.idNumber"
-                    required
-                  >
                 </div>
 
                 <!-- Employment Information -->
@@ -715,7 +704,6 @@ export default {
       showPassword: false,
       showEditPassword: false,
       newEmployee: {
-        employeeId: '',
         classificationId: '',
         firstName: '',
         lastName: '',
@@ -790,7 +778,6 @@ export default {
     },
     openAddEmployeeModal() {
       this.newEmployee = {
-        employeeId: '',
         classificationId: '',
         firstName: '',
         lastName: '',
@@ -814,7 +801,7 @@ export default {
     },
     async addNewEmployee() {
       const requiredFields = [
-        'employeeId', 'classificationId', 'firstName', 'lastName', 
+        'classificationId', 'firstName', 'lastName', 
         'contactNo', 'email', 'address', 'idNumber', 'dateHired',
         'leaveBalance', 'username', 'password', 'roles', 'department'
       ];
@@ -828,20 +815,14 @@ export default {
 
       // validate against store-backed list
       const existing = this.sourceEmployees || [];
-      if (existing.some(emp => emp.employeeId === this.newEmployee.employeeId)) {
-        alert('Employee ID already exists. Please use a unique ID.');
-        return;
-      }
-
       if (existing.some(emp => emp.username === this.newEmployee.username)) {
         alert('Username already exists. Please choose a different username.');
         return;
       }
 
-      // send payload to store action (server should assign id)
+      // send payload to store action (server should assign employee_id)
       const payload = {
         name: `${this.newEmployee.firstName} ${this.newEmployee.lastName}`,
-        employee_id: this.newEmployee.employeeId,
         classification_id: this.newEmployee.classificationId,
         first_name: this.newEmployee.firstName,
         last_name: this.newEmployee.lastName,
@@ -940,7 +921,7 @@ export default {
 
     async saveEmployeeChanges() {
       const requiredFields = [
-        'employeeId', 'classificationId', 'firstName', 'lastName', 
+        'classificationId', 'firstName', 'lastName', 
         'contactNo', 'email', 'address', 'idNumber', 'dateHired',
         'leaveBalance', 'username', 'roles', 'department'
       ];

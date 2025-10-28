@@ -71,19 +71,19 @@ export const getTotalAbsentDataCon = async (req, res) => {
 
 export const emitKPIUpdates = async (io) => {
     try {
-        const [total_employees, checked_in, checked_out, absent] = await Promise.all([
-            getTotalEmployeesData().total,
-            getTotalCheckedInData().checked,
-            getTotalCheckedOutData(),
-            getTotalAbsentData()
-        ]);
+        const totalEmployees = await getTotalEmployeesData();
+        const checkedIn = await getTotalCheckedInData();
+        const checkedOut = await getTotalCheckedOutData();
+        const absent = await getTotalAbsentData();
 
-        io.emit('kpiUpdate', {
-            total_employees,
-            checked_in,
-            checked_out,
-            absent
-        });
+        const kpiData = {
+            total: totalEmployees[0]?.total || 0,
+            checkedIn: checkedIn[0]?.checkedIn || 0,
+            checkedOut: checkedOut[0]?.checkedOut || 0,
+            absent: absent[0]?.absent || 0
+        };
+
+        io.emit('kpiUpdate', kpiData);
     } catch (error) {
         console.log('Error emitting KPI updates:', error);
     }

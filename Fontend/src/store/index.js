@@ -31,8 +31,10 @@ export default createStore({
   actions: {
     async fetch_employee_info({ commit }) {
       let data = await axios.get(`${API_URL}/api/clock-in-out/clockInOut`)
-      commit('get_employee_info', data.data.employees)
-      console.log(data.data.employees)
+      // Use the new formatted employees data if available, otherwise fall back to old structure
+      const employees = data.data.employees || data.data.clock_in_out_data || []
+      commit('get_employee_info', employees)
+      console.log('Fetched employees:', employees)
     },
 
     async add_employee({ dispatch }, payload) {
