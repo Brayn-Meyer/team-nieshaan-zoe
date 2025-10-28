@@ -2,7 +2,7 @@ import { pool } from '../config/db.js'
 
 export const getTotalEmployeesData = async () => {
   try {
-    let [row] = await pool.query("SELECT COUNT(employee_id) AS 'Total Employees' FROM employees;")
+    let [row] = await pool.query("SELECT COUNT(employee_id) AS 'total' FROM employees;")
     return row
   } catch (error) {
     throw new Error('Database error: ' + error.message);
@@ -11,7 +11,7 @@ export const getTotalEmployeesData = async () => {
 
 export const getTotalCheckedInData = async () => {
   try {
-    let [row] = await pool.query("SELECT COUNT(clockin_time) AS 'Total Employees Clocked In' FROM record_backups WHERE clockin_time IS NOT NULL;")
+    let [row] = await pool.query("SELECT COUNT(clockin_time) AS 'checkedIn' FROM record_backups WHERE clockin_time IS NOT NULL;")
     return row
   } catch (error) {
     throw new Error('Database error: ' + error.message);
@@ -20,7 +20,7 @@ export const getTotalCheckedInData = async () => {
 
 export const getTotalCheckedOutData = async () => {
   try {
-    let [row] = await pool.query("SELECT COUNT(clockout_time) AS 'Total Employees Clocked Out' FROM record_backups WHERE clockout_time IS NOT NULL;")
+    let [row] = await pool.query("SELECT COUNT(clockout_time) AS 'checkedOut' FROM record_backups WHERE clockout_time IS NOT NULL;")
     return row
   } catch (error) {
     throw new Error('Database error: ' + error.message);
@@ -29,9 +29,11 @@ export const getTotalCheckedOutData = async () => {
 
 export const getTotalAbsentData = async () => {
   try {
-    let [row] = await pool.query("SELECT COUNT(employment_status) AS 'Absent Employees' FROM employees WHERE employment_status NOT IN ('Active', 'Terminated') ;")
+    let [row] = await pool.query("SELECT COUNT(employment_status) AS 'absent' FROM employees WHERE employment_status NOT IN ('Active', 'Terminated') ;")
     return row
   } catch (error) {
     throw new Error('Database error: ' + error.message);
   }
 }
+
+

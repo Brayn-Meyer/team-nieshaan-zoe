@@ -1,4 +1,5 @@
 import { UpdateEmp } from "../middleware/Employee_mid.js";
+import { emitKPIUpdates } from "./admin_cards_con.js";
 
 const validateContactNo = (contactNo) => {
   const re = /^\+?[\d\s-]{10,}$/;
@@ -69,6 +70,11 @@ export const EditEmpCon = async (req, res) => {
       employee: employeeData,
       updateInfo: result
     });
+
+    // Emit updated KPI data after successful update
+    const io = req.app.get('io');
+    emitKPIUpdates(io);
+
   } catch (error) {
     console.error('Update error:', error);
     

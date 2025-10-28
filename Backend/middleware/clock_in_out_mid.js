@@ -8,3 +8,8 @@ export const getClockInOutData = async () => {
     throw new Error('Database error: ' + err.message);
   }
 }
+
+export const getfilterAll = async() => {
+    let [row] = await pool.query('SELECT * FROM record_backups');
+    return row;
+}

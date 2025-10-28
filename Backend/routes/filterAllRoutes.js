@@ -1,8 +1,7 @@
-import {pool} from '../config/db.js'
+import { getfilterAllCon } from "../controllers/filterAllCon.js";
+import express from 'express';
+ 
+const router = express.Router();
+router.get("/filterAll", getfilterAllCon);
 
-const getfilterAll = async() => {
-    let [row] = await pool.query('SELECT * FROM record_backups');
-    return row;
-}
-
-export {getfilterAll};
+export default router;

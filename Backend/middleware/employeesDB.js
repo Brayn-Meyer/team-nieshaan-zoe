@@ -2,8 +2,6 @@ import {pool} from '../config/db.js';
 
 // sql to add new employee
 
-
-
 export const addEmployee = async (employee) => {
     try {
         const sql = `

@@ -1,27 +1,16 @@
-// import mysql from 'mysql2/promise';
-// import {config} from 'dotenv';
-
-// config();
 
 
-// export const pool = mysql.createPool({
-//     host:process.env.host ,
-//     database:process.env.database,
-//     user:process.env.user ,
-//     password:process.env.password,
+import mysql from 'mysql2/promise';
+import { config } from 'dotenv';
 
-// }) ;
-
-import mysql from "mysql2/promise"
-import {config} from 'dotenv'
-
-config()
+config(); // load .env
 
 export const pool = mysql.createPool({
-    database: process.env.DATABASE,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
-    host: process.env.HOST
-})
-
-export default pool;    
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});

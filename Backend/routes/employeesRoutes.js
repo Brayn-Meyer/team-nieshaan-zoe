@@ -11,5 +11,4 @@ router.delete('/:id', deleteEmployeeCon);
 
 // You can add more routes later
 
-
 export default router;

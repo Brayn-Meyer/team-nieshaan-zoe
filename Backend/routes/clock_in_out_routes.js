@@ -1,6 +1,10 @@
 import express from 'express'
 import cors from 'cors'
 
-import { getClockInOutDataCon } from '../controllers/clock_in_out_con'
+import { getClockInOutDataCon } from '../controllers/clock_in_out_con.js'
 
-app.get("/clockInOut", getClockInOutDataCon)
+const router = express.Router()
+
+router.get("/clockInOut", getClockInOutDataCon)
+
+export default router
