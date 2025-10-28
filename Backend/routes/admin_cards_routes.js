@@ -1,8 +1,6 @@
 import express from 'express'
-import cors from 'cors'
 
 import { getTotalEmployeesDataCon, getTotalCheckedInDataCon, getTotalCheckedOutDataCon, getTotalAbsentDataCon, getAllKpiDataCon } from '../controllers/admin_cards_con.js'
-import { config } from 'dotenv'
 
 const router = express.Router()
 

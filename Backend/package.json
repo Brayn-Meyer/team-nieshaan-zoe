@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Backend for digital attendance tracking system",
   "main": "server.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
@@ -16,6 +16,5 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.15.3",
     "socket.io": "^4.8.1"
-  },
-  "type": "module"
+  }
 }
