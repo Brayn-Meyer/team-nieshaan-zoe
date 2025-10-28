@@ -5,6 +5,6 @@ export const getClockInOutData = async () => {
     let [row] = await pool.query("SELECT * FROM tracker_db.employees;")
     return row
   } catch (error) {
-    throw new Error('Database error: ' + err.message);
+    throw new Error('Database error: ' + error.message);
   }
 }
