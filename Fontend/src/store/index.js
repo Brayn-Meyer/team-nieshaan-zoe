@@ -52,12 +52,25 @@ export default createStore({
       console.log("Added Employee", payload)
     },
     async apply_history_filter({ commit }, payload) {
-      let data = await axios.post(`${API_URL}/api/employees/search`, payload)
-      const history = data.data || []
-      commit('get_history_info', history)
-      console.log("Applied History Filter", payload)
-    },
+     try {
+       // normalize payload so empty values don't break backend
+        const body = {
+          date: payload?.date || '',
+          name: payload?.name || '',
+          status: payload?.status || '',
+          employeeId: payload?.employeeId || ''
+        }
 
+        const res = await axios.post(`${API_URL}/api/employees/search`, body)
+        const history = res.data.history || res.data || []
+        commit('get_history_info', history)
+        console.log('Applied history filter', body, '->', history.length, 'records')
+        return history
+      } catch (err) {
+        console.error('apply_history_filter failed:', err.response ? err.response.data : err.message)
+        throw err
+      }
+  },
     async edit_employee({ dispatch }, payload){
       // expect payload to include id
       await axios.patch(`${API_URL}/api/edit-employee/employee/edit/${payload.id}`, payload)

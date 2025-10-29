@@ -49,21 +49,19 @@ export const searchEmployees = async (req, res) => {
 export const getEmployees = async (req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT 
-        e.employee_id,
-        CONCAT(e.first_name, ' ', e.last_name) AS full_name,
-        e.email,
-        e.contact_no,
-        e.employment_status,
-        e.date_hired,
-        ec.department,
-        ec.position,
-        ec.role,
-        ec.employment_type,
-        ec.employee_level
-      FROM employees e
-      JOIN emp_classification ec ON e.classification_id = ec.classification_id
-      ORDER BY e.employee_id;
+      SELECT
+        employees.employee_id,
+        employees.first_name,employees.last_name,employees.employment_status,
+        DATE(clockin_time) AS work_date,
+        MIN(CASE WHEN type = 'Work'  THEN clockin_time END) AS work_clockin,
+        MAX(CASE WHEN type = 'Work'  THEN clockout_time END) AS work_clockout,
+        MIN(CASE WHEN type = 'Tea'   THEN clockin_time END) AS tea_clockin,
+        MAX(CASE WHEN type = 'Tea'   THEN clockout_time END) AS tea_clockout,
+        MIN(CASE WHEN type = 'Lunch' THEN clockin_time END) AS lunch_clockin,
+        MAX(CASE WHEN type = 'Lunch' THEN clockout_time END) AS lunch_clockout
+      FROM record_backups INNER JOIN employees ON employees.employee_id = record_backups.employee_id
+      GROUP BY employee_id, DATE(clockin_time)
+      ORDER BY employee_id, work_date;
     `);
     res.status(200).json(rows);
   } catch (err) {

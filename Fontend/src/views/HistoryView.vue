@@ -17,7 +17,7 @@
       <div class="col-12">
         <HistoryFilters
           :filters="filters"
-          @update-filters="updateFilters"
+          @update-filters="onUpdateFilters"
         />
       </div>
     </div>
@@ -289,8 +289,13 @@ export default {
     }
   },
   methods: {
-    updateFilters(newFilters) {
-      this.filters = { ...newFilters };
+    async onUpdateFilters(filters) {
+      try {
+        await this.$store.dispatch('apply_history_filter', filters)
+        // optionally reset table page or other UI state here
+      } catch (err) {
+        console.error('Failed to apply history filters', err)
+      }
     },
     downloadSheet() {
       try {
@@ -342,6 +347,10 @@ export default {
       }
     },
   },
+  mounted() {
+    // load initial history
+    this.$store.dispatch('fetch_history_info').catch(()=>{})
+  }
 };
 </script>
 <style scoped>

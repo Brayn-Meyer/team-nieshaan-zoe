@@ -78,20 +78,20 @@
         </thead>
         <tbody>
           <tr v-for="record in paginatedRecords" :key="record.id">
-            <td>{{ record.firstName }} {{ record.lastName }}</td>
-            <td>{{ record.employeeId }}</td>
+            <td>{{ record.first_name }} {{ record.last_name }}</td>
+            <td>{{ record.employee_id }}</td>
             <td>
               <span class="status-badge" :class="record.status">
-                {{ record.status }}
+                {{ record.employment_status }}
               </span>
             </td>
-            <td>{{ record.date }}</td>
-            <td>{{ record.clockIn || '-' }}</td>
-            <td>{{ record.teaOut || '-' }}</td>
-            <td>{{ record.teaIn || '-' }}</td>
-            <td>{{ record.lunchOut || '-' }}</td>
-            <td>{{ record.lunchIn || '-' }}</td>
-            <td>{{ record.clockOut || '-' }}</td>
+            <td>{{ record.work_date }}</td>
+            <td>{{ record.work_clockin || '-' }}</td>
+            <td>{{ record.tea_clockin || '-' }}</td>
+            <td>{{ record.tea_clockout || '-' }}</td>
+            <td>{{ record.lunch_clockin || '-' }}</td>
+            <td>{{ record.lunch_clockout || '-' }}</td>
+            <td>{{ record.work_clockout || '-' }}</td>
           </tr>
           <tr v-if="recordsSource.length === 0">
             <td colspan="10" class="text-center text-muted">No records found</td>
@@ -124,7 +124,7 @@
       </ul>
     </nav>
     <div class="text-center text-muted small mt-2">
-      Showing {{ paginatedRecords.length }} of {{ records.length }} records
+      Showing {{ paginatedRecords.length }} of {{ recordsSource.length }} records
       <span class="d-none d-md-inline">({{ pageSize }} per page)</span>
       <span class="d-md-none">(5 per page)</span>
     </div>
@@ -217,7 +217,7 @@
       // Fetch store data safely
       if (this.$store && this.$store.dispatch) {
         try {
-          await this.$store.dispatch("get_history_info");
+          await this.$store.dispatch("fetch_history_info");
         } catch (err) {
           console.warn("Failed to fetch history_info from store:", err);
         }
