@@ -21,7 +21,8 @@
         />
       </div>
     </div>
-    <div class="row mb-3">
+    <!-- Added spacing class here -->
+    <div class="row mb-3 mt-4 mt-md-3 mt-sm-2">
       <div class="col-12 text-end">
         <button class="btn download btn-sm" @click="downloadSheet">
           <i class="bi bi-download me-1"></i>Download
@@ -351,5 +352,17 @@ export default {
 .download{
   color: white;
   background-color: #2EB28A !important;
+}
+
+@media (max-width: 768px) {
+  .row.mb-3.mt-4.mt-md-3.mt-sm-2 {
+    margin-top: 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .row.mb-3.mt-4.mt-md-3.mt-sm-2 {
+    margin-top: 0.75rem !important;
+  }
 }
 </style>
