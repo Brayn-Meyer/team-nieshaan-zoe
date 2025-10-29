@@ -1,7 +1,7 @@
 <template>
 <NavComp/>
 <br><br><br><br><br><br><br>
-<TimelogFilters/><br>
+<TimelogFilters/>
 <TimeLog/>
 </template>
 <script>
