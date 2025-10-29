@@ -19,7 +19,8 @@ function socketPlugin(store) {
 
 export default createStore({
   state: {
-    employee_info: []
+    employee_info: [],
+    history_info: []
   },
   getters: {
   },
@@ -27,6 +28,9 @@ export default createStore({
     get_employee_info(state, payload) {
       state.employee_info = payload;
     },
+    get_history_info(state, payload) {
+      state.history_info = payload;
+    }
   },
   actions: {
     async fetch_employee_info({ commit }) {
@@ -36,11 +40,22 @@ export default createStore({
       commit('get_employee_info', employees)
       console.log('Fetched employees:', employees)
     },
+    async fetch_history_info({ commit }) {
+      let data = await axios.get(`${API_URL}/api/employees/`)
+      const history = data.data.history || data.data || []
+      commit('get_history_info', history)
+    },
 
     async add_employee({ dispatch }, payload) {
       await axios.post(`${API_URL}/api/employees/addEmployee`, payload)
       dispatch("fetch_employee_info")
       console.log("Added Employee", payload)
+    },
+    async apply_history_filter({ commit }, payload) {
+      let data = await axios.post(`${API_URL}/api/employees/search`, payload)
+      const history = data.data || []
+      commit('get_history_info', history)
+      console.log("Applied History Filter", payload)
     },
 
     async edit_employee({ dispatch }, payload){
