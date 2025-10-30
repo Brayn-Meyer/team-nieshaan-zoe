@@ -1,7 +1,7 @@
 <template>
-    <NavComp @theme-changed="handleThemeChange"/>
+    <NavComp/>
     <br><br><br><br><br>
-  <div class="container-fluid py-3" :class="{ 'dark-mode': isDarkMode }">
+  <div class="container-fluid py-3">
     <div class="row">
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -18,7 +18,6 @@
         <HistoryFilters
           :filters="filters"
           @update-filters="onUpdateFilters"
-          :isDarkMode="isDarkMode"
         />
       </div>
     </div>
@@ -32,24 +31,21 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <HistoryTable :records="filteredHistory" :isDarkMode="isDarkMode"/>
+        <HistoryTable :records="filteredHistory" />
       </div>
     </div>
   </div>
 </template>
-
 <script>
 import HistoryFilters from "@/components/HistoryFilters.vue";
 import HistoryTable from "@/components/HistoryTable.vue";
 import NavComp from "@/components/NavComp.vue";
-
 export default {
   name: "HistoryView",
   components: { HistoryFilters, HistoryTable, NavComp },
   data() {
     return {
       filters: { date: "", name: "", status: "", employeeId: "" },
-      isDarkMode: false,
       history: [
         {
           id: 1,
@@ -293,9 +289,6 @@ export default {
     }
   },
   methods: {
-    handleThemeChange(isDarkMode) {
-      this.isDarkMode = isDarkMode;
-    },
     async onUpdateFilters(filters) {
       try {
         await this.$store.dispatch('apply_history_filter', filters)
@@ -357,92 +350,17 @@ export default {
   mounted() {
     // load initial history
     this.$store.dispatch('fetch_history_info').catch(()=>{})
-    
-    // Check for saved theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      this.isDarkMode = true;
-    }
   }
 };
 </script>
-
 <style scoped>
 .container-fluid {
   padding-left: 1rem;
   padding-right: 1rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  min-height: 100vh;
 }
-
-.container-fluid.dark-mode {
-  background-color: #121212;
-  color: #e0e0e0;
-}
-
 .download{
   color: white;
   background-color: #2EB28A !important;
-  transition: all 0.3s ease;
-}
-
-.container-fluid.dark-mode .download {
-  background-color: #249a77 !important;
-}
-
-.container-fluid.dark-mode .download:hover {
-  background-color: #1e7d5f !important;
-}
-
-/* Dark mode text colors */
-.container-fluid.dark-mode h2,
-.container-fluid.dark-mode p,
-.container-fluid.dark-mode .mb-1,
-.container-fluid.dark-mode .mb-0 {
-  color: #e0e0e0 !important;
-}
-
-/* Child component dark mode styles */
-:deep(.dark-mode .filter-container) {
-  background: #2d2d2d !important;
-  color: #e0e0e0 !important;
-  border-color: #404040 !important;
-}
-
-:deep(.dark-mode .filter-input) {
-  background: #363636 !important;
-  color: #e0e0e0 !important;
-  border-color: #404040 !important;
-}
-
-:deep(.dark-mode .filter-input::placeholder) {
-  color: #888 !important;
-}
-
-:deep(.dark-mode .history-table) {
-  background: #2d2d2d !important;
-  color: #e0e0e0 !important;
-}
-
-:deep(.dark-mode .table-header) {
-  background: #363636 !important;
-  color: #e0e0e0 !important;
-  border-color: #404040 !important;
-}
-
-:deep(.dark-mode .table-row) {
-  background: #2d2d2d !important;
-  color: #e0e0e0 !important;
-  border-color: #404040 !important;
-}
-
-:deep(.dark-mode .table-row:hover) {
-  background: #363636 !important;
-}
-
-:deep(.dark-mode .table-cell) {
-  color: #e0e0e0 !important;
-  border-color: #404040 !important;
 }
 
 @media (max-width: 768px) {
