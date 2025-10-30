@@ -14,22 +14,22 @@
       <div class="filter-buttons">
         <button
           class="filter-btn btn-red"
-          :class="{ active: activeFilter === 'owed' }"
-          @click="setFilter('owed')"
+          :class="{ active: activeFilter === 'red' }"
+          @click="setFilter('red')"
         >
           <span class="tooltip">Hours Owed</span>
         </button>
         <button
           class="filter-btn btn-green"
-          :class="{ active: activeFilter === 'worked' }"
-          @click="setFilter('worked')"
+          :class="{ active: activeFilter === 'green' }"
+          @click="setFilter('green')"
         >
           <span class="tooltip">Hours Worked</span>
         </button>
         <button
           class="filter-btn btn-yellow"
-          :class="{ active: activeFilter === 'overtime' }"
-          @click="setFilter('overtime')"
+          :class="{ active: activeFilter === 'yellow' }"
+          @click="setFilter('yellow')"
         >
           <span class="tooltip">Hours Overtime</span>
         </button>
@@ -37,6 +37,7 @@
     </div>
   </div>
 </template>
+
 <script>
 export default {
   name: 'TimelogFilters',
@@ -65,6 +66,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
 h1{
     text-align: center;
@@ -75,11 +77,11 @@ h1{
 .timelog-filters {
   margin-bottom: 20px;
   display: flex;
-  justify-content: center; /* Center the filter section */
+  justify-content: center; 
 }
 .filter-section {
   display: flex;
-  width: 50%; /* Set to 50% width */
+  width: 45%;
   gap: 20px;
   align-items: center;
   padding: 15px;
@@ -88,7 +90,7 @@ h1{
   border: 1px solid #E9ECEF;
 }
 .search-container {
-  flex: 1; /* Take available space */
+  flex: 1; 
   min-width: 0;
 }
 .search-input {
@@ -111,10 +113,10 @@ h1{
   flex-shrink: 0;
 }
 .filter-btn {
-  width: 40px;
-  height: 40px;
+  width: 32px; 
+  height: 32px; 
   border-radius: 50%;
-  border: none;
+  border: 2px solid transparent; 
   cursor: pointer;
   transition: all 0.3s;
   position: relative;
@@ -127,6 +129,7 @@ h1{
 .filter-btn.active {
   transform: translateY(0);
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+  border: 2px solid #000000;
 }
 .btn-red {
   background-color: #E74C3C;
@@ -167,7 +170,7 @@ h1{
   opacity: 1;
   visibility: visible;
 }
-/* Responsive design */
+
 @media (max-width: 768px) {
   .filter-section {
     width: 90%;

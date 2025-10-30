@@ -88,8 +88,8 @@
             <tr>
               <th scope="col">Name</th>
               <th scope="col">Employee ID</th>
-              <th scope="col">Roles</th>
               <th scope="col">Department</th>
+              <th scope="col">Roles</th>
               <th scope="col">Status</th>
               <th scope="col">Action</th>
             </tr>
@@ -98,8 +98,8 @@
             <tr v-for="employee in filteredList" :key="employee.id">
               <td>{{ employee.name }}</td>
               <td>{{ employee.employeeId }}</td>
+             <td>{{ employee.department }}</td>
               <td>{{ employee.roles }}</td>
-              <td>{{ employee.department }}</td>
               <td>{{ employee.status }}</td>
               <td>
                 <div class="dropdown">
@@ -1338,7 +1338,6 @@ th {
 .employee-table {
   margin: 0 auto;
   width: 95%;
-
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
