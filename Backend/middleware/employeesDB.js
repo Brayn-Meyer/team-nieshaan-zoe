@@ -77,7 +77,7 @@ export const addEmployee = async (employee) => {
             contactNo,
             employee.email,
             employee.address,
-            employee.id_number, // This maps to the 'id' field in DB (ID number like national ID)
+            employee.id, // This maps to the 'id' field in DB (ID number like national ID)
             isAdmin,
             employmentStatus,
             formattedDateHired,
