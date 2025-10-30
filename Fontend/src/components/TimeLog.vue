@@ -37,14 +37,12 @@
 </template>
 
 <script setup>
-const employees = computed(() =>
-  store.state.timelog_info || [
+const employees =  [
     { name: "Employee Names", id: "E123", status: "Active", hoursWorked: "45h", hoursOwed: "-", overtime: "-", indicator: "green" },
     { name: "Employee Names", id: "E124", status: "Active", hoursWorked: "42h", hoursOwed: "-", overtime: "3h", indicator: "yellow" },
     { name: "Employee Names", id: "E125", status: "Active", hoursWorked: "40h", hoursOwed: "5h", overtime: "-", indicator: "red" },
     { name: "Employee Names", id: "E126", status: "Active", hoursWorked: "45h", hoursOwed: "-", overtime: "-", indicator: "green" }
   ]
-);
 </script>
 
 <style scoped>
