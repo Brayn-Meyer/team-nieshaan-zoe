@@ -12,6 +12,11 @@ import employeesRoutes from './routes/employeesRoutes.js';
 import filterAllRoutes from './routes/filterAllRoutes.js';
 import EditEmployeeRoutes from './routes/EditEmployee.js';
 
+import employeeRoutes from './routes/employeeRoutes.js';
+import classificationRoutes from './routes/classificationRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import qrRoutes from './routes/qrRoutes.js';
+
 config();
 
 const app = express();
@@ -36,6 +41,11 @@ app.use('/api/employees', employeesRoutes);
 // app.use('/api/filter', filterRoutes);
 app.use('/api/filter-all', filterAllRoutes);
 app.use('/api/edit-employee', EditEmployeeRoutes);
+
+app.use('/api/employees', employeeRoutes);
+app.use('/api/classifications', classificationRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/qr-storage', qrRoutes);
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);

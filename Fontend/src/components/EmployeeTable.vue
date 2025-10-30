@@ -9,9 +9,9 @@
               <i class="fa-solid fa-clock-rotate-left"></i>
               History
             </button>
-            <button class="btn btn-primary small-btn" @click="openMapModal">
-              <i class="fa-solid fa-map-location-dot"></i>
-              Map
+            <button class="btn btn-primary small-btn" @click="TimelogView">
+<i class="fa-solid fa-calendar"></i>
+              Time log
             </button>
           </div>
         </div>
@@ -83,7 +83,7 @@
     </div>
     <div class="d-none d-md-block">
       <div class="table-responsive">
-        <table class="table table-striped employee-table">
+        <table class=" employee-table">
           <thead>
             <tr>
               <th scope="col">Name</th>
@@ -139,6 +139,28 @@
                 </div>
                 
                 <div class="col-md-6">
+                  <label for="employeeId" class="form-label">Employee ID <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="employeeId" 
+                    v-model="newEmployee.employeeId"
+                    required
+                  >
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="classificationId" class="form-label">Classification ID <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="classificationId" 
+                    v-model="newEmployee.classificationId"
+                    required
+                  >
+                </div>
+
+                <div class="col-md-6">
                   <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
                   <input 
                     type="text" 
@@ -156,17 +178,6 @@
                     class="form-control" 
                     id="lastName" 
                     v-model="newEmployee.lastName"
-                    required
-                  >
-                </div>
-                
-                <div class="col-md-6">
-                  <label for="classificationId" class="form-label">Classification ID <span class="text-danger">*</span></label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    id="classificationId" 
-                    v-model="newEmployee.classificationId"
                     required
                   >
                 </div>
@@ -190,18 +201,7 @@
                     id="email" 
                     v-model="newEmployee.email"
                     required
-                  >
-                </div>
-
-                <div class="col-md-6">
-                  <label for="idNumber" class="form-label">ID Number <span class="text-danger">*</span></label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    id="idNumber" 
-                    v-model="newEmployee.idNumber"
-                    required
-                  >
+                                      >
                 </div>
 
                 <div class="col-12">
@@ -214,6 +214,17 @@
                     placeholder="Enter full address"
                     rows="3"
                   ></textarea>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="idNumber" class="form-label">ID Number <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="idNumber" 
+                    v-model="newEmployee.idNumber"
+                    required
+                  >
                 </div>
 
                 <!-- Employment Information -->
@@ -691,10 +702,12 @@
 
 <script>
 import HistoryView from '@/views/HistoryView.vue'
+import TimelogView from '@/views/Timelog.View.vue';
 
 export default {
   components: {
     HistoryView,
+    TimelogView
   },
   data() {
     return {
@@ -704,6 +717,7 @@ export default {
       showPassword: false,
       showEditPassword: false,
       newEmployee: {
+        employeeId: '',
         classificationId: '',
         firstName: '',
         lastName: '',
@@ -722,8 +736,106 @@ export default {
         status: 'on-site'
       },
       // keep a local fallback list for offline / initial UX (can be empty)
-      employees: [],
-      employeeTimes: []
+      employees: [
+        {
+          id: 1,
+          name: 'John Doe',
+          employeeId: 'EMP001',
+          classificationId: 'CL001',
+          firstName: 'John',
+          lastName: 'Doe',
+          contactNo: '+1 (555) 123-4567',
+          email: 'john.doe@company.com',
+          address: '123 Main St, New York, NY',
+          idNumber: '123456789',
+          userType: 'Employee',
+          dateHired: '2023-01-15',
+          supervisorName: 'Sarah Wilson',
+          leaveBalance: 20,
+          username: 'johndoe',
+          password: 'password123',
+          roles: 'Developer',
+          department: 'Engineering',
+          status: 'On-site',
+        },
+        {
+          id: 2,
+          name: 'Jane Smith',
+          employeeId: 'EMP002',
+          classificationId: 'CL002',
+          firstName: 'Jane',
+          lastName: 'Smith',
+          contactNo: '+1 (555) 234-5678',
+          email: 'jane.smith@company.com',
+          address: '456 Oak Ave, Los Angeles, CA',
+          idNumber: '234567890',
+          userType: 'Employee',
+          dateHired: '2023-02-20',
+          supervisorName: 'Mike Johnson',
+          leaveBalance: 18,
+          username: 'janesmith',
+          password: 'password123',
+          roles: 'Designer',
+          department: 'Design',
+          status: 'remote',
+        },
+        {
+          id: 3,
+          name: 'Mike Jordan',
+          employeeId: 'EMP003',
+          classificationId: 'CL003',
+          firstName: 'Mike',
+          lastName: 'Jordan',
+          contactNo: '+1 (555) 345-6789',
+          email: 'mike.jordan@company.com',
+          address: '789 Pine Rd, Chicago, IL',
+          idNumber: '345678901',
+          userType: 'Admin',
+          dateHired: '2022-11-10',
+          supervisorName: '',
+          leaveBalance: 22,
+          username: 'mikejordan',
+          password: 'password123',
+          roles: 'Manager',
+          department: 'Operations',
+          status: 'on-site',
+        }
+      ],
+      employeeTimes: [
+        {
+          id: 1,
+          date: '2025-08-01',
+          clockIn: '09:00 AM',
+          clockOut: '05:00 PM',
+          teaclockin: '10:30 AM',
+          teaclockout: '10:45 AM',
+          lunchclockin: '01:00 PM',
+          lunchclockout: '02:00 PM',
+          totalHours: 8,
+        },
+        {
+          id: 2,
+          date: '2025-08-02',
+          clockIn: '09:15 AM',
+          clockOut: '05:15 PM',
+          teaclockin: '10:30 AM',
+          teaclockout: '10:45 AM',
+          lunchclockin: '01:00 PM',
+          lunchclockout: '02:00 PM',
+          totalHours: 8,
+        },
+        {
+          id: 3,
+          date: '2025-08-03',
+          clockIn: '08:45 AM',
+          clockOut: '04:45 PM',
+          teaclockin: '10:30 AM',
+          teaclockout: '10:45 AM',
+          lunchclockin: '01:00 PM',
+          lunchclockout: '02:00 PM',
+          totalHours: 8,
+        },
+      ]
     }
   },
   mounted() {
@@ -746,7 +858,7 @@ export default {
       const q = (this.searchQuery || '').toLowerCase()
       return this.sourceEmployees.filter(item => {
         const matchesText = item.name?.toLowerCase().includes(q) ||
-                           (item.employeeId || '').toLowerCase().includes(q) ||
+                           (item.employee_id || '').toLowerCase().includes(q) ||
                            (item.roles || '').toLowerCase().includes(q) ||
                            (item.department || '').toLowerCase().includes(q)
         return matchesText
@@ -757,6 +869,11 @@ export default {
      HistoryView() {
       if (this.$router) {
         this.$router.push('/history');
+      }
+    },
+         TimelogView() {
+      if (this.$router) {
+        this.$router.push('/Timelog');
       }
     },
     
@@ -778,6 +895,7 @@ export default {
     },
     openAddEmployeeModal() {
       this.newEmployee = {
+        employeeId: '',
         classificationId: '',
         firstName: '',
         lastName: '',
@@ -801,7 +919,7 @@ export default {
     },
     async addNewEmployee() {
       const requiredFields = [
-        'classificationId', 'firstName', 'lastName', 
+        'employeeId', 'classificationId', 'firstName', 'lastName', 
         'contactNo', 'email', 'address', 'idNumber', 'dateHired',
         'leaveBalance', 'username', 'password', 'roles', 'department'
       ];
@@ -815,25 +933,31 @@ export default {
 
       // validate against store-backed list
       const existing = this.sourceEmployees || [];
+      if (existing.some(emp => emp.employeeId === this.newEmployee.employeeId)) {
+        alert('Employee ID already exists. Please use a unique ID.');
+        return;
+      }
+
       if (existing.some(emp => emp.username === this.newEmployee.username)) {
         alert('Username already exists. Please choose a different username.');
         return;
       }
 
-      // send payload to store action (server should assign employee_id)
+      // send payload to store action (server should assign id)
       const payload = {
         name: `${this.newEmployee.firstName} ${this.newEmployee.lastName}`,
-        classification_id: this.newEmployee.classificationId,
-        first_name: this.newEmployee.firstName,
-        last_name: this.newEmployee.lastName,
-        contact_no: this.newEmployee.contactNo,
+        employeeId: this.newEmployee.employeeId,
+        classificationId: this.newEmployee.classificationId,
+        firstName: this.newEmployee.firstName,
+        lastName: this.newEmployee.lastName,
+        contactNo: this.newEmployee.contactNo,
         email: this.newEmployee.email,
         address: this.newEmployee.address,
-        id_number: this.newEmployee.idNumber,
-        user_type: this.newEmployee.userType,
-        date_hired: this.newEmployee.dateHired,
-        supervisor_name: this.newEmployee.supervisorName,
-        leave_balance: this.newEmployee.leaveBalance,
+        idNumber: this.newEmployee.idNumber,
+        userType: this.newEmployee.userType,
+        dateHired: this.newEmployee.dateHired,
+        supervisorName: this.newEmployee.supervisorName,
+        leaveBalance: this.newEmployee.leaveBalance,
         username: this.newEmployee.username,
         password: this.newEmployee.password,
         roles: this.newEmployee.roles,
@@ -857,18 +981,18 @@ export default {
       this.selectedEmployee = JSON.parse(JSON.stringify(employee));
       
       const defaultEmployee = {
-        employee_id: '',
-        classification_id: '',
-        first_name: '',
-        last_name: '',
-        contact_no: '',
+        employeeId: '',
+        classificationId: '',
+        firstName: '',
+        lastName: '',
+        contactNo: '',
         email: '',
         address: '',
-        id_number: '',
-        user_type: 'Employee',
-        date_hired: new Date().toISOString().split('T')[0],
-        supervisor_name: '',
-        leave_balance: 20,
+        idNumber: '',
+        userType: 'Employee',
+        dateHired: new Date().toISOString().split('T')[0],
+        supervisorName: '',
+        leaveBalance: 20,
         username: '',
         password: '',
         roles: '',
@@ -921,7 +1045,7 @@ export default {
 
     async saveEmployeeChanges() {
       const requiredFields = [
-        'classificationId', 'firstName', 'lastName', 
+        'employeeId', 'classificationId', 'firstName', 'lastName', 
         'contactNo', 'email', 'address', 'idNumber', 'dateHired',
         'leaveBalance', 'username', 'roles', 'department'
       ];
@@ -982,14 +1106,12 @@ export default {
         }
       }
     },
-
-    // ...existing code...
   },
 }
 </script>
 
 <style scoped>
-/* Updated styles for the new layout */
+
 .search-add-container {
   max-width: 100%;
   margin: 0 auto;
@@ -1021,27 +1143,27 @@ export default {
 .search-container {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
   border-radius: 8px;
   background-color: #f8f9fa;
 }
 
 .search-input {
   width: 100%;
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
   font-size: 0.875rem;
   padding: 6px 12px;
 }
 
 .search-input:focus {
-  border-color: #00C0AA;
+  border-color: #2EB28A;
   box-shadow: 0 0 0 0.2rem rgba(0, 192, 170, 0.25);
 }
 
 /* Button Styles */
 .btn-primary {
-  background-color: #00C0AA;
-  border-color: #00C0AA;
+  background-color: #2EB28A;
+  border-color: #2EB28A;
 }
 
 .btn-primary:hover {
@@ -1062,16 +1184,24 @@ export default {
 .text-danger {
   color: #dc3545 !important;
 }
-
+.employee-table thead {
+  background-color: #2EB28A !important;
+  border-radius: 8px;
+}
+th {
+  padding: 1.5rem;
+  font-weight: 600;
+  color: #FAFAFA;
+}
 /* Modal Styles */
 .modal-xl {
   max-width: 1140px;
 }
 
 .section-title {
-  color: #00C0AA;
+  color: #2EB28A;
   font-weight: 600;
-  border-bottom: 2px solid #00C0AA;
+  border-bottom: 2px solid #2EB28A;
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -1084,17 +1214,17 @@ export default {
 }
 
 .form-control, .form-select {
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
   border-radius: 6px;
 }
 
 .form-control:focus, .form-select:focus {
-  border-color: #00C0AA;
+  border-color: #2EB28A;
   box-shadow: 0 0 0 0.2rem rgba(0, 192, 170, 0.25);
 }
 
 .form-check-input:checked {
-  background-color: #00C0AA;
+  background-color: #2EB28A;
   border-color: #00C0AA;
 }
 
@@ -1110,7 +1240,7 @@ export default {
   height: 100%;
   border: none;
   background: transparent;
-  border-left: 1px solid #00C0AA;
+  border-left: 1px solid #2EB28A;
   border-radius: 0 6px 6px 0;
 }
 
@@ -1130,7 +1260,7 @@ export default {
 
 .employee-card {
   background: white;
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
   border-radius: 8px;
   margin-bottom: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -1208,7 +1338,9 @@ export default {
 .employee-table {
   margin: 0 auto;
   width: 95%;
-  border: 1px solid #00C0AA;
+
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 @media (min-width: 1200px) {
@@ -1229,11 +1361,11 @@ export default {
 }
 
 .modal-content {
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
 }
 
 .modal-header {
-  border-bottom: 1px solid #00C0AA;
+  border-bottom: 1px solid #2EB28A;
   padding: 1rem 1rem;
 }
 
@@ -1244,7 +1376,7 @@ export default {
 }
 
 .modal-footer {
-  border-top: 1px solid #00C0AA;
+  border-top: 1px solid #2EB28A;
   padding: 1rem;
 }
 

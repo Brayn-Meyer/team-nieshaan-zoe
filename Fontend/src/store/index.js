@@ -19,7 +19,9 @@ function socketPlugin(store) {
 
 export default createStore({
   state: {
-    employee_info: []
+    employee_info: [],
+    history_info: [],
+    timelog_info: []
   },
   getters: {
   },
@@ -27,6 +29,12 @@ export default createStore({
     get_employee_info(state, payload) {
       state.employee_info = payload;
     },
+    get_history_info(state, payload) {
+      state.history_info = payload;
+    },
+    get_timelog_info(state, payload) {
+      state.timelog_info = payload
+    }
   },
   actions: {
     async fetch_employee_info({ commit }) {
@@ -36,13 +44,44 @@ export default createStore({
       commit('get_employee_info', employees)
       console.log('Fetched employees:', employees)
     },
+    async fetch_history_info({ commit }) {
+      let data = await axios.get(`${API_URL}/api/employees/`)
+      const history = data.data.history || data.data || []
+      commit('get_history_info', history)
+      console.log('Fetched history:', history)
+    },
+    async fetch_timelog_info({ commit }) {
+      let data = await axios.get(`${API_URL}/api/employees/`)
+      const timelog = data.data.timelog || data.data || []
+      commit('get_timelog_info', timelog)
+      console.log('Fetched time logs:', timelog)
+    },
 
     async add_employee({ dispatch }, payload) {
       await axios.post(`${API_URL}/api/employees/addEmployee`, payload)
       dispatch("fetch_employee_info")
       console.log("Added Employee", payload)
     },
+    async apply_history_filter({ commit }, payload) {
+     try {
+       // normalize payload so empty values don't break backend
+        const body = {
+          date: payload?.date || '',
+          name: payload?.name || '',
+          status: payload?.status || '',
+          employeeId: payload?.employeeId || ''
+        }
 
+        const res = await axios.post(`${API_URL}/api/employees/search`, body)
+        const history = res.data.history || res.data || []
+        commit('get_history_info', history)
+        console.log('Applied history filter', body, '->', history.length, 'records')
+        return history
+      } catch (err) {
+        console.error('apply_history_filter failed:', err.response ? err.response.data : err.message)
+        throw err
+      }
+  },
     async edit_employee({ dispatch }, payload){
       // expect payload to include id
       await axios.patch(`${API_URL}/api/edit-employee/employee/edit/${payload.id}`, payload)

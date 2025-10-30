@@ -1,23 +1,11 @@
 <template>
-  <div class="card p-3 shadow-sm">
-    <div class="row g-3 align-items-end">
-      <!-- Date - Full width on small, half on medium, 3 columns on large -->
-      <div class="col-12 col-md-6 col-lg-3">
+  <div class="card p-3 shadow-sm mx-auto">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-sm-4 col-md-3">
         <label class="form-label small fw-bold">Select Date</label>
         <input type="date" class="form-control form-control-sm" v-model="localFilters.date" />
       </div>
-      <!-- Employee ID - Full width on small, half on medium, 2 columns on large -->
-      <div class="col-12 col-md-6 col-lg-2">
-        <label class="form-label small fw-bold">Employee ID</label>
-        <input
-          type="text"
-          class="form-control form-control-sm"
-          placeholder="Enter ID"
-          v-model="localFilters.employeeId"
-        />
-      </div>
-      <!-- Name - Full width on small, half on medium, 3 columns on large -->
-      <div class="col-12 col-md-6 col-lg-3">
+      <div class="col-12 col-sm-4 col-md-4">
         <label class="form-label small fw-bold">Name (First or Last)</label>
         <input
           type="text"
@@ -26,8 +14,7 @@
           v-model="localFilters.name"
         />
       </div>
-      <!-- Status - Full width on small, half on medium, 2 columns on large -->
-      <div class="col-12 col-md-6 col-lg-2">
+      <div class="col-12 col-sm-4 col-md-2">
         <label class="form-label small fw-bold">Status</label>
         <select class="form-select form-select-sm" v-model="localFilters.status">
           <option value="">All</option>
@@ -37,8 +24,7 @@
           <option value="terminated">Terminated</option>
         </select>
       </div>
-      <!-- Apply Button - Full width on small, full width on medium, 2 columns on large -->
-      <div class="col-12 col-md-12 col-lg-2">
+      <div class="col-12 col-sm-12 col-md-3">
         <button class="btn apply btn-sm w-100" @click="applyFilters">
           <i class="bi bi-funnel me-1"></i>Apply Filters
         </button>
@@ -137,7 +123,6 @@ export default {
   border-radius: 0.5rem;
   border: 1px solid #DEE2E6;
   width: 50%;
-  margin: auto;
   background-color: #EBEBEB;
 }
 .form-label {
@@ -176,12 +161,3 @@ export default {
   }
 }
 </style>
-
-
-
-
-
-
-
-
-

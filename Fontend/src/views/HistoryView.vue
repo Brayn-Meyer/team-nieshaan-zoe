@@ -17,11 +17,12 @@
       <div class="col-12">
         <HistoryFilters
           :filters="filters"
-          @update-filters="updateFilters"
+          @update-filters="onUpdateFilters"
         />
       </div>
     </div>
-    <div class="row mb-3">
+    <!-- Added spacing class here -->
+    <div class="row mb-3 mt-4 mt-md-3 mt-sm-2">
       <div class="col-12 text-end">
         <button class="btn download btn-sm" @click="downloadSheet">
           <i class="bi bi-download me-1"></i>Download
@@ -288,8 +289,13 @@ export default {
     }
   },
   methods: {
-    updateFilters(newFilters) {
-      this.filters = { ...newFilters };
+    async onUpdateFilters(filters) {
+      try {
+        await this.$store.dispatch('apply_history_filter', filters)
+        // optionally reset table page or other UI state here
+      } catch (err) {
+        console.error('Failed to apply history filters', err)
+      }
     },
     downloadSheet() {
       try {
@@ -341,6 +347,10 @@ export default {
       }
     },
   },
+  mounted() {
+    // load initial history
+    this.$store.dispatch('fetch_history_info').catch(()=>{})
+  }
 };
 </script>
 <style scoped>
@@ -351,5 +361,17 @@ export default {
 .download{
   color: white;
   background-color: #2EB28A !important;
+}
+
+@media (max-width: 768px) {
+  .row.mb-3.mt-4.mt-md-3.mt-sm-2 {
+    margin-top: 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .row.mb-3.mt-4.mt-md-3.mt-sm-2 {
+    margin-top: 0.75rem !important;
+  }
 }
 </style>
