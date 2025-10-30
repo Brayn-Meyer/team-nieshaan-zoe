@@ -1,7 +1,7 @@
 <template>
-  <NavComp @theme-changed="handleThemeChange"/>
-  <br><br><br>
-  <div class="user-guide-page" :class="{ 'dark-mode': isDarkMode }">
+  <NavComp/>
+  <br><br><br><br>
+  <div class="user-guide-page">
     <!-- Header -->
     <div class="guide-header-section">
       <div class="header-content">
@@ -383,21 +383,15 @@ export default {
     NavComp
   },
   name: "UserGuidePage",
-  data() {
-    return {
-      isDarkMode: false
-    }
-  },
   methods: {
-    handleThemeChange(isDarkMode) {
-      this.isDarkMode = isDarkMode;
-    },
     startInteractiveGuide() {
       this.$router.push('/?guide=true');
     },
+
     contactSupport() {
       alert('For technical support or questions:\n\nEmail: support@attendance-system.com\nPhone: +1 (555) 123-4567\nHours: Monday-Friday, 8:00 AM - 6:00 PM EST');
     },
+
     viewPDFGuide() {
       const pdfHTML = this.generatePDFHTML();
       const newWindow = window.open('', '_blank');
@@ -406,6 +400,7 @@ export default {
       this.addPrintStyles(newWindow);
       newWindow.focus();
     },
+
     generatePDFHTML() {
       const currentDate = new Date().toLocaleDateString();
       return `<!DOCTYPE html>
@@ -502,336 +497,17 @@ export default {
 </body>
 </html>`;
     },
+
     addPrintStyles(win) {
       const style = win.document.createElement('style');
       style.textContent = `@media print { body { margin: 0; padding: 20px; font-size: 12pt; } .header { margin-bottom: 20px; } .section { margin-bottom: 20px; } }`;
       win.document.head.appendChild(style);
-    }
-  },
-  mounted() {
-    // Check for saved theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      this.isDarkMode = true;
     }
   }
 };
 </script>
 
 <style scoped>
-/* Dark mode styles for UserGuide */
-.user-guide-page.dark-mode {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  color: #e0e0e0;
-}
-
-.user-guide-page.dark-mode .guide-header-section,
-.user-guide-page.dark-mode .guide-section,
-.user-guide-page.dark-mode .sidebar-section {
-  background: #2d2d2d;
-  border-color: #404040;
-  color: #e0e0e0;
-}
-
-.user-guide-page.dark-mode .guide-title,
-.user-guide-page.dark-mode .guide-subtitle,
-.user-guide-page.dark-mode .section-header h2,
-.user-guide-page.dark-mode .sidebar-section h3 {
-  color: #e0e0e0;
-}
-
-.user-guide-page.dark-mode .section-content p,
-.user-guide-page.dark-mode .feature-item,
-.user-guide-page.dark-mode .history-feature p,
-.user-guide-page.dark-mode .record-item,
-.user-guide-page.dark-mode .data-point p,
-.user-guide-page.dark-mode .practice-content p {
-  color: #b0b0b0;
-}
-
-.user-guide-page.dark-mode .example-card,
-.user-guide-page.dark-mode .history-feature,
-.user-guide-page.dark-mode .data-point,
-.user-guide-page.dark-mode .practice-item,
-.user-guide-page.dark-mode .table-feature,
-.user-guide-page.dark-mode .help-option {
-  background: #363636;
-  border-color: #404040;
-}
-
-.user-guide-page.dark-mode .section-tip,
-.user-guide-page.dark-mode .history-example {
-  background: #2a3a2e;
-  border-color: #404040;
-  color: #e0e0e0;
-}
-
-.user-guide-page.dark-mode .feature-highlight {
-  background: #2a3a2e;
-  color: #e0e0e0;
-}
-
-.user-guide-page.dark-mode .quick-link {
-  color: #4ade80;
-}
-
-.user-guide-page.dark-mode .quick-link:hover {
-  color: #86efac;
-}
-
-.user-guide-page.dark-mode .help-option:hover {
-  background: #404040;
-  border-color: #4ade80;
-  color: #e0e0e0;
-}
-
-.user-guide-page.dark-mode .section-icon {
-  background: #2a3a2e;
-  color: #4ade80;
-}
-
-.user-guide-page.dark-mode .card-icon {
-  background: #2a3a2e;
-  color: #4ade80;
-}
-
-.user-guide-page.dark-mode .card-content h4,
-.user-guide-page.dark-mode .card-value {
-  color: #e0e0e0;
-}
-
-.user-guide-page.dark-mode .card-desc {
-  color: #b0b0b0;
-}
-
-.user-guide-page.dark-mode .card-change.positive {
-  color: #4ade80;
-}
-
-.user-guide-page.dark-mode .card-change.negative {
-  color: #f87171;
-}
-
-.user-guide-page.dark-mode .status-active {
-  color: #4ade80;
-}
-
-.user-guide-page.dark-mode .feature-header i {
-  color: #4ade80;
-}
-
-.user-guide-page.dark-mode .feature-header h4 {
-  color: #e0e0e0;
-}
-
-.user-guide-page.dark-mode .record-example {
-  background: #363636;
-  border-color: #404040;
-}
-
-.user-guide-page.dark-mode .record-item strong {
-  color: #4ade80;
-}
-
-/* Rest of your existing CSS remains the same */
-.user-guide-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-  padding: 20px;
-  transition: all 0.3s ease;
-}
-
-.guide-header-section {
-  background: white;
-  border-radius: 16px;
-  padding: 40px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
-  border: 1px solid #d1fae5;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.guide-title {
-  color: #065f46;
-  font-size: 2.5em;
-  font-weight: 700;
-  margin-bottom: 10px;
-  transition: color 0.3s ease;
-}
-
-.guide-subtitle {
-  color: #059669;
-  font-size: 1.2em;
-  margin-bottom: 0;
-  transition: color 0.3s ease;
-}
-
-.guide-content-section {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 30px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.content-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.guide-section {
-  background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
-}
-
-.guide-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.section-icon {
-  width: 50px;
-  height: 50px;
-  background: #d1fae5;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #065f46;
-  font-size: 1.2em;
-}
-
-.section-header h2 {
-  color: #065f46;
-  font-size: 1.5em;
-  font-weight: 600;
-  margin: 0;
-  transition: color 0.3s ease;
-}
-
-.section-content p {
-  color: #374151;
-  line-height: 1.6;
-  margin-bottom: 15px;
-  transition: color 0.3s ease;
-}
-
-.feature-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #059669;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.feature-item i {
-  color: #10b981;
-}
-
-.card-examples {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin: 20px 0;
-}
-
-.example-card {
-  background: #f8fafc;
-  border-radius: 10px;
-  padding: 20px;
-  border-left: 4px solid #10b981;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.card-icon {
-  width: 40px;
-  height: 40px;
-  background: #d1fae5;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #065f46;
-}
-
-.card-content h4 {
-  margin: 0 0 5px 0;
-  color: #065f46;
-  font-size: 0.9em;
-}
-
-.card-value {
-  font-size: 1.5em;
-  font-weight: 700;
-  color: #065f46;
-  margin: 0;
-}
-
-.card-desc {
-  font-size: 0.8em;
-  color: #6b7280;
-  margin: 0;
-}
-
-.card-change {
-  font-size: 0.75em;
-  margin: 5px 0 0 0;
-  font-weight: 600;
-}
-
-.card-change.positive {
-  color: #10b981;
-}
-
-.card-change.negative {
-  color: #ef4444;
-}
-
-.section-tip {
-  background: #f0fdf4;
-  border: 1px solid #a7f3d0;
-  border-radius: 8px;
-  padding: 15px;
-  color: #065f46;
-  font-style: italic;
-}
-
-.table-features {
-  display: grid;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.table-feature {
-  padding: 10px 15px;
-  background: #f8fafc;
-  border-radius: 6px;
-  border-left: 3px solid #10b981;
-}
-
 /* History Section Styles */
 .history-features {
   display: flex;
@@ -912,6 +588,21 @@ export default {
   font-weight: 600;
 }
 
+/* Existing styles remain the same */
+.card-change {
+  font-size: 0.75em;
+  margin: 5px 0 0 0;
+  font-weight: 600;
+}
+
+.card-change.positive {
+  color: #10b981;
+}
+
+.card-change.negative {
+  color: #ef4444;
+}
+
 .data-interpretation {
   display: flex;
   flex-direction: column;
@@ -969,6 +660,278 @@ export default {
   font-size: 0.9em;
 }
 
+.feature-highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feature-highlight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #f0fdf4;
+  border-radius: 6px;
+  color: #065f46;
+  font-weight: 500;
+}
+
+.feature-highlight i {
+  color: #10b981;
+}
+
+/* Rest of your existing CSS remains unchanged */
+.user-guide-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  padding: 20px;
+}
+
+.guide-header-section {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
+  border: 1px solid #d1fae5;
+  text-align: center;
+}
+
+.guide-title {
+  color: #065f46;
+  font-size: 2.5em;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.guide-subtitle {
+  color: #059669;
+  font-size: 1.2em;
+  margin-bottom: 0;
+}
+
+.guide-content-section {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.content-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.guide-section {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s ease;
+}
+
+.guide-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.section-icon {
+  width: 50px;
+  height: 50px;
+  background: #d1fae5;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #065f46;
+  font-size: 1.2em;
+}
+
+.section-header h2 {
+  color: #065f46;
+  font-size: 1.5em;
+  font-weight: 600;
+  margin: 0;
+}
+
+.section-content p {
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #059669;
+  font-weight: 500;
+}
+
+.feature-item i {
+  color: #10b981;
+}
+
+.card-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.example-card {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 20px;
+  border-left: 4px solid #10b981;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  background: #d1fae5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #065f46;
+}
+
+.card-content h4 {
+  margin: 0 0 5px 0;
+  color: #065f46;
+  font-size: 0.9em;
+}
+
+.card-value {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #065f46;
+  margin: 0;
+}
+
+.card-desc {
+  font-size: 0.8em;
+  color: #6b7280;
+  margin: 0;
+}
+
+.section-tip {
+  background: #f0fdf4;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 15px;
+  color: #065f46;
+  font-style: italic;
+}
+
+.table-features {
+  display: grid;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.table-feature {
+  padding: 10px 15px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border-left: 3px solid #10b981;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.quick-action {
+  text-align: center;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.quick-action:hover {
+  background: #f0fdf4;
+  transform: translateY(-2px);
+}
+
+.action-icon {
+  width: 50px;
+  height: 50px;
+  background: #d1fae5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  color: #065f46;
+  font-size: 1.2em;
+}
+
+.quick-action h4 {
+  color: #065f46;
+  margin: 0 0 10px 0;
+}
+
+.quick-action p {
+  color: #6b7280;
+  font-size: 0.9em;
+  margin: 0;
+}
+
+.shortcuts-grid {
+  display: grid;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.shortcut-item kbd {
+  background: #065f46;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.shortcut-item span {
+  color: #374151;
+  font-weight: 500;
+}
+
 .guide-sidebar {
   display: flex;
   flex-direction: column;
@@ -1016,27 +979,6 @@ export default {
   background: #f0fdf4;
   border-color: #a7f3d0;
   color: #065f46;
-}
-
-.feature-highlights {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.feature-highlight {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  background: #f0fdf4;
-  border-radius: 6px;
-  color: #065f46;
-  font-weight: 500;
-}
-
-.feature-highlight i {
-  color: #10b981;
 }
 
 .quick-links {
@@ -1088,7 +1030,8 @@ export default {
     padding: 20px;
   }
   
-  .card-examples {
+  .card-examples,
+  .quick-actions-grid {
     grid-template-columns: 1fr;
   }
 }
