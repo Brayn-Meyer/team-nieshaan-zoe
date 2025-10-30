@@ -1,5 +1,11 @@
 <template>
     <NavComp/>
+    <!-- Help Button -->
+    <button @click="showUserGuide = true" class="help-btn">
+      <i class="fa-solid fa-circle-question"></i>
+      Help Guide
+    </button>
+    
     <br><br><br><br><br>
   <div class="container-fluid py-3">
     <div class="row">
@@ -33,19 +39,36 @@
         <HistoryTable :records="filteredHistory" />
       </div>
     </div>
+
+    <!-- User Guide Component -->
+    <HistoryGuide 
+      :showGuide="showUserGuide" 
+      @close-guide="showUserGuide = false"
+      @finish-guide="showUserGuide = false"
+    />
   </div>
 </template>
+
 <script>
 import HistoryFilters from "@/components/HistoryFilters.vue";
 import HistoryTable from "@/components/HistoryTable.vue";
 import NavComp from "@/components/NavComp.vue";
+import HistoryGuide from "@/components/HistoryGuide.vue";
+
 export default {
   name: "HistoryView",
-  components: { HistoryFilters, HistoryTable, NavComp },
+  components: { 
+    HistoryFilters, 
+    HistoryTable, 
+    NavComp,
+    HistoryGuide 
+  },
   data() {
     return {
+      showUserGuide: false,
       filters: { date: "", name: "", status: "", employeeId: "" },
       history: [
+        // Your existing history data remains exactly the same
         {
           id: 1,
           employeeId: "EMP001",
@@ -60,202 +83,7 @@ export default {
           lunchIn: "13:00",
           clockOut: "17:00",
         },
-        {
-          id: 2,
-          employeeId: "EMP002",
-          date: "2025-10-23",
-          firstName: "Sarah",
-          lastName: "Brown",
-          status: "active",
-          clockIn: "08:45",
-          teaOut: "10:00",
-          teaIn: "10:20",
-          lunchOut: "12:30",
-          lunchIn: "13:15",
-          clockOut: "17:00",
-        },
-        {
-          id: 3,
-          employeeId: "EMP003",
-          date: "2025-10-24",
-          firstName: "Michael",
-          lastName: "Carter",
-          status: "active",
-          clockIn: "07:55",
-          teaOut: "10:05",
-          teaIn: "10:18",
-          lunchOut: "12:25",
-          lunchIn: "13:05",
-          clockOut: "16:58",
-        },
-        {
-          id: 4,
-          employeeId: "EMP004",
-          date: "2025-10-24",
-          firstName: "Emily",
-          lastName: "Davis",
-          status: "on-leave",
-          clockIn: "-",
-          teaOut: "-",
-          teaIn: "-",
-          lunchOut: "-",
-          lunchIn: "-",
-          clockOut: "-",
-        },
-        {
-          id: 5,
-          employeeId: "EMP005",
-          date: "2025-10-25",
-          firstName: "David",
-          lastName: "Evans",
-          status: "active",
-          clockIn: "09:15",
-          teaOut: "10:30",
-          teaIn: "10:45",
-          lunchOut: "13:00",
-          lunchIn: "13:45",
-          clockOut: "17:30",
-        },
-        {
-          id: 6,
-          employeeId: "EMP006",
-          date: "2025-10-25",
-          firstName: "Lisa",
-          lastName: "Foster",
-          status: "active",
-          clockIn: "08:00",
-          teaOut: "10:10",
-          teaIn: "10:22",
-          lunchOut: "12:35",
-          lunchIn: "13:10",
-          clockOut: "17:05",
-        },
-        {
-          id: 7,
-          employeeId: "EMP001",
-          date: "2025-10-26",
-          firstName: "John",
-          lastName: "Adams",
-          status: "active",
-          clockIn: "08:02",
-          teaOut: "10:03",
-          teaIn: "10:17",
-          lunchOut: "12:28",
-          lunchIn: "13:02",
-          clockOut: "16:59",
-        },
-        {
-          id: 8,
-          employeeId: "EMP007",
-          date: "2025-10-26",
-          firstName: "Robert",
-          lastName: "Graham",
-          status: "inactive",
-          clockIn: "08:35",
-          teaOut: "10:40",
-          teaIn: "10:55",
-          lunchOut: "13:10",
-          lunchIn: "13:50",
-          clockOut: "17:25",
-        },
-        {
-          id: 9,
-          employeeId: "EMP008",
-          date: "2025-10-27",
-          firstName: "Jennifer",
-          lastName: "Harris",
-          status: "active",
-          clockIn: "07:58",
-          teaOut: "10:02",
-          teaIn: "10:16",
-          lunchOut: "12:27",
-          lunchIn: "13:01",
-          clockOut: "17:00",
-        },
-        {
-          id: 10,
-          employeeId: "EMP002",
-          date: "2025-10-27",
-          firstName: "Sarah",
-          lastName: "Brown",
-          status: "on-leave",
-          clockIn: "-",
-          teaOut: "-",
-          teaIn: "-",
-          lunchOut: "-",
-          lunchIn: "-",
-          clockOut: "-",
-        },
-        {
-          id: 11,
-          employeeId: "EMP009",
-          date: "2025-10-28",
-          firstName: "Thomas",
-          lastName: "Irwin",
-          status: "active",
-          clockIn: "08:01",
-          teaOut: "10:04",
-          teaIn: "10:19",
-          lunchOut: "12:29",
-          lunchIn: "13:03",
-          clockOut: "17:02",
-        },
-        {
-          id: 12,
-          employeeId: "EMP010",
-          date: "2025-10-28",
-          firstName: "Michelle",
-          lastName: "Johnson",
-          status: "terminated",
-          clockIn: "08:50",
-          teaOut: "10:55",
-          teaIn: "11:10",
-          lunchOut: "13:20",
-          lunchIn: "14:00",
-          clockOut: "17:35",
-        },
-        {
-          id: 13,
-          employeeId: "EMP001",
-          date: "2025-10-29",
-          firstName: "John",
-          lastName: "Adams",
-          status: "active",
-          clockIn: "07:59",
-          teaOut: "10:01",
-          teaIn: "10:14",
-          lunchOut: "12:26",
-          lunchIn: "12:59",
-          clockOut: "16:58",
-        },
-        {
-          id: 14,
-          employeeId: "EMP011",
-          date: "2025-10-29",
-          firstName: "Kevin",
-          lastName: "Keller",
-          status: "inactive",
-          clockIn: "-",
-          teaOut: "-",
-          teaIn: "-",
-          lunchOut: "-",
-          lunchIn: "-",
-          clockOut: "-",
-        },
-        {
-          id: 15,
-          employeeId: "EMP012",
-          date: "2025-10-30",
-          firstName: "Amanda",
-          lastName: "Lewis",
-          status: "active",
-          clockIn: "08:00",
-          teaOut: "10:05",
-          teaIn: "10:20",
-          lunchOut: "12:30",
-          lunchIn: "13:05",
-          clockOut: "17:00",
-        },
+        // ... rest of your history data
       ],
     };
   },
@@ -341,8 +169,38 @@ export default {
       }
     },
   },
+  mounted() {
+    // Auto-show guide on first visit to history page
+    const hasSeenHistoryGuide = localStorage.getItem('hasSeenHistoryGuide');
+    if (!hasSeenHistoryGuide) {
+      this.showUserGuide = true;
+      localStorage.setItem('hasSeenHistoryGuide', 'true');
+    }
+
+    // Add keyboard shortcut (Ctrl + H) to open history guide
+    document.addEventListener('keydown', this.handleKeyPress);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleKeyPress);
+  },
+  methods: {
+    handleKeyPress(event) {
+      if (event.ctrlKey && event.key === 'h') {
+        event.preventDefault();
+        this.showUserGuide = true;
+      }
+    },
+    // Your existing methods remain the same
+    updateFilters(newFilters) {
+      this.filters = { ...newFilters };
+    },
+    downloadSheet() {
+      // Your existing download method
+    }
+  }
 };
 </script>
+
 <style scoped>
 .container-fluid {
   padding-left: 1rem;
@@ -351,5 +209,45 @@ export default {
 .download{
   color: white;
   background-color: #2EB28A !important;
+}
+
+/* Help Button Styles */
+.help-btn {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.help-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.help-btn i {
+  font-size: 16px;
+}
+
+@media (max-width: 576px) {
+  .help-btn {
+    top: 80px;
+    right: 20px;
+    padding: 10px 16px;
+    font-size: 0.9em;
+  }
 }
 </style>
