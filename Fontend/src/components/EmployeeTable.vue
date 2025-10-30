@@ -858,7 +858,7 @@ export default {
       const q = (this.searchQuery || '').toLowerCase()
       return this.sourceEmployees.filter(item => {
         const matchesText = item.name?.toLowerCase().includes(q) ||
-                           (item.employeeId || '').toLowerCase().includes(q) ||
+                           (item.employee_id || '').toLowerCase().includes(q) ||
                            (item.roles || '').toLowerCase().includes(q) ||
                            (item.department || '').toLowerCase().includes(q)
         return matchesText
