@@ -202,3 +202,45 @@ ORDER BY week_number DESC;`);
     throw new Error('Server error');
   }
 };
+
+export class HoursManagement {
+    // Create hours record
+    static async createRecord(employee_id, week_start, week_end, expected_hours, total_worked_hours) {
+        // Calculate both hours owed AND overtime
+        let hour_owed = 0;
+        let overtime = 0;
+        
+        if (total_worked_hours < expected_hours) {
+            // Employee owes hours
+            hour_owed = expected_hours - total_worked_hours;
+        } else if (total_worked_hours > expected_hours) {
+            // Employee has overtime
+            overtime = total_worked_hours - expected_hours;
+        }
+        // If equal, both remain 0
+        
+        const hrs_id = await this.getNextId();
+        
+        const query = `
+            INSERT INTO hours_management 
+            (hrs_id, employee_id, week_start, week_end, expected_hours, total_worked_hours, hours_owed, overtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        
+        await pool.execute(query, [hrs_id, employee_id, week_start, week_end, expected_hours, total_worked_hours, hour_owed, overtime]);
+        return { hrs_id, hour_owed, overtime };
+    }
+
+    // Get employee hours
+    static async getByEmployee(employee_id) {
+        const query = `SELECT * FROM hours_management WHERE employee_id = ? ORDER BY week_start DESC`;
+        const [rows] = await pool.execute(query, [employee_id]);
+        return rows;
+    }
+
+    // Get next ID
+    static async getNextId() {
+        const [rows] = await pool.execute('SELECT MAX(hrs_id) as max_id FROM hours_management');
+        return (rows[0].max_id || 0) + 1;
+    }
+}

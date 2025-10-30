@@ -1,9 +1,13 @@
 import express from 'express'
 
-import { getClockInOutDataCon } from '../controllers/clock_in_out_con.js'
+import { getClockInOutDataCon, getHoursWorkedCon, HoursController } from '../controllers/clock_in_out_con.js'
 
 const router = express.Router()
 
-router.get("/clockInOut", getClockInOutDataCon)
+router.get("/clockInOut", getClockInOutDataCon);
+router.get('/getHoursWorked/', getHoursWorkedCon);
+router.post('/', HoursController.createRecord);
+router.get('/hours/:employee_id', HoursController.getEmployeeHours);
+
 
 export default router

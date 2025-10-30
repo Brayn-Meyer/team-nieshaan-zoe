@@ -1,4 +1,4 @@
-import { getClockInOutData } from "../middleware/clock_in_out_mid.js"
+import { getClockInOutData, getHoursWorked, HoursManagement } from "../middleware/clock_in_out_mid.js"
 
 export const getClockInOutDataCon = async (req, res) => {
     try {
@@ -33,5 +33,41 @@ export const getClockInOutDataCon = async (req, res) => {
     } catch (error) {
         console.error('Error in getClockInOutDataCon:', error);
         res.status(500).json({ error: 'Failed to fetch employee data' });
+    }
+}
+
+export const getHoursWorkedCon = async (req, res) => {
+    try{
+        const hoursWorked = await getHoursWorked();
+        res.json({ hoursWorked });
+    } catch (error) {
+        console.error('Error in getHoursWorkedCon:', error);
+        res.status(500).json({ error: 'Failed to fetch hours worked' });
+    }
+};
+
+export class HoursController {
+    // Create hours record
+    static async createRecord(req, res) {
+        try {
+            const { employee_id, week_start, week_end, expected_hours, total_worked_hours } = req.body;
+            
+            const result = await HoursManagement.createRecord(employee_id, week_start, week_end, expected_hours, total_worked_hours);
+            
+            res.json({ success: true, data: result });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    }
+
+    // Get employee hours
+    static async getEmployeeHours(req, res) {
+        try {
+            const { employee_id } = req.params;
+            const records = await HoursManagement.getByEmployee(employee_id);
+            res.json({ success: true, data: records });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
     }
 }
