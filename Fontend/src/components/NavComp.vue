@@ -9,6 +9,7 @@
 
     <div class="nav-right">
       <router-link to="/" class="nav-link" exact-active-class="active">Dashboard</router-link>
+      <router-link to="/user-guide" class="nav-link" exact-active-class="active">User guide</router-link>
       <button class="logout-btn">
         <i class="fa-solid fa-right-from-bracket"></i>
         Logout
