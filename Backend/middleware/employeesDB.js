@@ -77,7 +77,7 @@ export const addEmployee = async (employee) => {
             contactNo,
             employee.email,
             employee.address,
-            employee.id_number, // This maps to the 'id' field in DB (ID number like national ID)
+            employee.id, // This maps to the 'id' field in DB (ID number like national ID)
             isAdmin,
             employmentStatus,
             formattedDateHired,
@@ -169,3 +169,36 @@ export const getDepartments = async () => {
     }
 }
 
+export const getHoursWorked = async () => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT 
+  e.employee_id,
+  CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+  YEARWEEK(r.date, 1) AS week_number,
+  MIN(STR_TO_DATE(CONCAT(YEARWEEK(r.date, 1), ' Monday'), '%X%V %W')) AS week_start,
+  MAX(DATE_ADD(STR_TO_DATE(CONCAT(YEARWEEK(r.date, 1), ' Monday'), '%X%V %W'), INTERVAL 6 DAY)) AS week_end,
+  SUM(
+    CASE 
+      WHEN r.clockout_time > r.clockin_time THEN
+        TIMESTAMPDIFF(MINUTE, r.clockin_time, r.clockout_time) / 60.0
+      ELSE 0
+    END
+  ) AS total_hours
+FROM record_backups r
+JOIN employees e ON e.employee_id = r.employee_id
+WHERE r.type = 'Work'
+  AND r.status IN ('Early', 'OnTime', 'Late')
+  AND DAYOFWEEK(r.date) NOT IN (1, 7)
+  AND r.clockin_time IS NOT NULL
+  AND r.clockout_time IS NOT NULL
+  -- Optional filter for specific week (if user selects one)
+  -- AND YEARWEEK(r.date, 1) = YEARWEEK('2025-10-27', 1)
+GROUP BY e.employee_id, YEARWEEK(r.date, 1)
+ORDER BY week_number DESC;`);
+    return rows;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Server error');
+  }
+};

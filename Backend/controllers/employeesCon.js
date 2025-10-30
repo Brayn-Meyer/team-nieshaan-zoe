@@ -1,4 +1,4 @@
-import { addEmployee, deleteEmployee, getRoles, getDepartments } from '../middleware/employeesDB.js';
+import { addEmployee, deleteEmployee, getRoles, getDepartments, getHoursWorked } from '../middleware/employeesDB.js';
 import { emitKPIUpdates } from "./admin_cards_con.js";
 
 
@@ -55,5 +55,15 @@ export const deleteEmployeeCon = async (req, res) => {
     } catch (error) {
         console.error('Error in deleteEmployeeCon:', error);
         res.status(500).json({ error: 'Failed to delete employee' });
+    }
+};
+
+export const getHoursWorkedCon = async (req, res) => {
+    try{
+        const hoursWorked = await getHoursWorked();
+        res.json({ hoursWorked });
+    } catch (error) {
+        console.error('Error in getHoursWorkedCon:', error);
+        res.status(500).json({ error: 'Failed to fetch hours worked' });
     }
 };
