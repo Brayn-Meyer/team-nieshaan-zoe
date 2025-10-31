@@ -23,7 +23,15 @@ export const getClockInOutDataCon = async (req, res) => {
             username: emp.username,
             roles: emp.role || 'Employee',  // From emp_classification table
             department: emp.department || 'General',  // From emp_classification table
-            status: emp.employment_status || 'Active'
+            status: emp.employment_status || 'Active',
+
+            work_date: emp.work_date,
+            work_clockin: emp.work_clockin,
+            work_clockout: emp.work_clockout,
+            tea_clockin: emp.tea_clockin,
+            tea_clockout: emp.tea_clockout,
+            lunch_clockin: emp.lunch_clockin,
+            lunch_clockout: emp.lunch_clockout
         }));
 
         res.json({ 
