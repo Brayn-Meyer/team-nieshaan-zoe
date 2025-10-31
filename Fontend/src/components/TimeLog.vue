@@ -85,18 +85,18 @@ export default {
     return {
       showUserGuide: false,
       employees: [
-        { name: "John Smith", id: "E101", hoursWorked: 41, hoursOwed: 0, overtime: 1, indicator: "green" },
-        { name: "Sarah Johnson", id: "E102", hoursWorked: 39, hoursOwed: 1, overtime: 0, indicator: "red" },
-        { name: "Michael Brown", id: "E103", hoursWorked: 40, hoursOwed: 5, overtime: 0, indicator: "red" },
-        { name: "Emily Davis", id: "E104", hoursWorked: 38, hoursOwed: 2, overtime: 0, indicator: "red" },
-        { name: "David Wilson", id: "E105", hoursWorked: 35, hoursOwed: 5, overtime: 0, indicator: "red" },
-        { name: "Jennifer Lee", id: "E106", hoursWorked: 41, hoursOwed: 0, overtime: 1, indicator: "green" },
-        { name: "Robert Taylor", id: "E107", hoursWorked: 43, hoursOwed: 7, overtime: 0, indicator: "red" },
-        { name: "Lisa Anderson", id: "E108", hoursWorked: 0, hoursOwed: 40, overtime: 0, indicator: "red" },
-        { name: "James Martinez", id: "E109", hoursWorked: 33, hoursOwed: 7, overtime: 0, indicator: "red" },
-        { name: "Amanda White", id: "E110", hoursWorked: 39, hoursOwed: 1, overtime: 0, indicator: "red" },
-        { name: "Christopher Garcia", id: "E111", hoursWorked: 41, hoursOwed: 0, overtime: 1, indicator: "green" },
-        { name: "Michelle Rodriguez", id: "E112", hoursWorked: 37, hoursOwed: 3, overtime: 0, indicator: "red" }
+        // { name: "John Smith", id: "E101", hoursWorked: 41, hoursOwed: 0, overtime: 1, indicator: "green" },
+        // { name: "Sarah Johnson", id: "E102", hoursWorked: 39, hoursOwed: 1, overtime: 0, indicator: "red" },
+        // { name: "Michael Brown", id: "E103", hoursWorked: 40, hoursOwed: 5, overtime: 0, indicator: "red" },
+        // { name: "Emily Davis", id: "E104", hoursWorked: 38, hoursOwed: 2, overtime: 0, indicator: "red" },
+        // { name: "David Wilson", id: "E105", hoursWorked: 35, hoursOwed: 5, overtime: 0, indicator: "red" },
+        // { name: "Jennifer Lee", id: "E106", hoursWorked: 41, hoursOwed: 0, overtime: 1, indicator: "green" },
+        // { name: "Robert Taylor", id: "E107", hoursWorked: 43, hoursOwed: 7, overtime: 0, indicator: "red" },
+        // { name: "Lisa Anderson", id: "E108", hoursWorked: 0, hoursOwed: 40, overtime: 0, indicator: "red" },
+        // { name: "James Martinez", id: "E109", hoursWorked: 33, hoursOwed: 7, overtime: 0, indicator: "red" },
+        // { name: "Amanda White", id: "E110", hoursWorked: 39, hoursOwed: 1, overtime: 0, indicator: "red" },
+        // { name: "Christopher Garcia", id: "E111", hoursWorked: 41, hoursOwed: 0, overtime: 1, indicator: "green" },
+        // { name: "Michelle Rodriguez", id: "E112", hoursWorked: 37, hoursOwed: 3, overtime: 0, indicator: "red" }
       ],
       showPopup: false,
       popupEmployee: null
@@ -173,7 +173,7 @@ export default {
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.handleKeyPress);
-  }
+  },
 };
 </script>
 
