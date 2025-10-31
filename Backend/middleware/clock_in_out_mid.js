@@ -27,28 +27,35 @@ export const getfilterAll = async() => {
 export const getHoursWorked = async () => {
   try {
     const [rows] = await pool.query(`
-      SELECT 
-  e.employee_id,
-  CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
-  YEARWEEK(r.date, 1) AS week_number,
-  MIN(STR_TO_DATE(CONCAT(YEARWEEK(r.date, 1), ' Monday'), '%X%V %W')) AS week_start,
-  MAX(DATE_ADD(STR_TO_DATE(CONCAT(YEARWEEK(r.date, 1), ' Monday'), '%X%V %W'), INTERVAL 6 DAY)) AS week_end,
-  SUM(
-    CASE 
-      WHEN r.clockout_time > r.clockin_time THEN
-        TIMESTAMPDIFF(MINUTE, r.clockin_time, r.clockout_time) / 60.0
-      ELSE 0
-    END
-  ) AS total_hours
+SELECT 
+e.employee_id,
+CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+YEARWEEK(r.date, 1) AS week_number,
+MIN(STR_TO_DATE(CONCAT(YEARWEEK(r.date, 1), ' Monday'), '%X%V %W')) AS week_start,
+MAX(DATE_ADD(STR_TO_DATE(CONCAT(YEARWEEK(r.date, 1), ' Monday'), '%X%V %W'), INTERVAL 6 DAY)) AS week_end,
+ROUND(SUM(
+  GREATEST(
+	0,
+	TIMESTAMPDIFF(
+	  MINUTE,
+	  -- effective clock-in (no earlier than 08:30)
+	  CASE
+		WHEN TIMESTAMP(r.date, TIME(r.clockin_time)) < TIMESTAMP(r.date, '08:30:00')
+		  THEN TIMESTAMP(r.date, '08:30:00')
+		ELSE TIMESTAMP(r.date, TIME(r.clockin_time))
+	  END,
+	  -- effective clock-out: use actual clock-out (do not cap to 16:30)
+	  TIMESTAMP(r.date, TIME(r.clockout_time))
+	)
+  )
+) / 60.0) AS total_hours
 FROM record_backups r
 JOIN employees e ON e.employee_id = r.employee_id
 WHERE r.type = 'Work'
-  AND r.status IN ('Early', 'OnTime', 'Late')
-  AND DAYOFWEEK(r.date) NOT IN (1, 7)
-  AND r.clockin_time IS NOT NULL
-  AND r.clockout_time IS NOT NULL
-  -- Optional filter for specific week (if user selects one)
-  -- AND YEARWEEK(r.date, 1) = YEARWEEK('2025-10-27', 1)
+AND r.status IN ('Early', 'OnTime', 'Late')
+AND DAYOFWEEK(r.date) NOT IN (1, 7)
+AND r.clockin_time IS NOT NULL
+AND r.clockout_time IS NOT NULL
 GROUP BY e.employee_id, YEARWEEK(r.date, 1)
 ORDER BY week_number DESC;`);
     return rows;
