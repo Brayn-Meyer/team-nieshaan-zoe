@@ -13,6 +13,8 @@
 <i class="fa-solid fa-calendar"></i>
               Time log
             </button>
+            <AdminNotifications/>
+
           </div>
         </div>
         
@@ -703,11 +705,13 @@
 <script>
 import HistoryView from '@/views/HistoryView.vue'
 import TimelogView from '@/views/Timelog.View.vue';
+import AdminNotifications from './AdminNotifications.vue';
 
 export default {
   components: {
     HistoryView,
-    TimelogView
+    TimelogView,
+    AdminNotifications
   },
   data() {
     return {

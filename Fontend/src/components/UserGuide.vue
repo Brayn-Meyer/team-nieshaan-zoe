@@ -1,31 +1,41 @@
 <template>
-
-  <div v-if="showGuide" class="user-guide-overlay">
-    <!-- Highlight Overlay -->
-    <div class="highlight-overlay" :style="highlightStyle"></div>
-    
-    <!-- Guide Content -->
-    <div class="guide-content" :style="guideContentStyle">
-      <div class="guide-header">
-        <h3>{{ currentStep.title }}</h3>
-        <button @click="closeGuide" class="close-btn">&times;</button>
+  <h1>Weekly Time Log</h1>
+  <br>
+  <div class="timelog-filters">
+    <div class="filter-section">
+      <div class="search-container">
+        <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="Search Employee..."
+          class="search-input"
+        />
       </div>
-      <div class="guide-body">
-        <p>{{ currentStep.content }}</p>
-        <div class="step-indicator">
-          Step {{ currentStepIndex + 1 }} of {{ guideSteps.length }}
-        </div>
-      </div>
-      <div class="guide-footer">
-        <button 
-          v-if="currentStepIndex > 0" 
-          @click="prevStep" 
-          class="btn-secondary"
+      <div class="week-container">
+        <select
+          v-model="selectedWeek"
+          class="week-select"
         >
-          Back
+          <option value="">Select Week</option>
+          <option v-for="week in weekOptions" :key="week.value" :value="week.value">
+            {{ week.label }}
+          </option>
+        </select>
+      </div>
+      <div class="filter-buttons">
+        <button
+          class="filter-btn btn-red"
+          :class="{ active: activeFilter === 'red' }"
+          @click="setFilter('red')"
+        >
+          <span class="tooltip">Hours Owed</span>
         </button>
-        <button @click="nextStep" class="btn-primary">
-          {{ currentStepIndex === guideSteps.length - 1 ? 'Finish' : 'Next' }}
+        <button
+          class="filter-btn btn-green"
+          :class="{ active: activeFilter === 'green' }"
+          @click="setFilter('green')"
+        >
+          <span class="tooltip">Hours Worked</span>
         </button>
       </div>
     </div>
@@ -34,256 +44,313 @@
 
 <script>
 export default {
-  name: 'UserGuide',
-  props: {
-    showGuide: {
-      type: Boolean,
-      default: false
-    }
-  },
+  name: 'TimelogFilters',
   data() {
     return {
-      currentStepIndex: 0,
-      guideSteps: [
-        {
-          title: "Dashboard Overview",
-          content: "Welcome to your Employee Attendance Dashboard! This is your main hub for tracking employee attendance in real-time.",
-          highlight: { top: '120px', left: '60px', width: 'calc(100% - 120px)', height: 'calc(100% - 170px)' },
-          position: { top: '200px', left: '50%', transform: 'translateX(-50%)' }
-        },
-        {
-          title: "Total Employees",
-          content: "This card shows the total number of registered employees in your system. Currently tracking 120 employees.",
-          highlight: { top: '120px', left: '60px', width: 'calc(25% - 40px)', height: '140px' },
-          position: { top: '280px', left: 'calc(12.5% + 60px)' }
-        },
-        {
-          title: "Clock In Status",
-          content: "Monitor how many employees are currently clocked in. Right now, 95 employees are present and working.",
-          highlight: { top: '120px', left: 'calc(25% + 40px)', width: 'calc(25% - 40px)', height: '140px' },
-          position: { top: '280px', left: '37.5%' }
-        },
-        {
-          title: "Clock Out Status",
-          content: "Track employees who have clocked out for the day. Currently, 20 employees have ended their shift.",
-          highlight: { top: '120px', left: 'calc(50% + 20px)', width: 'calc(25% - 40px)', height: '140px' },
-          position: { top: '280px', left: '62.5%' }
-        },
-        {
-          title: "Absent Employees",
-          content: "Keep an eye on absent employees. Currently, 5 employees are not present today.",
-          highlight: { top: '120px', left: 'calc(75% + 0px)', width: 'calc(25% - 40px)', height: '140px' },
-          position: { top: '280px', left: 'calc(87.5% + 20px)', transform: 'translateX(-100%)' }
-        },
-        {
-          title: "Employee Details Table",
-          content: "View detailed information about all employees including their clock-in/out times, status, and department information in this comprehensive table.",
-          highlight: { top: '300px', left: '60px', width: 'calc(100% - 120px)', height: 'calc(100% - 350px)' },
-          position: { top: '60%', left: '50%', transform: 'translateX(-50%)' }
-        }
-      ]
-    };
-  },
-  computed: {
-    currentStep() {
-      return this.guideSteps[this.currentStepIndex];
-    },
-    highlightStyle() {
-      return {
-        top: this.currentStep.highlight.top,
-        left: this.currentStep.highlight.left,
-        width: this.currentStep.highlight.width,
-        height: this.currentStep.highlight.height,
-      };
-    },
-    guideContentStyle() {
-      return {
-        top: this.currentStep.position.top,
-        left: this.currentStep.position.left,
-        transform: this.currentStep.position.transform
-      };
+      searchQuery: '',
+      activeFilter: null,
+      selectedWeek: '',
+      weekOptions: [],
+      refreshInterval: null
     }
   },
   methods: {
-    nextStep() {
-      if (this.currentStepIndex < this.guideSteps.length - 1) {
-        this.currentStepIndex++;
-      } else {
-        this.finishGuide();
+    setFilter(filterType) {
+      this.activeFilter = this.activeFilter === filterType ? null : filterType;
+      this.emitFilters();
+    },
+    generateWeekOptions() {
+      const options = [];
+      const today = new Date();
+      
+      for (let i = -4; i <= 8; i++) {
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay() + 1 + (i * 7)); 
+        
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 4); 
+        
+        const value = weekStart.toISOString().split('T')[0];
+        const startFormatted = this.formatDate(weekStart);
+        const endFormatted = this.formatDate(weekEnd);
+        
+        let label = `Week of ${startFormatted} - ${endFormatted}`;
+        
+      
+        if (i === 0) {
+          label += ' (Current Week)';
+        } else if (i === 1) {
+          label += ' (Next Week)';
+        } else if (i === -1) {
+          label += ' (Last Week)';
+        }
+        
+        options.push({ value, label, isCurrent: i === 0 });
+      }
+      
+      this.weekOptions = options;
+      
+      const currentWeek = options.find(week => week.isCurrent);
+      if (currentWeek && !this.selectedWeek) {
+        this.selectedWeek = currentWeek.value;
       }
     },
-    prevStep() {
-      if (this.currentStepIndex > 0) {
-        this.currentStepIndex--;
+    formatDate(date) {
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+      });
+    },
+    emitFilters() {
+      this.$emit('filter-changed', {
+        search: this.searchQuery,
+        filter: this.activeFilter,
+        week: this.selectedWeek
+      });
+    },
+    setupWeeklyRefresh() {
+      // Clear existing interval
+      if (this.refreshInterval) {
+        clearInterval(this.refreshInterval);
       }
+      
+      // Refresh weeks every day at midnight to ensure current week is always accurate
+      this.refreshInterval = setInterval(() => {
+        const now = new Date();
+        if (now.getHours() === 0 && now.getMinutes() === 0) {
+          this.generateWeekOptions();
+        }
+      }, 60000); // Check every minute
     },
-    closeGuide() {
-      this.$emit('close-guide');
-      this.resetGuide();
-    },
-    finishGuide() {
-      this.$emit('finish-guide');
-      this.resetGuide();
-    },
-    resetGuide() {
-      this.currentStepIndex = 0;
+    // Method to manually refresh weeks (can be called if needed)
+    refreshWeeks() {
+      this.generateWeekOptions();
     }
   },
   watch: {
-    showGuide(newVal) {
-      if (newVal) {
-        this.resetGuide();
-      }
+    searchQuery() {
+      this.emitFilters();
+    },
+    selectedWeek() {
+      this.emitFilters();
+    }
+  },
+  mounted() {
+    this.generateWeekOptions();
+    this.setupWeeklyRefresh();
+  },
+  beforeUnmount() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
     }
   }
-};
+}
 </script>
 
 <style scoped>
-.user-guide-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
+h1{
+    text-align: center;
+    font-style: bold;
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+}
+
+.timelog-filters {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center; 
+}
+
+.filter-section {
+  display: flex;
+  width: 80%;
+  gap: 15px;
+  align-items: center;
+  padding: 15px;
+  background-color: #F8F9FA;
+  border-radius: 8px;
+  border: 1px solid #E9ECEF;
+}
+
+.search-container {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-input {
   width: 100%;
-  height: 100%;
-  z-index: 10000;
-  pointer-events: none;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s;
+  height: 40px;
+  font-family: 'Poppins', sans-serif;
+  background-color: white;
+  color: #333;
 }
 
-.highlight-overlay {
-  position: absolute;
-  border: 3px solid #10b981;
-  border-radius: 12px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
-  pointer-events: none;
-  transition: all 0.4s ease;
-  animation: pulse 2s infinite;
+.search-input:focus {
+  outline: none;
+  border-color: #4A90E2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 
-@keyframes pulse {
-  0% { border-color: #10b981; }
-  50% { border-color: #34d399; }
-  100% { border-color: #10b981; }
+.week-container {
+  flex-shrink: 0;
+  min-width: 280px;
 }
 
-.guide-content {
-  position: absolute;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  min-width: 350px;
-  max-width: 450px;
-  z-index: 10001;
-  pointer-events: all;
-  border: 1px solid #e2e8f0;
-}
-
-.guide-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 25px 0 25px;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 15px;
-}
-
-.guide-header h3 {
-  margin: 0;
-  color: #065f46;
-  font-size: 1.3em;
-  font-weight: 600;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5em;
+.week-select {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s;
+  height: 40px;
+  font-family: 'Poppins', sans-serif;
+  background-color: white;
+  color: #333;
   cursor: pointer;
-  color: #718096;
-  padding: 0;
-  width: 30px;
-  height: 30px;
+}
+
+.week-select:focus {
+  outline: none;
+  border-color: #4A90E2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.filter-btn {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.close-btn:hover {
-  background: #f0fdf4;
+.filter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.guide-body {
-  padding: 20px 25px;
+.filter-btn.active {
+  transform: translateY(0);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+  border: 2px solid #000000;
 }
 
-.guide-body p {
-  margin: 0 0 15px 0;
-  line-height: 1.6;
-  color: #374151;
-  font-size: 1em;
+.btn-red {
+  background-color: #E74C3C;
 }
 
-.step-indicator {
-  font-size: 0.9em;
-  color: #059669;
-  font-weight: 500;
-  text-align: center;
-  padding: 8px 0;
-  border-top: 1px solid #e2e8f0;
+.btn-green {
+  background-color: #2ECC71;
 }
 
-.guide-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 25px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.btn-primary {
-  background: #10b981;
+.tooltip {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s;
+  z-index: 10;
 }
 
-.btn-primary:hover {
-  background: #059669;
-  transform: translateY(-1px);
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 5px 5px 5px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
 }
 
-.btn-secondary {
-  background: #d1fae5;
-  color: #065f46;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
+.filter-btn:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
 }
 
-.btn-secondary:hover {
-  background: #a7f3d0;
-  color: #064e3b;
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+  .filter-section {
+    width: 95%;
+    gap: 12px;
+  }
+  
+  .week-container {
+    min-width: 250px;
+  }
 }
 
 @media (max-width: 768px) {
-  .guide-content {
-    min-width: 300px;
-    max-width: 350px;
-    margin: 0 20px;
+  .filter-section {
+    width: 95%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
   }
   
-  .guide-header,
-  .guide-body,
-  .guide-footer {
-    padding: 15px 20px;
+  .search-container {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .week-container {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .week-select {
+    width: 100%;
+  }
+  
+  .filter-buttons {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-section {
+    width: 100%;
+    margin: 0 10px;
+    padding: 12px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+    padding: 0 10px;
+  }
+  
+  .search-input,
+  .week-select {
+    font-size: 16px;
+    height: 44px;
+  }
+  
+  .week-container {
+    min-width: auto;
   }
 }
 </style>
