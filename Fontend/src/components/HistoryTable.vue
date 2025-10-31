@@ -12,7 +12,7 @@
               <h6 class="card-title mb-1">{{ record.firstName }} {{ record.lastName }}</h6>
               <small class="text-muted">{{ record.employeeId }}</small>
             </div>
-            <span
+            <!-- <span
               class="badge"
               :class="{
                 'bg-success': record.status === 'active',
@@ -22,7 +22,7 @@
               }"
             >
               {{ record.status }}
-            </span>
+            </span> -->
           </div>
           <div class="mb-2">
             <small class="text-muted d-block">Date</small>
@@ -66,7 +66,7 @@
           <tr>
             <th>Full Name</th>
             <th>Employee ID</th>
-            <th>Status</th>
+            <!-- <th>Status</th> -->
             <th>Date</th>
             <th>Clock In</th>
             <th>Tea Out</th>
@@ -80,11 +80,11 @@
           <tr v-for="record in paginatedRecords" :key="record.id">
             <td>{{ record.first_name }} {{ record.last_name }}</td>
             <td>{{ record.employee_id }}</td>
-            <td>
+            <!-- <td>
               <span class="status-badge" :class="record.status">
                 {{ record.employment_status }}
               </span>
-            </td>
+            </td> -->
             <td>{{ formatDate(record.work_date) }}</td>
             <td>{{ record.work_clockin || '-' }}</td>
             <td>{{ record.tea_clockin || '-' }}</td>
