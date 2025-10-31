@@ -1,127 +1,98 @@
 <template>
-  <div class="table-container">
-    <table class="time-log-table">
-      <thead>
-        <tr>
-          <th>Employee Name</th>
-          <th>Employee ID</th>
-          <th>Status</th>
-          <th>Hours Worked</th>
-          <th>Hours Owed</th>
-          <th>Overtime</th>
-          <th>Indicator</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="employee in filteredEmployees" :key="employee.id">
-          <td>{{ employee.name }}</td>
-          <td>{{ employee.id }}</td>
-          <td>{{ employee.status }}</td>
-          <td>{{ employee.hoursWorked }}h</td>
-          <td>{{ employee.hoursOwed > 0 ? employee.hoursOwed + 'h' : '-' }}</td>
-          <td>{{ employee.overtime > 0 ? employee.overtime + 'h' : '-' }}</td>
-          <td>
-            <span
-              class="indicator"
-              :class="{
-                'green': employee.indicator === 'green',
-                'yellow': employee.indicator === 'yellow',
-                'red': employee.indicator === 'red'
-              }"
-              @click="handleIndicatorClick(employee)"
-            ></span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div>
+    <!-- Help Button -->
+    <button @click="showUserGuide = true" class="help-btn">
+      <i class="fa-solid fa-circle-question"></i>
+      Help Guide
+    </button>
 
-    <div v-if="showPopup" class="popup-overlay">
-      <div class="popup-container">
-        <div class="popup-content">
-          <h3>Hours are balanced.</h3>
-          <p>Confirm changes for {{ popupEmployee?.name }}?</p>
-          <div class="popup-buttons">
-            <button class="popup-btn popup-btn-no" @click="cancelChange">No</button>
-            <button class="popup-btn popup-btn-yes" @click="confirmChange">Yes</button>
-          </div>
-        </div>
-      </div>
+    <div class="table-container">
+      <table class="time-log-table">
+        <thead>
+          <tr>
+            <th>Employee Name</th>
+            <th>Employee ID</th>
+            <th>Status</th>
+            <th>Hours Worked</th>
+            <th>Hours Owed</th>
+            <th>Overtime</th>
+            <th>Indicator</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="employee in employees" :key="employee.id">
+            <td>{{ employee.name }}</td>
+            <td>{{ employee.id }}</td>
+            <td>{{ employee.status }}</td>
+            <td>{{ employee.hoursWorked }}</td>
+            <td>{{ employee.hoursOwed || '-' }}</td>
+            <td>{{ employee.overtime || '-' }}</td>
+            <td>
+              <span
+                class="indicator"
+                :class="{
+                  'green': employee.indicator === 'green',
+                  'yellow': employee.indicator === 'yellow',
+                  'red': employee.indicator === 'red'
+                }"
+              ></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+
+    <!-- Time Log Guide Component -->
+    <TimeLogGuide 
+      :showGuide="showUserGuide" 
+      @close-guide="showUserGuide = false"
+      @finish-guide="showUserGuide = false"
+    />
   </div>
 </template>
 
 <script>
+import TimeLogGuide from "@/components/TimeLogGuide.vue";
+
 export default {
-  name: 'TimeLog',
-  props: {
-    filterData: {
-      type: Object,
-      default: () => ({ search: '', filter: null })
-    }
+  name: "TimeLogView",
+  components: {
+    TimeLogGuide
   },
   data() {
     return {
+      showUserGuide: false,
       employees: [
-        { name: "John Smith", id: "E101", status: "Active", hoursWorked: 45, hoursOwed: 0, overtime: 0, indicator: "green" },
-        { name: "Sarah Johnson", id: "E102", status: "Active", hoursWorked: 42, hoursOwed: 3, overtime: 3, indicator: "yellow" },
-        { name: "Michael Brown", id: "E103", status: "Active", hoursWorked: 40, hoursOwed: 5, overtime: 0, indicator: "red" },
-        { name: "Emily Davis", id: "E104", status: "Active", hoursWorked: 38, hoursOwed: 2, overtime: 0, indicator: "red" },
-        { name: "David Wilson", id: "E105", status: "Active", hoursWorked: 45, hoursOwed: 5, overtime: 5, indicator: "yellow" },
-        { name: "Jennifer Lee", id: "E106", status: "Active", hoursWorked: 40, hoursOwed: 0, overtime: 0, indicator: "green" },
-        { name: "Robert Taylor", id: "E107", status: "Active", hoursWorked: 43, hoursOwed: 3, overtime: 3, indicator: "yellow" },
-        { name: "Lisa Anderson", id: "E108", status: "Inactive", hoursWorked: 0, hoursOwed: 8, overtime: 0, indicator: "red" },
-        { name: "James Martinez", id: "E109", status: "Active", hoursWorked: 47, hoursOwed: 7, overtime: 7, indicator: "yellow" },
-        { name: "Amanda White", id: "E110", status: "Active", hoursWorked: 39, hoursOwed: 1, overtime: 0, indicator: "red" },
-        { name: "Christopher Garcia", id: "E111", status: "Active", hoursWorked: 41, hoursOwed: 0, overtime: 1, indicator: "green" },
-        { name: "Michelle Rodriguez", id: "E112", status: "Active", hoursWorked: 37, hoursOwed: 3, overtime: 0, indicator: "red" }
-      ],
-      showPopup: false,
-      popupEmployee: null
-    }
+        { name: "Employee Names", id: "E123", status: "Active", hoursWorked: "45h", hoursOwed: "-", overtime: "-", indicator: "green" },
+        { name: "Employee Names", id: "E124", status: "Active", hoursWorked: "42h", hoursOwed: "-", overtime: "3h", indicator: "yellow" },
+        { name: "Employee Names", id: "E125", status: "Active", hoursWorked: "40h", hoursOwed: "5h", overtime: "-", indicator: "red" },
+        { name: "Employee Names", id: "E126", status: "Active", hoursWorked: "45h", hoursOwed: "-", overtime: "-", indicator: "green" }
+      ]
+    };
   },
-  computed: {
-    filteredEmployees() {
-      let filtered = this.employees;
-      
-      if (this.filterData.search) {
-        const query = this.filterData.search.toLowerCase();
-        filtered = filtered.filter(employee => 
-          employee.name.toLowerCase().includes(query) || 
-          employee.id.toLowerCase().includes(query)
-        );
-      }
-
-      if (this.filterData.filter) {
-        filtered = filtered.filter(employee => 
-          employee.indicator === this.filterData.filter
-        );
-      }
-
-      return filtered;
+  mounted() {
+    // Auto-show guide on first visit
+    const hasSeenTimeLogGuide = localStorage.getItem('hasSeenTimeLogGuide');
+    if (!hasSeenTimeLogGuide) {
+      this.showUserGuide = true;
+      localStorage.setItem('hasSeenTimeLogGuide', 'true');
     }
+
+    // Add keyboard shortcut (Ctrl + T) to open guide
+    document.addEventListener('keydown', this.handleKeyPress);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleKeyPress);
   },
   methods: {
-    handleIndicatorClick(employee) {
-      if (employee.indicator === 'yellow') {
-        this.popupEmployee = employee;
-        this.showPopup = true;
+    handleKeyPress(event) {
+      if (event.ctrlKey && event.key === 't') {
+        event.preventDefault();
+        this.showUserGuide = true;
       }
-    },
-    confirmChange() {
-      if (this.popupEmployee) {
-        this.popupEmployee.indicator = 'green';
-      }
-      this.closePopup();
-    },
-    cancelChange() {
-      this.closePopup();
-    },
-    closePopup() {
-      this.showPopup = false;
-      this.popupEmployee = null;
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -242,5 +213,45 @@ export default {
 .popup-btn-yes:hover {
   background-color: #26997a;
   border-color: #26997a;
+}
+
+/* Help Button Styles */
+.help-btn {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.help-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.help-btn i {
+  font-size: 16px;
+}
+
+@media (max-width: 576px) {
+  .help-btn {
+    top: 80px;
+    right: 20px;
+    padding: 10px 16px;
+    font-size: 0.9em;
+  }
 }
 </style>
