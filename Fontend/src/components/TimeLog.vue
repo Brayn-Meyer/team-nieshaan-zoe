@@ -1,4 +1,10 @@
 <template>
+  <div>
+
+  <button @click="showUserGuide = true" class="help-btn">
+      <i class="fa-solid fa-circle-question"></i>
+      Help Guide
+    </button>
   <div class="table-container">
     <div class="table-wrapper">
       <table class="time-log-table">
@@ -57,6 +63,7 @@
       @close-guide="showUserGuide = false"
       @finish-guide="showUserGuide = false"
     />
+  </div>
   </div>
 </template>
 
