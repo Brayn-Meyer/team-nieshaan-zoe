@@ -1,5 +1,4 @@
 <template>
-
   <div v-if="showGuide" class="user-guide-overlay">
     <!-- Highlight Overlay -->
     <div class="highlight-overlay" :style="highlightStyle"></div>
@@ -36,7 +35,13 @@
 
 <script>
 export default {
-  name: 'TimelogFilters',
+  name: 'UserGuide', // FIXED: Changed from 'TimelogFilters'
+  props: {
+    showGuide: {
+      type: Boolean,
+      required: true
+    }
+  },
   data() {
     return {
       currentStepIndex: 0,
@@ -101,94 +106,24 @@ export default {
     }
   },
   methods: {
-    setFilter(filterType) {
-      this.activeFilter = this.activeFilter === filterType ? null : filterType;
-      this.emitFilters();
-    },
-    generateWeekOptions() {
-      const options = [];
-      const today = new Date();
-      
-      for (let i = -4; i <= 8; i++) {
-        const weekStart = new Date(today);
-        weekStart.setDate(today.getDate() - today.getDay() + 1 + (i * 7)); 
-        
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 4); 
-        
-        const value = weekStart.toISOString().split('T')[0];
-        const startFormatted = this.formatDate(weekStart);
-        const endFormatted = this.formatDate(weekEnd);
-        
-        let label = `Week of ${startFormatted} - ${endFormatted}`;
-        
-      
-        if (i === 0) {
-          label += ' (Current Week)';
-        } else if (i === 1) {
-          label += ' (Next Week)';
-        } else if (i === -1) {
-          label += ' (Last Week)';
-        }
-        
-        options.push({ value, label, isCurrent: i === 0 });
-      }
-      
-      this.weekOptions = options;
-      
-      const currentWeek = options.find(week => week.isCurrent);
-      if (currentWeek && !this.selectedWeek) {
-        this.selectedWeek = currentWeek.value;
+    // FIXED: Added the missing user guide methods
+    nextStep() {
+      if (this.currentStepIndex < this.guideSteps.length - 1) {
+        this.currentStepIndex++;
+      } else {
+        this.finishGuide();
       }
     },
-    formatDate(date) {
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: 'numeric'
-      });
-    },
-    emitFilters() {
-      this.$emit('filter-changed', {
-        search: this.searchQuery,
-        filter: this.activeFilter,
-        week: this.selectedWeek
-      });
-    },
-    setupWeeklyRefresh() {
-      // Clear existing interval
-      if (this.refreshInterval) {
-        clearInterval(this.refreshInterval);
+    prevStep() {
+      if (this.currentStepIndex > 0) {
+        this.currentStepIndex--;
       }
-      
-      // Refresh weeks every day at midnight to ensure current week is always accurate
-      this.refreshInterval = setInterval(() => {
-        const now = new Date();
-        if (now.getHours() === 0 && now.getMinutes() === 0) {
-          this.generateWeekOptions();
-        }
-      }, 60000); // Check every minute
     },
-    // Method to manually refresh weeks (can be called if needed)
-    refreshWeeks() {
-      this.generateWeekOptions();
-    }
-  },
-  watch: {
-    searchQuery() {
-      this.emitFilters();
+    closeGuide() {
+      this.$emit('close-guide');
     },
-    selectedWeek() {
-      this.emitFilters();
-    }
-  },
-  mounted() {
-    this.generateWeekOptions();
-    this.setupWeeklyRefresh();
-  },
-  beforeUnmount() {
-    if (this.refreshInterval) {
-      clearInterval(this.refreshInterval);
+    finishGuide() {
+      this.$emit('finish-guide');
     }
   }
 }
@@ -209,7 +144,7 @@ export default {
   position: absolute;
   border: 3px solid #2EB28A;
   border-radius: 12px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); /* Reduced opacity for better visibility */
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
   pointer-events: none;
   transition: all 0.4s ease;
   animation: pulse 2s infinite;
@@ -229,7 +164,7 @@ export default {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   min-width: 350px;
   max-width: 450px;
-  z-index: 10002; /* Higher than highlight */
+  z-index: 10002;
   pointer-events: all;
   border-left: 4px solid #2EB28A;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -244,10 +179,9 @@ export default {
   padding: 20px 25px;
 }
 
-.filter-section {
+.guide-header {
   display: flex;
-  width: 80%;
-  gap: 15px;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
@@ -259,38 +193,16 @@ export default {
   font-weight: 600;
 }
 
-.search-input:focus {
-  outline: none;
-  border-color: #4A90E2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-}
-
-.week-container {
-  flex-shrink: 0;
-  min-width: 280px;
-}
-
-.week-select {
-  width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.3s;
-  height: 40px;
-  font-family: 'Poppins', sans-serif;
-  background-color: white;
-  color: #333;
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
   cursor: pointer;
-}
-
-.week-select:focus {
-  outline: none;
-  border-color: #4A90E2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-}
-
-.filter-buttons {
+  color: #6b7280;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -333,14 +245,12 @@ export default {
 .btn-primary {
   background: #2EB28A;
   color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 14px;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s;
-  z-index: 10;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -363,45 +273,5 @@ export default {
   background: #a7f3d0;
   color: #064e3b;
   transform: translateY(-1px);
-}
-
-@media (max-width: 768px) {
-  .filter-section {
-    width: 95%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
-  }
-  
-  .search-container {
-    width: 100%;
-    min-width: auto;
-  }
-  
-  .week-container {
-    width: 100%;
-    min-width: auto;
-  }
-  
-  .week-select {
-    width: 100%;
-  }
-  
-  .filter-buttons {
-    justify-content: center;
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .filter-section {
-    width: 100%;
-    margin: 0 10px;
-    padding: 12px;
-  }
-  
-  .guide-content-inner {
-    padding: 15px 20px;
-  }
 }
 </style>

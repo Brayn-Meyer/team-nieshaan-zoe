@@ -1,69 +1,69 @@
 <template>
   <div>
-
-  <button @click="showUserGuide = true" class="help-btn">
+    <button @click="showUserGuide = true" class="help-btn">
       <i class="fa-solid fa-circle-question"></i>
       Help Guide
     </button>
-  <div class="table-container">
-    <div class="table-wrapper">
-      <table class="time-log-table">
-        <thead class="th">
-          <tr>
-            <th>Employee Name</th>
-            <th>Employee ID</th>
-            <th>Hours Worked</th>
-            <th>Hours Owed</th>
-            <th>Overtime</th>
-            <th>Indicator</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="employee in filteredEmployees" :key="employee.id" class="table-row">
-            <td data-label="Employee Name">{{ employee.name }}</td>
-            <td data-label="Employee ID">{{ employee.id }}</td>
-            <td data-label="Hours Worked">{{ employee.hoursWorked }}h</td>
-            <td data-label="Hours Owed">{{ employee.hoursOwed > 0 ? employee.hoursOwed + 'h' : '-' }}</td>
-            <td data-label="Overtime">{{ employee.overtime > 0 ? employee.overtime + 'h' : '-' }}</td>
-            <td data-label="Indicator">
-              <span
-                class="indicator"
-                :class="{
-                  'green': employee.indicator === 'green',
-                  'red': employee.indicator === 'red'
-                }"
-                @click="handleIndicatorClick(employee)"
-              ></span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <div v-if="filteredEmployees.length === 0" class="no-results">
-        <p>No employees found matching your criteria.</p>
+    
+    <div class="table-container">
+      <div class="table-wrapper">
+        <table class="time-log-table">
+          <thead class="th">
+            <tr>
+              <th>Employee Name</th>
+              <th>Employee ID</th>
+              <th>Hours Worked</th>
+              <th>Hours Owed</th>
+              <th>Overtime</th>
+              <th>Indicator</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="employee in filteredEmployees" :key="employee.id" class="table-row">
+              <td data-label="Employee Name">{{ employee.name }}</td>
+              <td data-label="Employee ID">{{ employee.id }}</td>
+              <td data-label="Hours Worked">{{ employee.hoursWorked }}h</td>
+              <td data-label="Hours Owed">{{ employee.hoursOwed > 0 ? employee.hoursOwed + 'h' : '-' }}</td>
+              <td data-label="Overtime">{{ employee.overtime > 0 ? employee.overtime + 'h' : '-' }}</td>
+              <td data-label="Indicator">
+                <span
+                  class="indicator"
+                  :class="{
+                    'green': employee.indicator === 'green',
+                    'red': employee.indicator === 'red'
+                  }"
+                  @click="handleIndicatorClick(employee)"
+                ></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div v-if="filteredEmployees.length === 0" class="no-results">
+          <p>No employees found matching your criteria.</p>
+        </div>
       </div>
-    </div>
 
-    <div v-if="showPopup" class="popup-overlay">
-      <div class="popup-container">
-        <div class="popup-content">
-          <h3>Hours are balanced.</h3>
-          <p>Confirm changes for {{ popupEmployee?.name }}?</p>
-          <div class="popup-buttons">
-            <button class="popup-btn popup-btn-no" @click="cancelChange">No</button>
-            <button class="popup-btn popup-btn-yes" @click="confirmChange">Yes</button>
+      <div v-if="showPopup" class="popup-overlay">
+        <div class="popup-container">
+          <div class="popup-content">
+            <h3>Hours are balanced.</h3>
+            <p>Confirm changes for {{ popupEmployee?.name }}?</p>
+            <div class="popup-buttons">
+              <button class="popup-btn popup-btn-no" @click="cancelChange">No</button>
+              <button class="popup-btn popup-btn-yes" @click="confirmChange">Yes</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Time Log Guide Component -->
-    <TimeLogGuide 
-      :showGuide="showUserGuide" 
-      @close-guide="showUserGuide = false"
-      @finish-guide="showUserGuide = false"
-    />
-  </div>
+      <!-- Time Log Guide Component -->
+      <TimeLogGuide 
+        :showGuide="showUserGuide" 
+        @close-guide="showUserGuide = false"
+        @finish-guide="showUserGuide = false"
+      />
+    </div>
   </div>
 </template>
 
@@ -72,6 +72,9 @@ import TimeLogGuide from "@/components/TimeLogGuide.vue";
 
 export default {
   name: 'TimeLog',
+  components: {
+    TimeLogGuide
+  },
   props: {
     filterData: {
       type: Object,
@@ -149,7 +152,27 @@ export default {
     closePopup() {
       this.showPopup = false;
       this.popupEmployee = null;
+    },
+    handleKeyPress(event) {
+      if (event.ctrlKey && event.key === '/') {
+        event.preventDefault();
+        this.showUserGuide = true;
+      }
     }
+  },
+  mounted() {
+    // Auto-show guide on first visit to time log page
+    const hasSeenTimeLogGuide = localStorage.getItem('hasSeenTimeLogGuide');
+    if (!hasSeenTimeLogGuide) {
+      this.showUserGuide = true;
+      localStorage.setItem('hasSeenTimeLogGuide', 'true');
+    }
+
+    // Add keyboard shortcut (Ctrl + /) to open guide
+    document.addEventListener('keydown', this.handleKeyPress);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleKeyPress);
   }
 };
 </script>
@@ -188,7 +211,6 @@ export default {
   border-bottom: 1px solid #E0E0E0;
 }
 
-
 .table-row:hover {
   background-color: #f8f9fa;
 }
@@ -220,6 +242,85 @@ export default {
   padding: 40px;
   color: #666;
   font-family: 'Poppins', sans-serif;
+}
+
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-container {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  min-width: 300px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.popup-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+}
+
+.popup-content p {
+  margin: 0 0 25px 0;
+  font-size: 16px;
+  color: #666;
+  font-family: 'Poppins', sans-serif;
+}
+
+.popup-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.popup-btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  min-width: 100px;
+}
+
+.popup-btn-no {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 2px solid #dee2e6;
+}
+
+.popup-btn-no:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.popup-btn-yes {
+  background-color: #2EB28A;
+  color: white;
+  border: 2px solid #2EB28A;
+}
+
+.popup-btn-yes:hover {
+  background-color: #26997a;
+  border-color: #26997a;
 }
 
 /* Mobile Responsive Styles */
@@ -291,10 +392,7 @@ export default {
     margin-bottom: 10px;
     padding: 8px;
   }
-}
-
-
-@media (max-width: 480px) {
+  
   .popup-container {
     padding: 20px;
     min-width: 250px;
