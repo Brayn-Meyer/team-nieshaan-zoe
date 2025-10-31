@@ -36,13 +36,13 @@ const createOrFindClassification = async (department, roles, userType) => {
 export const EditEmpCon = async (req, res) => {
   try {
     console.log('=== EDIT EMPLOYEE REQUEST ===');
-    console.log('Employee ID:', req.params.id);
+    console.log('Employee ID:', req.params.employee_id);
     console.log('Request body:', JSON.stringify(req.body, null, 2));
     console.log('============================');
 
-    const employee_id = req.params.id;
+    const employee_id = req.params.employee_id;
     if (!employee_id) {
-      return res.status(400).json({ success: false, message: "Missing employee id in params" });
+      return res.status(400).json({ success: false, message: "Missing employee_id in params" });
     }
 
     const {

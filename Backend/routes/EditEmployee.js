@@ -3,6 +3,6 @@ import { EditEmpCon } from "../controllers/EditEmployeeCon.js"
 
 const router = express.Router()
 
-router.patch("/employee/edit/:id", EditEmpCon)
+router.patch("/employee/edit/:employee_id", EditEmpCon)
 
 export default router

@@ -1,4 +1,4 @@
-  <template>
+<template>
   <div>
 
     <div class="search-add-container mb-4">
@@ -9,10 +9,12 @@
               <i class="fa-solid fa-clock-rotate-left"></i>
               History
             </button>
-            <button class="btn btn-primary small-btn" @click="openMapModal">
-              <i class="fa-solid fa-map-location-dot"></i>
-              Map
+            <button class="btn btn-primary small-btn" @click="TimelogView">
+<i class="fa-solid fa-calendar"></i>
+              Time log
             </button>
+            <AdminNotifications/>
+
           </div>
         </div>
         
@@ -83,23 +85,23 @@
     </div>
     <div class="d-none d-md-block">
       <div class="table-responsive">
-        <table class="table table-striped employee-table">
+        <table class=" employee-table">
           <thead>
             <tr>
-              <th scope="col">Employee ID</th>
               <th scope="col">Name</th>
-              <th scope="col">Roles</th>
+              <th scope="col">Employee ID</th>
               <th scope="col">Department</th>
+              <th scope="col">Roles</th>
               <th scope="col">Status</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="employee in filteredList" :key="employee.id">
-              <td>{{ employee.employeeId }}</td>
               <td>{{ employee.name }}</td>
+              <td>{{ employee.employeeId }}</td>
+             <td>{{ employee.department }}</td>
               <td>{{ employee.roles }}</td>
-              <td>{{ employee.department }}</td>
               <td>{{ employee.status }}</td>
               <td>
                 <div class="dropdown">
@@ -381,17 +383,6 @@
                     required
                   >
                 </div>
-<!--                 
-                <div class="col-md-6">
-                  <label for="editClassificationId" class="form-label">Classification ID <span class="text-danger">*</span></label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    id="editClassificationId" 
-                    v-model="selectedEmployee.classificationId"
-                    required
-                  >
-                </div> -->
 
                 <div class="col-md-6">
                   <label for="editFirstName" class="form-label">First Name <span class="text-danger">*</span></label>
@@ -598,6 +589,7 @@
       </div>
     </div>
 
+
     <!-- View Times Modal -->
     <div class="modal fade" id="viewTimesModal" tabindex="-1" aria-labelledby="viewTimesModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -622,17 +614,17 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="time in employeeTimes" :key="time.id">
-                    <td>{{ formatDate(time.date) }}</td>
-                    <td>{{ time.clockIn }}</td>
-                    <td>{{ time.teaclockout }}</td>
-                    <td>{{ time.teaclockin }}</td>
-                    <td>{{ time.lunchclockout }}</td>
-                    <td>{{ time.lunchclockin }}</td>
-                    <td>{{ time.clockOut }}</td>
-                    <td>{{ time.totalHours }} hours</td>
+                  <tr v-if="selectedEmployee">
+                    <td>{{ formatDate(selectedEmployee.date) }}</td>
+                    <td>{{ selectedEmployee.work_clockin }}</td>
+                    <td>{{ selectedEmployee.tea_clockin }}</td>
+                    <td>{{ selectedEmployee.tea_clockout }}</td>
+                    <td>{{ selectedEmployee.lunch_clockin }}</td>
+                    <td>{{ selectedEmployee.lunch_clockout }}</td>
+                    <td>{{ selectedEmployee.work_clockout }}</td>
+                    <td>{{ selectedEmployee.totalHours }} hours</td>
                   </tr>
-                  <tr v-if="employeeTimes.length === 0">
+                  <tr v-else>
                     <td colspan="8" class="text-center text-muted">No time records found</td>
                   </tr>
                 </tbody>
@@ -673,12 +665,15 @@
 
 <script>
 import HistoryView from '@/views/HistoryView.vue'
+import TimelogView from '@/views/Timelog.View.vue';
+import AdminNotifications from './AdminNotifications.vue';
 import axios from 'axios';
-import API_URL from '../API';
-
+import API_URL from '@/API';
 export default {
   components: {
     HistoryView,
+    TimelogView,
+    AdminNotifications
   },
   data() {
     return {
@@ -743,19 +738,13 @@ export default {
       const storeList = this.$store && this.$store.state && Array.isArray(this.$store.state.employee_info)
         ? this.$store.state.employee_info
         : []
-      const employees = storeList.length ? storeList : this.employees
-      
-      // Format dates for all employees to prevent date input errors
-      return employees.map(emp => ({
-        ...emp,
-        dateHired: emp.dateHired ? this.formatDateForInput(emp.dateHired) : emp.dateHired
-      }))
+      return storeList.length ? storeList : this.employees
     },
     filteredList() {
       const q = (this.searchQuery || '').toLowerCase()
       return this.sourceEmployees.filter(item => {
         const matchesText = item.name?.toLowerCase().includes(q) ||
-                           (item.employee_id|| '').toLowerCase().includes(q) ||
+                           (item.employee_id || '').toLowerCase().includes(q) ||
                            (item.roles || '').toLowerCase().includes(q) ||
                            (item.department || '').toLowerCase().includes(q)
         return matchesText
@@ -763,51 +752,14 @@ export default {
     }
   },
   methods: {
-    formatDateForInput(dateString) {
-      if (!dateString) return dateString;
-      try {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return dateString;
-        return date.toISOString().split('T')[0];
-      } catch (error) {
-        console.error('Error formatting date:', error);
-        return dateString;
-      }
-    },
-    async fetchRoles() {
-      this.rolesLoading = true;
-      this.rolesError = null;
-      try {
-        const response = await axios.get(`${API_URL}/api/employees/getRoles`);
-        console.log('Fetched roles:', response.data);
-        this.roles = response.data.roles.map(role => ({
-          classification_id: role,
-          role: role
-        }));
-      } catch (error) {
-        console.error('Error fetching roles:', error);
-        this.rolesError = 'Failed to load roles';
-      } finally {
-        this.rolesLoading = false;
-      }
-    },
-    async fetchDepartments() {
-      this.departmentsLoading = true;
-      this.departmentsError = null;
-      try {
-        const response = await axios.get(`${API_URL}/api/employees/getDepartments`);
-        console.log('Fetched departments:', response.data);
-        this.departments = response.data.departments;
-      } catch (error) {
-        console.error('Error fetching departments:', error);
-        this.departmentsError = 'Failed to load departments';
-      } finally {
-        this.departmentsLoading = false;
-      }
-    },
-    HistoryView() {
+     HistoryView() {
       if (this.$router) {
         this.$router.push('/history');
+      }
+    },
+         TimelogView() {
+      if (this.$router) {
+        this.$router.push('/Timelog');
       }
     },
     
@@ -824,12 +776,17 @@ export default {
       this.searchQuery = '';
     },
     formatDate(dateString) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString(undefined, options);
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
     },
     openAddEmployeeModal() {
       this.newEmployee = {
-        // classificationId intentionally removed; backend will derive classification from role+department
+        employeeId: '',
         firstName: '',
         lastName: '',
         contactNo: '',
@@ -866,12 +823,17 @@ export default {
 
       // validate against store-backed list
       const existing = this.sourceEmployees || [];
+      if (existing.some(emp => emp.employeeId === this.newEmployee.employeeId)) {
+        alert('Employee ID already exists. Please use a unique ID.');
+        return;
+      }
+
       if (existing.some(emp => emp.username === this.newEmployee.username)) {
         alert('Username already exists. Please choose a different username.');
         return;
       }
 
-      // send payload to store action (server should assign employee_id)
+      // send payload to store action (server should assign id)
       const payload = {
         name: `${this.newEmployee.firstName} ${this.newEmployee.lastName}`,
         first_name: this.newEmployee.firstName,
@@ -879,7 +841,7 @@ export default {
         contact_no: this.newEmployee.contactNo,
         email: this.newEmployee.email,
         address: this.newEmployee.address,
-        id_number: this.newEmployee.idNumber,
+        id: this.newEmployee.idNumber,
         user_type: this.newEmployee.userType,
         date_hired: this.newEmployee.dateHired,
         supervisor_name: this.newEmployee.supervisorName,
@@ -902,24 +864,52 @@ export default {
         alert('Failed to add employee. See console for details.')
       }
     },
-
+    async fetchRoles() {
+      this.rolesLoading = true;
+      this.rolesError = null;
+      try {
+        const response = await axios.get(`${API_URL}/api/employees/getRoles`);
+        console.log('Fetched roles:', response.data);
+        this.roles = response.data.roles.map(role => ({
+          role: role
+        }));
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+        this.rolesError = 'Failed to load roles';
+      } finally {
+        this.rolesLoading = false;
+      }
+    },
+    async fetchDepartments() {
+      this.departmentsLoading = true;
+      this.departmentsError = null;
+      try {
+        const response = await axios.get(`${API_URL}/api/employees/getDepartments`);
+        console.log('Fetched departments:', response.data);
+        this.departments = response.data.departments;
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+        this.departmentsError = 'Failed to load departments';
+      } finally {
+        this.departmentsLoading = false;
+      }
+    },
     openEditModal(employee) {
-      // Create a deep copy to avoid reactivity issues
-      const employeeCopy = JSON.parse(JSON.stringify(employee));
+      this.selectedEmployee = JSON.parse(JSON.stringify(employee));
       
       const defaultEmployee = {
-        employee_id: '',
-        classification_id: '',
-        first_name: '',
-        last_name: '',
-        contact_no: '',
+        employeeId: '',
+        classificationId: '',
+        firstName: '',
+        lastName: '',
+        contactNo: '',
         email: '',
         address: '',
-        id_number: '',
-        user_type: 'Employee',
-        date_hired: new Date().toISOString().split('T')[0],
-        supervisor_name: '',
-        leave_balance: 20,
+        idNumber: '',
+        userType: 'Employee',
+        dateHired: new Date().toISOString().split('T')[0],
+        supervisorName: '',
+        leaveBalance: 20,
         username: '',
         password: '',
         roles: '',
@@ -927,18 +917,7 @@ export default {
         status: 'home'
       };
       
-      // Merge with defaults, ensuring we don't have reactive references
-      this.selectedEmployee = { ...defaultEmployee, ...employeeCopy };
-      
-      // Format the dateHired field to yyyy-MM-dd format for HTML date input
-      if (this.selectedEmployee.dateHired) {
-        this.selectedEmployee.dateHired = this.formatDateForInput(this.selectedEmployee.dateHired);
-      }
-      
-      // Ensure all date-related fields are formatted
-      if (this.selectedEmployee.date_hired) {
-        this.selectedEmployee.date_hired = this.formatDateForInput(this.selectedEmployee.date_hired);
-      }
+      this.selectedEmployee = { ...defaultEmployee, ...this.selectedEmployee };
       
       if (this.selectedEmployee.name && !this.selectedEmployee.firstName) {
         const nameParts = this.selectedEmployee.name.split(' ');
@@ -953,17 +932,9 @@ export default {
 
     // Open View Times modal for given employee
     openViewTimesModal(employee) {
-      this.selectedEmployee = employee || this.selectedEmployee;
-      const el = document.getElementById('viewTimesModal');
-      if (el && typeof window !== 'undefined' && window.bootstrap) {
-        const modal = new window.bootstrap.Modal(el);
-        modal.show();
-      } else if (el && typeof bootstrap !== 'undefined') {
-        const modal = new bootstrap.Modal(el);
-        modal.show();
-      } else {
-        console.warn('Bootstrap modal instance or element not available for #viewTimesModal');
-      }
+      this.selectedEmployee = employee;
+      const modal = new bootstrap.Modal(document.getElementById('viewTimesModal'));
+      modal.show();
     },
 
     // Open Delete Confirmation modal and set selected employee
@@ -983,7 +954,7 @@ export default {
 
     async saveEmployeeChanges() {
       const requiredFields = [
-        'firstName', 'lastName', 
+        'employeeId', 'classificationId', 'firstName', 'lastName', 
         'contactNo', 'email', 'address', 'idNumber', 'dateHired',
         'leaveBalance', 'username', 'roles', 'department'
       ];
@@ -1012,54 +983,38 @@ export default {
         return;
       }
 
-      // Create clean payload with only the fields we need, avoiding duplicate/conflicting fields
-      const payload = {
-        id: this.selectedEmployee.id,
-        firstName: this.selectedEmployee.firstName,
-        lastName: this.selectedEmployee.lastName,
-        contactNo: this.selectedEmployee.contactNo,
-        email: this.selectedEmployee.email,
-        address: this.selectedEmployee.address,
-        idNumber: this.selectedEmployee.idNumber,
-        userType: this.selectedEmployee.userType,
-        dateHired: this.selectedEmployee.dateHired, // This is already formatted as yyyy-MM-dd
-        supervisorName: this.selectedEmployee.supervisorName,
-        leaveBalance: this.selectedEmployee.leaveBalance,
-        username: this.selectedEmployee.username,
-        roles: this.selectedEmployee.roles,
-        department: this.selectedEmployee.department,
-        status: this.selectedEmployee.status
-      };
-
-      // Only include password if it's not empty
-      if (this.selectedEmployee.password && this.selectedEmployee.password.trim() !== '') {
-        payload.password = this.selectedEmployee.password;
+      // If password is empty, do not send password field so backend can keep it
+      const payload = { ...this.selectedEmployee };
+      if (!payload.password) {
+        delete payload.password;
       }
-
-      // Ensure name is synced
-      payload.name = `${payload.firstName} ${payload.lastName}`;
-
-      // Debug: Log what we're sending
-      console.log('Sending employee update payload:', {
+      // ensure name is synced and prepare fields for backend
+      const editPayload = {
+        employee_id: payload.employee_id || payload.employeeId, // Primary key for route param
+        name: `${payload.firstName} ${payload.lastName}`,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        contactNo: payload.contactNo,
+        email: payload.email,
+        address: payload.address,
+        idNumber: payload.idNumber, // This is the national ID, not employee_id
+        userType: payload.userType,
+        dateHired: payload.dateHired,
+        supervisorName: payload.supervisorName,
+        leaveBalance: payload.leaveBalance,
+        username: payload.username,
         roles: payload.roles,
         department: payload.department,
-        userType: payload.userType
-      });
+        status: payload.status
+      };
+      if (payload.password) {
+        editPayload.password = payload.password;
+      }
 
       try {
-        await this.$store.dispatch('edit_employee', payload);
-        
-        // Hide modal immediately after successful save
+        await this.$store.dispatch('edit_employee', editPayload);
         const modal = bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal'));
-        if (modal) {
-          modal.hide();
-        }
-        
-        // Clear selectedEmployee to break any reactive connections
-        this.selectedEmployee = {
-          roles: ""
-        };
-        
+        modal.hide();
         console.log(`Employee ${payload.name} updated successfully.`);
       } catch (err) {
         console.error('Failed to update employee:', err)
@@ -1080,14 +1035,12 @@ export default {
         }
       }
     },
-
-    // ...existing code...
   },
 }
 </script>
 
 <style scoped>
-/* Updated styles for the new layout */
+
 .search-add-container {
   max-width: 100%;
   margin: 0 auto;
@@ -1119,27 +1072,27 @@ export default {
 .search-container {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
   border-radius: 8px;
   background-color: #f8f9fa;
 }
 
 .search-input {
   width: 100%;
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
   font-size: 0.875rem;
   padding: 6px 12px;
 }
 
 .search-input:focus {
-  border-color: #00C0AA;
+  border-color: #2EB28A;
   box-shadow: 0 0 0 0.2rem rgba(0, 192, 170, 0.25);
 }
 
 /* Button Styles */
 .btn-primary {
-  background-color: #00C0AA;
-  border-color: #00C0AA;
+  background-color: #2EB28A;
+  border-color: #2EB28A;
 }
 
 .btn-primary:hover {
@@ -1160,16 +1113,24 @@ export default {
 .text-danger {
   color: #dc3545 !important;
 }
-
+.employee-table thead {
+  background-color: #2EB28A !important;
+  border-radius: 8px;
+}
+th {
+  padding: 1.5rem;
+  font-weight: 600;
+  color: #FAFAFA;
+}
 /* Modal Styles */
 .modal-xl {
   max-width: 1140px;
 }
 
 .section-title {
-  color: #00C0AA;
+  color: #2EB28A;
   font-weight: 600;
-  border-bottom: 2px solid #00C0AA;
+  border-bottom: 2px solid #2EB28A;
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -1182,17 +1143,17 @@ export default {
 }
 
 .form-control, .form-select {
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
   border-radius: 6px;
 }
 
 .form-control:focus, .form-select:focus {
-  border-color: #00C0AA;
+  border-color: #2EB28A;
   box-shadow: 0 0 0 0.2rem rgba(0, 192, 170, 0.25);
 }
 
 .form-check-input:checked {
-  background-color: #00C0AA;
+  background-color: #2EB28A;
   border-color: #00C0AA;
 }
 
@@ -1208,7 +1169,7 @@ export default {
   height: 100%;
   border: none;
   background: transparent;
-  border-left: 1px solid #00C0AA;
+  border-left: 1px solid #2EB28A;
   border-radius: 0 6px 6px 0;
 }
 
@@ -1228,7 +1189,7 @@ export default {
 
 .employee-card {
   background: white;
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
   border-radius: 8px;
   margin-bottom: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -1306,7 +1267,8 @@ export default {
 .employee-table {
   margin: 0 auto;
   width: 95%;
-  border: 1px solid #00C0AA;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 @media (min-width: 1200px) {
@@ -1327,11 +1289,11 @@ export default {
 }
 
 .modal-content {
-  border: 1px solid #00C0AA;
+  border: 1px solid #2EB28A;
 }
 
 .modal-header {
-  border-bottom: 1px solid #00C0AA;
+  border-bottom: 1px solid #2EB28A;
   padding: 1rem 1rem;
 }
 
@@ -1342,7 +1304,7 @@ export default {
 }
 
 .modal-footer {
-  border-top: 1px solid #00C0AA;
+  border-top: 1px solid #2EB28A;
   padding: 1rem;
 }
 

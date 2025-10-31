@@ -18,7 +18,12 @@ const routes = [
     path:'/history',
     name:'History',
     component: HistoryView,
-  }
+  },
+{
+  path:'/Timelog',
+    name:'Timelog',
+    component: () => import('../views/Timelog.View.vue'),
+}
 ]
 
 const router = createRouter({

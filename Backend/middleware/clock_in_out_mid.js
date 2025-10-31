@@ -24,9 +24,9 @@ export const getfilterAll = async() => {
     return row;
 }
 
-export const getHoursWorked = async () => {
+export const getHoursWorked = async (weekStart = null) => {
   try {
-    const [rows] = await pool.query(`
+    let query = `
 SELECT 
 e.employee_id,
 CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
@@ -52,12 +52,24 @@ ROUND(SUM(
 FROM record_backups r
 JOIN employees e ON e.employee_id = r.employee_id
 WHERE r.type = 'Work'
-AND r.status IN ('Early', 'OnTime', 'Late')
+AND r.status = 'Active'
 AND DAYOFWEEK(r.date) NOT IN (1, 7)
 AND r.clockin_time IS NOT NULL
-AND r.clockout_time IS NOT NULL
+AND r.clockout_time IS NOT NULL`;
+
+    const params = [];
+    
+    // Add week filter if provided
+    if (weekStart) {
+      query += ` AND r.date >= ? AND r.date < DATE_ADD(?, INTERVAL 7 DAY)`;
+      params.push(weekStart, weekStart);
+    }
+
+    query += `
 GROUP BY e.employee_id, YEARWEEK(r.date, 1)
-ORDER BY week_number DESC;`);
+ORDER BY week_number DESC`;
+
+    const [rows] = await pool.query(query, params);
     return rows;
   } catch (err) {
     console.error(err);
@@ -66,8 +78,28 @@ ORDER BY week_number DESC;`);
 };
 
 export class HoursManagement {
+    // Check if record exists for employee and week
+    static async recordExists(employee_id, week_start) {
+        const query = `SELECT hrs_id FROM hours_management 
+                       WHERE employee_id = ? AND week_start = ?`;
+        const [rows] = await pool.execute(query, [employee_id, week_start]);
+        return rows.length > 0;
+    }
+
+    // Get all records for a specific week (batch fetch)
+    static async getByWeek(week_start) {
+        const query = `SELECT * FROM hours_management WHERE week_start = ?`;
+        const [rows] = await pool.execute(query, [week_start]);
+        return rows;
+    }
+
     // Create hours record
     static async createRecord(employee_id, week_start, week_end, expected_hours, total_worked_hours) {
+        // Prevent duplicates
+        if (await this.recordExists(employee_id, week_start)) {
+            throw new Error('Record already exists for this week');
+        }
+
         // Calculate both hours owed AND overtime
         let hour_owed = 0;
         let overtime = 0;

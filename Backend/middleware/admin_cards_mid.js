@@ -11,7 +11,11 @@ export const getTotalEmployeesData = async () => {
 
 export const getTotalCheckedInData = async () => {
   try {
-    let [row] = await pool.query("SELECT COUNT(clockin_time) AS 'checkedIn' FROM record_backups WHERE clockin_time IS NOT NULL;")
+    const today = new Date().toISOString().split('T')[0];
+    let [row] = await pool.query(
+      "SELECT COUNT(DISTINCT employee_id) AS 'checkedIn' FROM record_backups WHERE clockin_time IS NOT NULL AND date = ? AND type = 'Work'",
+      [today]
+    );
     return row
   } catch (error) {
     throw new Error('Database error: ' + error.message);
@@ -20,7 +24,11 @@ export const getTotalCheckedInData = async () => {
 
 export const getTotalCheckedOutData = async () => {
   try {
-    let [row] = await pool.query("SELECT COUNT(clockout_time) AS 'checkedOut' FROM record_backups WHERE clockout_time IS NOT NULL;")
+    const today = new Date().toISOString().split('T')[0];
+    let [row] = await pool.query(
+      "SELECT COUNT(DISTINCT employee_id) AS 'checkedOut' FROM record_backups WHERE clockout_time IS NOT NULL AND date = ? AND type = 'Work'",
+      [today]
+    );
     return row
   } catch (error) {
     throw new Error('Database error: ' + error.message);
@@ -29,7 +37,11 @@ export const getTotalCheckedOutData = async () => {
 
 export const getTotalAbsentData = async () => {
   try {
-    let [row] = await pool.query("SELECT COUNT(employment_status) AS 'absent' FROM employees WHERE employment_status NOT IN ('Active', 'Terminated') ;")
+    const today = new Date().toISOString().split('T')[0];
+    let [row] = await pool.query(
+      "SELECT COUNT(DISTINCT employee_id) AS 'absent' FROM record_backups WHERE status = 'Absent' AND date = ? AND type = 'Work'",
+      [today]
+    );
     return row
   } catch (error) {
     throw new Error('Database error: ' + error.message);

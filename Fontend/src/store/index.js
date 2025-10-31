@@ -44,8 +44,8 @@ export default createStore({
     },
 
     async edit_employee({ dispatch }, payload){
-      // expect payload to include id
-      await axios.patch(`${API_URL}/api/edit-employee/employee/edit/${payload.id}`, payload)
+      // expect payload to include employee_id
+      await axios.patch(`${API_URL}/api/edit-employee/employee/edit/${payload.employee_id}`, payload)
       dispatch("fetch_employee_info")
     },
 

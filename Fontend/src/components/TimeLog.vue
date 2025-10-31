@@ -1,0 +1,506 @@
+<template>
+  <div>
+    <button @click="showUserGuide = true" class="help-btn">
+      <i class="fa-solid fa-circle-question"></i>
+      Help Guide
+    </button>
+    
+    <div class="table-container">
+      <div class="table-wrapper">
+        <table class="time-log-table">
+          <thead class="th">
+            <tr>
+              <th>Employee Name</th>
+              <th>Employee ID</th>
+              <th>Hours Worked</th>
+              <th>Hours Owed</th>
+              <th>Overtime</th>
+              <th>Indicator</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="employee in filteredEmployees" :key="employee.id" class="table-row">
+              <td data-label="Employee Name">{{ employee.name }}</td>
+              <td data-label="Employee ID">{{ employee.id }}</td>
+              <td data-label="Hours Worked">{{ employee.hoursWorked }}</td>
+              <td data-label="Hours Owed">{{ employee.hoursOwed > 0 ? employee.hoursOwed + 'h' : '-' }}</td>
+              <td data-label="Overtime">{{ employee.overtime > 0 ? employee.overtime + 'h' : '-' }}</td>
+              <td data-label="Indicator">
+                <span
+                  class="indicator"
+                  :class="{
+                    'green': employee.indicator === 'green',
+                    'red': employee.indicator === 'red'
+                  }"
+                  @click="handleIndicatorClick(employee)"
+                ></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div v-if="filteredEmployees.length === 0" class="no-results">
+          <p>No employees found matching your criteria.</p>
+        </div>
+      </div>
+
+      <div v-if="showPopup" class="popup-overlay">
+        <div class="popup-container">
+          <div class="popup-content">
+            <h3>Hours are balanced.</h3>
+            <p>Confirm changes for {{ popupEmployee?.name }}?</p>
+            <div class="popup-buttons">
+              <button class="popup-btn popup-btn-no" @click="cancelChange">No</button>
+              <button class="popup-btn popup-btn-yes" @click="confirmChange">Yes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Log Guide Component -->
+      <TimeLogGuide 
+        :showGuide="showUserGuide" 
+        @close-guide="showUserGuide = false"
+        @finish-guide="showUserGuide = false"
+      />
+    </div>
+  </div>
+</template>
+
+<script>
+import TimeLogGuide from "@/components/TimeLogGuide.vue";
+import axios from "axios";
+import API_URL from '../API';
+
+export default {
+  name: 'TimeLog',
+  components: {
+    TimeLogGuide
+  },
+  props: {
+    filterData: {
+      type: Object,
+      default: () => ({ search: '', filter: null, week: null })
+    }
+  },
+  data() {
+    return {
+      showUserGuide: false,
+      employees: [],
+      showPopup: false,
+      popupEmployee: null,
+      currentWeek: null // Store selected week
+    }
+  },
+  computed: {
+    filteredEmployees() {
+      let filtered = this.employees;
+      
+      // Search filter
+      if (this.filterData.search) {
+        const query = this.filterData.search.toLowerCase();
+        filtered = filtered.filter(employee => 
+          employee.name.toLowerCase().includes(query) || 
+          String(employee.id).toLowerCase().includes(query)
+        );
+      }
+
+      // Color filter - fix: check if filter is not null
+      if (this.filterData.filter) {
+        filtered = filtered.filter(employee => 
+          employee.indicator === this.filterData.filter
+        );
+      }
+
+      return filtered;
+    }
+  },
+  watch: {
+    // Watch for week filter changes from parent
+    'filterData.week'(newWeek) {
+      if (newWeek) {
+        console.log('Week filter changed to:', newWeek);
+        this.fetchTimeLogData(newWeek);
+      }
+    }
+  },
+  methods: {
+    // Get current week's Monday in YYYY-MM-DD format
+    getCurrentWeekMonday() {
+      const today = new Date();
+      const day = today.getDay();
+      const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+      const monday = new Date(today.setDate(diff));
+      return monday.toISOString().split('T')[0];
+    },
+
+    async fetchTimeLogData(selectedWeek = null) {
+      try {
+        // Use selected week or current week
+        const week = selectedWeek || this.currentWeek || this.getCurrentWeekMonday();
+        this.currentWeek = week;
+        
+        const response = await axios.get(`${API_URL}/api/clock-in-out/getTimeLogData`, {
+          params: { week }
+        });
+        
+        this.employees = response.data.timeLogData || [];
+        console.log('Fetched time log data for week:', week, this.employees);
+      } catch (error) {
+        console.error("Error fetching time log data:", error);
+        this.employees = [];
+      }
+    },
+
+    handleIndicatorClick(employee) {
+      if (employee.indicator === 'red' && !employee.is_saved) {
+        this.popupEmployee = employee;
+        this.showPopup = true;
+      }
+    },
+
+    async confirmChange() {
+      if (this.popupEmployee) {
+        try {
+          // Format week_start and week_end as YYYY-MM-DD
+          const weekStart = typeof this.popupEmployee.week_start === 'string' 
+            ? this.popupEmployee.week_start 
+            : new Date(this.popupEmployee.week_start).toISOString().split('T')[0];
+          
+          const weekEnd = typeof this.popupEmployee.week_end === 'string'
+            ? this.popupEmployee.week_end
+            : new Date(this.popupEmployee.week_end).toISOString().split('T')[0];
+
+          // Save to hours_management table
+          const response = await axios.post(`${API_URL}/api/clock-in-out/createRecord`, {
+            employee_id: this.popupEmployee.id,
+            week_start: weekStart,
+            week_end: weekEnd,
+            expected_hours: this.popupEmployee.expected_hours || 40,
+            total_worked_hours: this.popupEmployee.hoursWorked
+          });
+          
+          if (response.data.success) {
+            // Update indicator locally
+            this.popupEmployee.indicator = 'green';
+            this.popupEmployee.is_saved = true;
+            this.$forceUpdate();
+            console.log('Hours balanced for:', this.popupEmployee.name);
+          }
+        } catch (error) {
+          console.error('Error saving hours record:', error);
+          
+          if (error.response?.status === 409) {
+            alert('This record has already been saved.');
+          } else {
+            alert('Failed to save record. Please try again.');
+          }
+        }
+      }
+      this.closePopup();
+    },
+    cancelChange() {
+      this.closePopup();
+    },
+    closePopup() {
+      this.showPopup = false;
+      this.popupEmployee = null;
+    },
+    handleKeyPress(event) {
+      if (event.ctrlKey && event.key === '/') {
+        event.preventDefault();
+        this.showUserGuide = true;
+      }
+    }
+  },
+  mounted() {
+    // Fetch time log data
+    this.fetchTimeLogData();
+    
+    // Auto-show guide on first visit to time log page
+    const hasSeenTimeLogGuide = localStorage.getItem('hasSeenTimeLogGuide');
+    if (!hasSeenTimeLogGuide) {
+      this.showUserGuide = true;
+      localStorage.setItem('hasSeenTimeLogGuide', 'true');
+    }
+
+    // Add keyboard shortcut (Ctrl + /) to open guide
+    document.addEventListener('keydown', this.handleKeyPress);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleKeyPress);
+  }
+};
+</script>
+
+<style scoped>
+.table-container {
+  margin: 1rem auto;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  max-width: 1200px;
+  width: 95%;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+.time-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Poppins', sans-serif;
+  background-color: white;
+  min-width: 600px;
+}
+
+.time-log-table thead {
+  background-color: #2EB28A;
+  color: white;
+}
+
+.time-log-table th, .time-log-table td {
+  padding: 30px 20px;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.table-row:hover {
+  background-color: #f8f9fa;
+}
+
+.indicator {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 2px solid transparent;
+}
+
+.indicator:hover {
+  transform: scale(1.2);
+}
+
+.indicator.green {
+  background-color: #00C851;
+}
+
+.indicator.red {
+  background-color: #FF4444;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-container {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  min-width: 300px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.popup-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+}
+
+.popup-content p {
+  margin: 0 0 25px 0;
+  font-size: 16px;
+  color: #666;
+  font-family: 'Poppins', sans-serif;
+}
+
+.popup-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.popup-btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  min-width: 100px;
+}
+
+.popup-btn-no {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 2px solid #dee2e6;
+}
+
+.popup-btn-no:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.popup-btn-yes {
+  background-color: #2EB28A;
+  color: white;
+  border: 2px solid #2EB28A;
+}
+
+.popup-btn-yes:hover {
+  background-color: #26997a;
+  border-color: #26997a;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .table-container {
+    margin: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .time-log-table {
+    min-width: 100%;
+  }
+  
+  .time-log-table thead {
+    display: none;
+  }
+  
+  .time-log-table tbody tr {
+    display: block;
+    margin-bottom: 15px;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    padding: 10px;
+    background: white;
+  }
+  
+  .time-log-table tbody tr td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: right;
+  }
+  
+  .time-log-table tbody tr td:last-child {
+    border-bottom: none;
+  }
+  
+  .time-log-table tbody tr td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    text-align: left;
+    color: #333;
+  }
+  
+  .time-log-table tbody tr td:last-child {
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .time-log-table tbody tr td:last-child::before {
+    content: "Indicator";
+  }
+}
+
+@media (max-width: 480px) {
+  .table-container {
+    margin: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .time-log-table tbody tr td {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .time-log-table tbody tr {
+    margin-bottom: 10px;
+    padding: 8px;
+  }
+  
+  .popup-container {
+    padding: 20px;
+    min-width: 250px;
+  }
+  
+  .popup-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .popup-btn {
+    width: 100%;
+  }
+}
+
+/* Help Button Styles */
+.help-btn {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.help-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.help-btn i {
+  font-size: 16px;
+}
+
+@media (max-width: 576px) {
+  .help-btn {
+    top: 80px;
+    right: 20px;
+    padding: 10px 16px;
+    font-size: 0.9em;
+  }
+}
+</style>
