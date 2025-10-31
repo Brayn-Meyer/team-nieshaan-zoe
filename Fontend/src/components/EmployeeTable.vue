@@ -653,17 +653,17 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="time in employeeTimes" :key="time.id">
-                    <td>{{ formatDate(time.date) }}</td>
-                    <td>{{ time.clockIn }}</td>
-                    <td>{{ time.teaclockout }}</td>
-                    <td>{{ time.teaclockin }}</td>
-                    <td>{{ time.lunchclockout }}</td>
-                    <td>{{ time.lunchclockin }}</td>
-                    <td>{{ time.clockOut }}</td>
-                    <td>{{ time.totalHours }} hours</td>
+                  <tr v-if="selectedEmployee">
+                    <td>{{ formatDate(selectedEmployee.date) }}</td>
+                    <td>{{ selectedEmployee.work_clockin }}</td>
+                    <td>{{ selectedEmployee.tea_clockin }}</td>
+                    <td>{{ selectedEmployee.tea_clockout }}</td>
+                    <td>{{ selectedEmployee.lunch_clockin }}</td>
+                    <td>{{ selectedEmployee.lunch_clockout }}</td>
+                    <td>{{ selectedEmployee.work_clockout }}</td>
+                    <td>{{ selectedEmployee.totalHours }} hours</td>
                   </tr>
-                  <tr v-if="employeeTimes.length === 0">
+                  <tr v-else>
                     <td colspan="8" class="text-center text-muted">No time records found</td>
                   </tr>
                 </tbody>
@@ -741,104 +741,104 @@ export default {
       },
       // keep a local fallback list for offline / initial UX (can be empty)
       employees: [
-        {
-          id: 1,
-          name: 'John Doe',
-          employeeId: 'EMP001',
-          classificationId: 'CL001',
-          firstName: 'John',
-          lastName: 'Doe',
-          contactNo: '+1 (555) 123-4567',
-          email: 'john.doe@company.com',
-          address: '123 Main St, New York, NY',
-          idNumber: '123456789',
-          userType: 'Employee',
-          dateHired: '2023-01-15',
-          supervisorName: 'Sarah Wilson',
-          leaveBalance: 20,
-          username: 'johndoe',
-          password: 'password123',
-          roles: 'Developer',
-          department: 'Engineering',
-          status: 'On-site',
-        },
-        {
-          id: 2,
-          name: 'Jane Smith',
-          employeeId: 'EMP002',
-          classificationId: 'CL002',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          contactNo: '+1 (555) 234-5678',
-          email: 'jane.smith@company.com',
-          address: '456 Oak Ave, Los Angeles, CA',
-          idNumber: '234567890',
-          userType: 'Employee',
-          dateHired: '2023-02-20',
-          supervisorName: 'Mike Johnson',
-          leaveBalance: 18,
-          username: 'janesmith',
-          password: 'password123',
-          roles: 'Designer',
-          department: 'Design',
-          status: 'remote',
-        },
-        {
-          id: 3,
-          name: 'Mike Jordan',
-          employeeId: 'EMP003',
-          classificationId: 'CL003',
-          firstName: 'Mike',
-          lastName: 'Jordan',
-          contactNo: '+1 (555) 345-6789',
-          email: 'mike.jordan@company.com',
-          address: '789 Pine Rd, Chicago, IL',
-          idNumber: '345678901',
-          userType: 'Admin',
-          dateHired: '2022-11-10',
-          supervisorName: '',
-          leaveBalance: 22,
-          username: 'mikejordan',
-          password: 'password123',
-          roles: 'Manager',
-          department: 'Operations',
-          status: 'on-site',
-        }
+        // {
+        //   id: 1,
+        //   name: 'John Doe',
+        //   employeeId: 'EMP001',
+        //   classificationId: 'CL001',
+        //   firstName: 'John',
+        //   lastName: 'Doe',
+        //   contactNo: '+1 (555) 123-4567',
+        //   email: 'john.doe@company.com',
+        //   address: '123 Main St, New York, NY',
+        //   idNumber: '123456789',
+        //   userType: 'Employee',
+        //   dateHired: '2023-01-15',
+        //   supervisorName: 'Sarah Wilson',
+        //   leaveBalance: 20,
+        //   username: 'johndoe',
+        //   password: 'password123',
+        //   roles: 'Developer',
+        //   department: 'Engineering',
+        //   status: 'On-site',
+        // },
+        // {
+        //   id: 2,
+        //   name: 'Jane Smith',
+        //   employeeId: 'EMP002',
+        //   classificationId: 'CL002',
+        //   firstName: 'Jane',
+        //   lastName: 'Smith',
+        //   contactNo: '+1 (555) 234-5678',
+        //   email: 'jane.smith@company.com',
+        //   address: '456 Oak Ave, Los Angeles, CA',
+        //   idNumber: '234567890',
+        //   userType: 'Employee',
+        //   dateHired: '2023-02-20',
+        //   supervisorName: 'Mike Johnson',
+        //   leaveBalance: 18,
+        //   username: 'janesmith',
+        //   password: 'password123',
+        //   roles: 'Designer',
+        //   department: 'Design',
+        //   status: 'remote',
+        // },
+        // {
+        //   id: 3,
+        //   name: 'Mike Jordan',
+        //   employeeId: 'EMP003',
+        //   classificationId: 'CL003',
+        //   firstName: 'Mike',
+        //   lastName: 'Jordan',
+        //   contactNo: '+1 (555) 345-6789',
+        //   email: 'mike.jordan@company.com',
+        //   address: '789 Pine Rd, Chicago, IL',
+        //   idNumber: '345678901',
+        //   userType: 'Admin',
+        //   dateHired: '2022-11-10',
+        //   supervisorName: '',
+        //   leaveBalance: 22,
+        //   username: 'mikejordan',
+        //   password: 'password123',
+        //   roles: 'Manager',
+        //   department: 'Operations',
+        //   status: 'on-site',
+        // }
       ],
       employeeTimes: [
-        {
-          id: 1,
-          date: '2025-08-01',
-          clockIn: '09:00 AM',
-          clockOut: '05:00 PM',
-          teaclockin: '10:30 AM',
-          teaclockout: '10:45 AM',
-          lunchclockin: '01:00 PM',
-          lunchclockout: '02:00 PM',
-          totalHours: 8,
-        },
-        {
-          id: 2,
-          date: '2025-08-02',
-          clockIn: '09:15 AM',
-          clockOut: '05:15 PM',
-          teaclockin: '10:30 AM',
-          teaclockout: '10:45 AM',
-          lunchclockin: '01:00 PM',
-          lunchclockout: '02:00 PM',
-          totalHours: 8,
-        },
-        {
-          id: 3,
-          date: '2025-08-03',
-          clockIn: '08:45 AM',
-          clockOut: '04:45 PM',
-          teaclockin: '10:30 AM',
-          teaclockout: '10:45 AM',
-          lunchclockin: '01:00 PM',
-          lunchclockout: '02:00 PM',
-          totalHours: 8,
-        },
+        // {
+        //   id: 1,
+        //   date: '2025-08-01',
+        //   clockIn: '09:00 AM',
+        //   clockOut: '05:00 PM',
+        //   teaclockin: '10:30 AM',
+        //   teaclockout: '10:45 AM',
+        //   lunchclockin: '01:00 PM',
+        //   lunchclockout: '02:00 PM',
+        //   totalHours: 8,
+        // },
+        // {
+        //   id: 2,
+        //   date: '2025-08-02',
+        //   clockIn: '09:15 AM',
+        //   clockOut: '05:15 PM',
+        //   teaclockin: '10:30 AM',
+        //   teaclockout: '10:45 AM',
+        //   lunchclockin: '01:00 PM',
+        //   lunchclockout: '02:00 PM',
+        //   totalHours: 8,
+        // },
+        // {
+        //   id: 3,
+        //   date: '2025-08-03',
+        //   clockIn: '08:45 AM',
+        //   clockOut: '04:45 PM',
+        //   teaclockin: '10:30 AM',
+        //   teaclockout: '10:45 AM',
+        //   lunchclockin: '01:00 PM',
+        //   lunchclockout: '02:00 PM',
+        //   totalHours: 8,
+        // },
       ]
     }
   },
@@ -894,8 +894,13 @@ export default {
       this.searchQuery = '';
     },
     formatDate(dateString) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString(undefined, options);
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
     },
     openAddEmployeeModal() {
       this.newEmployee = {
@@ -1019,17 +1024,9 @@ export default {
 
     // Open View Times modal for given employee
     openViewTimesModal(employee) {
-      this.selectedEmployee = employee || this.selectedEmployee;
-      const el = document.getElementById('viewTimesModal');
-      if (el && typeof window !== 'undefined' && window.bootstrap) {
-        const modal = new window.bootstrap.Modal(el);
-        modal.show();
-      } else if (el && typeof bootstrap !== 'undefined') {
-        const modal = new bootstrap.Modal(el);
-        modal.show();
-      } else {
-        console.warn('Bootstrap modal instance or element not available for #viewTimesModal');
-      }
+      this.selectedEmployee = employee;
+      const modal = new bootstrap.Modal(document.getElementById('viewTimesModal'));
+      modal.show();
     },
 
     // Open Delete Confirmation modal and set selected employee

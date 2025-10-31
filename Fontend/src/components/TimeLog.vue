@@ -50,10 +50,19 @@
         </div>
       </div>
     </div>
+
+    <!-- Time Log Guide Component -->
+    <TimeLogGuide 
+      :showGuide="showUserGuide" 
+      @close-guide="showUserGuide = false"
+      @finish-guide="showUserGuide = false"
+    />
   </div>
 </template>
 
 <script>
+import TimeLogGuide from "@/components/TimeLogGuide.vue";
+
 export default {
   name: 'TimeLog',
   props: {
@@ -64,6 +73,7 @@ export default {
   },
   data() {
     return {
+      showUserGuide: false,
       employees: [
         { name: "John Smith", id: "E101", hoursWorked: 41, hoursOwed: 0, overtime: 1, indicator: "green" },
         { name: "Sarah Johnson", id: "E102", hoursWorked: 39, hoursOwed: 1, overtime: 0, indicator: "red" },
@@ -134,7 +144,7 @@ export default {
       this.popupEmployee = null;
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -290,6 +300,46 @@ export default {
   
   .popup-btn {
     width: 100%;
+  }
+}
+
+/* Help Button Styles */
+.help-btn {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.help-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.help-btn i {
+  font-size: 16px;
+}
+
+@media (max-width: 576px) {
+  .help-btn {
+    top: 80px;
+    right: 20px;
+    padding: 10px 16px;
+    font-size: 0.9em;
   }
 }
 </style>
