@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showGuide" class="history-guide-overlay">
+  <div v-if="showGuide" class="time-log-guide-overlay">
     <!-- Highlight Overlay -->
     <div class="highlight-overlay" :style="highlightStyle"></div>
     
@@ -33,7 +33,7 @@
 
 <script>
 export default {
-  name: 'HistoryGuide',
+  name: 'TimeLogGuide',
   props: {
     showGuide: {
       type: Boolean,
@@ -45,16 +45,16 @@ export default {
       currentStepIndex: 0,
       guideSteps: [
         {
-          title: "Attendance History Overview",
-          content: "Welcome to the Attendance History page! Here you can view, filter, and export comprehensive attendance records for all employees.",
-          highlight: { top: '120px', left: '1rem', width: 'calc(100% - 2rem)', height: 'calc(100% - 140px)' },
-          position: { top: '200px', left: '50%', transform: 'translateX(-50%)' }
+          title: "Time Log Table Overview",
+          content: "Welcome to the Time Log Table! This page provides a comprehensive view of employee work hours, overtime, and performance indicators.",
+          highlight: { top: '0', left: '0', width: '100%', height: '100%' },
+          position: { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
         },
         {
-          title: "Attendance Records Table",
-          content: "View detailed attendance information including clock-in/out times, tea breaks, lunch breaks, and employee status for each day.",
-          highlight: { top: '380px', left: '1rem', width: 'calc(100% - 2rem)', height: 'calc(100% - 420px)' },
-          position: { top: '60%', left: '50%', transform: 'translateX(-50%)' }
+          title: "Understanding Indicators",
+          content: "Green: Normal hours (45h), Yellow: Some overtime (42h + 3h OT), Red: Hours owed (40h + 5h owed) - monitor closely.",
+          highlight: { top: '120px', left: '1rem', width: 'calc(100% - 2rem)', height: '200px' },
+          position: { top: '350px', left: '50%', transform: 'translateX(-50%)' }
         }
       ]
     };
@@ -115,7 +115,7 @@ export default {
 </script>
 
 <style scoped>
-.history-guide-overlay {
+.time-log-guide-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -127,7 +127,7 @@ export default {
 
 .highlight-overlay {
   position: absolute;
-  border: 3px solid #2EB28A;
+  border: 3px solid #10b981;
   border-radius: 12px;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
   pointer-events: none;
@@ -136,9 +136,9 @@ export default {
 }
 
 @keyframes pulse {
-  0% { border-color: #2EB28A; }
+  0% { border-color: #10b981; }
   50% { border-color: #34d399; }
-  100% { border-color: #2EB28A; }
+  100% { border-color: #10b981; }
 }
 
 .guide-content {
@@ -164,9 +164,9 @@ export default {
 
 .guide-header h3 {
   margin: 0;
-  color: #000000;
+  color: #065f46;
   font-size: 1.3em;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .close-btn {
@@ -201,8 +201,8 @@ export default {
 
 .step-indicator {
   font-size: 0.9em;
-  color: #2EB28A;
-  font-weight: 600;
+  color: #059669;
+  font-weight: 500;
   text-align: center;
   padding: 8px 0;
   border-top: 1px solid #e2e8f0;
@@ -217,7 +217,7 @@ export default {
 }
 
 .btn-primary {
-  background: #2EB28A;
+  background: #10b981;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -228,7 +228,7 @@ export default {
 }
 
 .btn-primary:hover {
-  background: #259673;
+  background: #059669;
   transform: translateY(-1px);
 }
 

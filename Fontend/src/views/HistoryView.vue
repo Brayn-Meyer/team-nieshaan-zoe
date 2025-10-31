@@ -1,5 +1,11 @@
 <template>
     <NavComp/>
+    <!-- Help Button -->
+    <button @click="showUserGuide = true" class="help-btn">
+      <i class="fa-solid fa-circle-question"></i>
+      Help Guide
+    </button>
+    
     <br><br><br><br><br>
   <div class="container-fluid py-3">
     <div class="row">
@@ -34,17 +40,32 @@
         <HistoryTable :records="filteredHistory" />
       </div>
     </div>
+
+    <!-- History Guide Component -->
+    <HistoryGuide 
+      :showGuide="showUserGuide" 
+      @close-guide="showUserGuide = false"
+      @finish-guide="showUserGuide = false"
+    />
   </div>
 </template>
 <script>
 import HistoryFilters from "@/components/HistoryFilters.vue";
 import HistoryTable from "@/components/HistoryTable.vue";
 import NavComp from "@/components/NavComp.vue";
+import HistoryGuide from "@/components/HistoryGuide.vue"; // Add this import
+
 export default {
   name: "HistoryView",
-  components: { HistoryFilters, HistoryTable, NavComp },
+  components: { 
+    HistoryFilters, 
+    HistoryTable, 
+    NavComp,
+    HistoryGuide // Add this component
+  },
   data() {
     return {
+      showUserGuide: false, // Add this data property
       filters: { date: "", name: "", status: "", employeeId: "" },
       history: [
         {
@@ -346,10 +367,29 @@ export default {
         alert("Failed to export data.");
       }
     },
+    handleKeyPress(event) {
+      if (event.ctrlKey && event.key === 'h') {
+        event.preventDefault();
+        this.showUserGuide = true;
+      }
+    }
   },
   mounted() {
     // load initial history
     this.$store.dispatch('fetch_history_info').catch(()=>{})
+    
+    // Auto-show guide on first visit to history page
+    const hasSeenHistoryGuide = localStorage.getItem('hasSeenHistoryGuide');
+    if (!hasSeenHistoryGuide) {
+      this.showUserGuide = true;
+      localStorage.setItem('hasSeenHistoryGuide', 'true');
+    }
+
+    // Add keyboard shortcut (Ctrl + H) to open history guide
+    document.addEventListener('keydown', this.handleKeyPress);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleKeyPress);
   }
 };
 </script>
@@ -363,15 +403,60 @@ export default {
   background-color: #2EB28A !important;
 }
 
+/* Help Button Styles */
+.help-btn {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.help-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.help-btn i {
+  font-size: 16px;
+}
+
 @media (max-width: 768px) {
   .row.mb-3.mt-4.mt-md-3.mt-sm-2 {
     margin-top: 1rem !important;
+  }
+  
+  .help-btn {
+    top: 80px;
+    right: 20px;
+    padding: 10px 16px;
+    font-size: 0.9em;
   }
 }
 
 @media (max-width: 576px) {
   .row.mb-3.mt-4.mt-md-3.mt-sm-2 {
     margin-top: 0.75rem !important;
+  }
+  
+  .help-btn {
+    top: 70px;
+    right: 15px;
+    padding: 8px 14px;
+    font-size: 0.8em;
   }
 }
 </style>
