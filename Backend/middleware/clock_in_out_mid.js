@@ -7,7 +7,8 @@ export const getClockInOutData = async () => {
         e.employee_id,
         e.first_name,
         e.last_name,
-        e.employment_status,
+        c.role,
+        c.department,
         DATE(rb.clockin_time) AS work_date,
         MIN(CASE WHEN rb.type = 'Work'  THEN rb.clockin_time END) AS work_clockin,
         MAX(CASE WHEN rb.type = 'Work'  THEN rb.clockout_time END) AS work_clockout,
@@ -16,14 +17,15 @@ export const getClockInOutData = async () => {
         MIN(CASE WHEN rb.type = 'Lunch' THEN rb.clockin_time END) AS lunch_clockin,
         MAX(CASE WHEN rb.type = 'Lunch' THEN rb.clockout_time END) AS lunch_clockout
       FROM employees e
+      LEFT JOIN emp_classification c 
+        ON e.classification_id = c.classification_id
       LEFT JOIN record_backups rb 
           ON rb.employee_id = e.employee_id
         AND DATE(rb.clockin_time) = (
-          -- lock everything to the single most recent date
           SELECT MAX(DATE(clockin_time))
           FROM record_backups
         )
-      GROUP BY e.employee_id, e.first_name, e.last_name, DATE(rb.clockin_time)
+      GROUP BY e.employee_id, e.first_name, e.last_name, c.role, c.department, DATE(rb.clockin_time)
       ORDER BY e.employee_id;
     `);
     return row

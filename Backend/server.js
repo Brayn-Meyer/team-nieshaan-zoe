@@ -14,8 +14,10 @@ import EditEmployeeRoutes from './routes/EditEmployee.js';
 
 import employeeRoutes from './routes/employeeRoutes.js';
 import classificationRoutes from './routes/classificationRoutes.js';
-import notificationRoutes from './routes/notificationRoutes.js';
 import qrRoutes from './routes/qrRoutes.js';
+
+import notificationRoutes from './routes/notificationRoutes.js';
+import addNotificationRoutes from './routes/adminNotificationRoutes.js';
 
 config();
 
@@ -46,6 +48,9 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/classifications', classificationRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/qr-storage', qrRoutes);
+
+app.use('/api/notifications', notificationRoutes);
+app.use('api/adminNotifications', addNotificationRoutes);
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
