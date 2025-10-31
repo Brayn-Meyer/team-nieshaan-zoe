@@ -97,47 +97,122 @@ export default {
 
 <style scoped>
 .table-container {
-  margin: 1rem;
+  margin: 2rem;
   overflow-x: auto;
   border-radius: 8px;
   margin-bottom: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
-
 .time-log-table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
   font-family: 'Poppins', sans-serif;
 }
-
 .time-log-table thead {
   background-color: #2EB28A;
   color: white;
 }
-
 .time-log-table th, .time-log-table td {
   padding: 14px 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #E0E0E0;
 }
-
 .indicator {
   display: inline-block;
   width: 14px;
   height: 14px;
   border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
-
+.indicator:hover {
+  transform: scale(1.2);
+}
 .indicator.green {
-  background-color: #00c851;
+  background-color: #00C851;
 }
-
 .indicator.yellow {
-  background-color: #ffbb33;
+  background-color: #FFBB33;
+}
+.indicator.red {
+  background-color: #FF4444;
 }
 
-.indicator.red {
-  background-color: #ff4444;
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-container {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  min-width: 400px;
+  text-align: center;
+}
+
+.popup-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+}
+
+.popup-content p {
+  margin: 0 0 25px 0;
+  font-size: 16px;
+  color: #666;
+  font-family: 'Poppins', sans-serif;
+}
+
+.popup-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.popup-btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  min-width: 100px;
+}
+
+.popup-btn-no {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 2px solid #dee2e6;
+}
+
+.popup-btn-no:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.popup-btn-yes {
+  background-color: #2EB28A;
+  color: white;
+  border: 2px solid #2EB28A;
+}
+
+.popup-btn-yes:hover {
+  background-color: #26997a;
+  border-color: #26997a;
 }
 
 /* Help Button Styles */

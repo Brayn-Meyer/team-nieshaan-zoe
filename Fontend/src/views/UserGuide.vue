@@ -1,4 +1,6 @@
 <template>
+  <NavComp/>
+  <br><br><br><br>
   <div class="user-guide-page">
     <!-- Header -->
     <div class="guide-header-section">
@@ -374,7 +376,12 @@
 </template>
 
 <script>
+import NavComp from '@/components/NavComp.vue';
+
 export default {
+  components: {
+    NavComp
+  },
   name: "UserGuidePage",
   methods: {
     startInteractiveGuide() {

@@ -1,4 +1,5 @@
 <template>
+
   <div v-if="showGuide" class="user-guide-overlay">
     <!-- Highlight Overlay -->
     <div class="highlight-overlay" :style="highlightStyle"></div>
