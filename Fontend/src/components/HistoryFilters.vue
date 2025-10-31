@@ -1,6 +1,6 @@
 <template>
   <div class="card p-3 shadow-sm mx-auto">
-    <div class="row g-2 align-items-end">
+    <div class="row g-2 align-items-end justify-content-center text-center">
       <div class="col-12 col-sm-4 col-md-3">
         <label class="form-label small fw-bold">Select Date</label>
         <input type="date" class="form-control form-control-sm" v-model="localFilters.date" />
@@ -14,7 +14,7 @@
           v-model="localFilters.name"
         />
       </div>
-      <div class="col-12 col-sm-4 col-md-2">
+      <!-- <div class="col-12 col-sm-4 col-md-2">
         <label class="form-label small fw-bold">Status</label>
         <select class="form-select form-select-sm" v-model="localFilters.status">
           <option value="">All</option>
@@ -23,7 +23,7 @@
           <option value="on-leave">On Leave</option>
           <option value="terminated">Terminated</option>
         </select>
-      </div>
+      </div> -->
       <div class="col-12 col-sm-12 col-md-3">
         <button class="btn apply btn-sm w-100" @click="applyFilters">
           <i class="bi bi-funnel me-1"></i>Apply Filters
