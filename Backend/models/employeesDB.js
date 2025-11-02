@@ -71,6 +71,16 @@ export const addEmployee = async (employee) => {
             }
         }
 
+        // Validate required fields
+        if (!employee.first_name || !employee.last_name || !employee.email || !employee.address || !employee.id) {
+            throw new Error('Missing required fields: first_name, last_name, email, address, and id are required');
+        }
+
+        // Ensure date_hired has a value (required field)
+        if (!formattedDateHired) {
+            formattedDateHired = new Date().toISOString().split('T')[0]; // Use today's date as default
+        }
+
         const mappedData = [
             employee.first_name,
             employee.last_name,
@@ -79,12 +89,9 @@ export const addEmployee = async (employee) => {
             employee.address,
             employee.id, // This maps to the 'id' field in DB (ID number like national ID)
             isAdmin,
-            employmentStatus,
             formattedDateHired,
             employee.supervisor_name,
             employee.leave_balance,
-            employee.username,
-            employee.password,
             classificationId || 1  // Default to classification_id 1 if none provided
         ];
 
@@ -99,14 +106,11 @@ export const addEmployee = async (employee) => {
                 address, 
                 id, 
                 is_admin, 
-                employment_status, 
                 date_hired, 
                 supervisor_name, 
                 leave_balance, 
-                username, 
-                password,
                 classification_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const [result] = await pool.execute(sql, mappedData);

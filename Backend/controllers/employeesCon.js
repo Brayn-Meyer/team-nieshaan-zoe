@@ -1,4 +1,4 @@
-import { addEmployee, deleteEmployee, getRoles, getDepartments } from '../middleware/employeesDB.js';
+import { addEmployee, deleteEmployee, getRoles, getDepartments } from '../models/employeesDB.js';
 import { emitKPIUpdates } from "./admin_cards_con.js";
 
 

@@ -1,4 +1,4 @@
-import { getTotalEmployeesData, getTotalCheckedInData, getTotalCheckedOutData, getTotalAbsentData } from "../middleware/admin_cards_mid.js"
+import { getTotalEmployeesData, getTotalCheckedInData, getTotalCheckedOutData, getTotalAbsentData } from "../models/admin_cards_mid.js"
 
 // These controllers ONLY handle HTTP requests
 export const getTotalEmployeesDataCon = async (req, res) => {

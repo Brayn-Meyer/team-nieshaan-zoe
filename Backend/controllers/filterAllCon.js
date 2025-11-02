@@ -1,4 +1,4 @@
-import { getfilterAll } from "../middleware/clock_in_out_mid.js";
+import { getfilterAll } from "../models/clock_in_out_mid.js";
 
 const getfilterAllCon = async (req, res) => {
   try {

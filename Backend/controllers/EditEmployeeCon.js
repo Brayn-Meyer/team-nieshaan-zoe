@@ -1,4 +1,4 @@
-import { UpdateEmp } from "../middleware/Employee_mid.js";
+import { UpdateEmp } from "../models/Employee_mid.js";
 import { emitKPIUpdates } from "./admin_cards_con.js";
 import { pool } from "../config/db.js";
 
@@ -90,27 +90,7 @@ export const EditEmpCon = async (req, res) => {
       }
     }
 
-    // Validate and map employment_status if provided
-    const statusToValidate = status || employment_status;
-    let mappedEmploymentStatus;
-    if (statusToValidate !== undefined) {
-      const statusMap = {
-        'on-site': 'Active',
-        'home': 'Active',
-        'active': 'Active',
-        'inactive': 'Inactive',
-        'onleave': 'OnLeave',
-        'on_leave': 'OnLeave',
-        'terminated': 'Terminated'
-      };
-      mappedEmploymentStatus = statusMap[statusToValidate.toLowerCase()];
-      if (!mappedEmploymentStatus) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Invalid employment status. Valid values are: on-site, home, active, inactive, onleave, terminated" 
-        });
-      }
-    }
+    // Note: employment_status field doesn't exist in employees table, skip validation
 
     // Validate and truncate contact number to fit database limit (10 chars)
     const finalContactNo = contactNo || contact_no;
@@ -150,9 +130,6 @@ export const EditEmpCon = async (req, res) => {
       date_hired: formattedDateHired,
       supervisor_name: supervisorName,
       leave_balance: leaveBalance || legacyLeaveBalance,
-      username: username,
-      password: password,
-      employment_status: mappedEmploymentStatus || 'Active',
       classification_id: classificationId,
       employee_id: employee_id
     };

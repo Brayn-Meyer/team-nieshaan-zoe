@@ -1,4 +1,4 @@
-import { getClockInOutData, getHoursWorked, HoursManagement } from "../middleware/clock_in_out_mid.js"
+import { getClockInOutData, getHoursWorked, HoursManagement } from "../models/clock_in_out_mid.js"
 
 export const getClockInOutDataCon = async (req, res) => {
     try {
@@ -46,77 +46,100 @@ export const getHoursWorkedCon = async (req, res) => {
     }
 };
 
-// Get time log data with hours_owed and overtime calculated
+// Get time log data - only from hours_management table
 export const getTimeLogData = async (req, res) => {
     try {
         const { week } = req.query; // e.g., '2025-10-28' (Monday)
+        console.log('=== TIME LOG DATA REQUEST ===');
+        console.log('Requested week:', week);
         
-        // Get hours worked for specific week (or latest if not specified)
-        const hoursWorkedData = await getHoursWorked(week);
-        
-        if (hoursWorkedData.length === 0) {
-            return res.json({ timeLogData: [] });
+        if (!week) {
+            // If no week specified, get the latest processed week
+            const processedWeeks = await HoursManagement.getAllProcessedWeeks();
+            if (processedWeeks.length === 0) {
+                return res.json({ 
+                    timeLogData: [], 
+                    message: 'No processed weeks found. Process weekly hours first.' 
+                });
+            }
+            week = processedWeeks[0].week_start; // Use latest week
         }
         
-        // Get the week_start from first record (they'll all be the same week)
-        const weekStart = hoursWorkedData[0].week_start;
+        // Fetch data only from hours_management table
+        const timeLogRecords = await HoursManagement.getByWeek(week);
+        console.log('Found records in hours_management:', timeLogRecords.length);
         
-        // Batch fetch all hours_management records for this week (single query!)
-        const existingRecords = await HoursManagement.getByWeek(weekStart);
+        if (timeLogRecords.length === 0) {
+            return res.json({ 
+                timeLogData: [], 
+                message: `No processed data found for week ${week}. Process this week's hours first.` 
+            });
+        }
         
-        // Create a map for O(1) lookup
-        const existingRecordsMap = new Map(
-            existingRecords.map(r => [r.employee_id, r])
-        );
-        
-        const EXPECTED_HOURS = 40;
-        
-        // Process each employee's weekly data
-        const timeLogData = hoursWorkedData.map((record) => {
-            const { employee_id, employee_name, week_start, week_end, total_hours } = record;
-            
-            const existing = existingRecordsMap.get(employee_id);
-            
-            let hours_owed = 0;
-            let overtime = 0;
-            let indicator = 'green';
-            let is_saved = false;
-            
-            if (existing) {
-                // Use existing record from hours_management
-                hours_owed = existing.hours_owed || 0;
-                overtime = existing.overtime || 0;
-                indicator = 'green'; // Already saved/balanced
-                is_saved = true;
-            } else {
-                // Calculate on the fly (will be saved when admin confirms)
-                if (total_hours < EXPECTED_HOURS) {
-                    hours_owed = EXPECTED_HOURS - total_hours;
-                    indicator = 'red';
-                } else if (total_hours > EXPECTED_HOURS) {
-                    overtime = total_hours - EXPECTED_HOURS;
-                    indicator = 'green';
-                }
-            }
+        // Format data for frontend
+        const timeLogData = timeLogRecords.map((record) => {
+            const indicator = (record.hours_owed > 0) ? 'red' : 'green';
             
             return {
-                id: employee_id,
-                name: employee_name,
-                hoursWorked: Math.round(total_hours * 10) / 10, // Round to 1 decimal
-                hoursOwed: Math.round(hours_owed * 10) / 10,
-                overtime: Math.round(overtime * 10) / 10,
+                id: record.employee_id,
+                name: record.employee_name,
+                hoursWorked: Math.round(record.total_worked_hours * 10) / 10,
+                hoursOwed: Math.round(record.hours_owed * 10) / 10,
+                overtime: Math.round(record.overtime * 10) / 10,
                 indicator: indicator,
-                week_start: week_start,
-                week_end: week_end,
-                expected_hours: EXPECTED_HOURS,
-                is_saved: is_saved
+                week_start: record.week_start,
+                week_end: record.week_end,
+                expected_hours: record.expected_hours,
+                is_saved: true // All records in hours_management are saved/processed
             };
         });
         
+        console.log('Returning timeLogData:', timeLogData.length, 'records');
         res.json({ timeLogData });
     } catch (error) {
         console.error('Error in getTimeLogData:', error);
         res.status(500).json({ error: 'Failed to fetch time log data' });
+    }
+};
+
+// Process weekly hours - converts raw data to hours_management records
+export const processWeeklyHours = async (req, res) => {
+    try {
+        const { week_start } = req.body; // e.g., '2024-11-04' (Monday)
+        
+        if (!week_start) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'week_start is required' 
+            });
+        }
+        
+        console.log('Processing weekly hours for:', week_start);
+        
+        const results = await HoursManagement.processWeeklyHours(week_start);
+        
+        res.json({ 
+            success: true, 
+            message: `Processed ${results.length} employee records for week ${week_start}`,
+            data: results 
+        });
+    } catch (error) {
+        console.error('Error processing weekly hours:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
+        });
+    }
+};
+
+// Get all processed weeks for dropdown
+export const getProcessedWeeks = async (req, res) => {
+    try {
+        const weeks = await HoursManagement.getAllProcessedWeeks();
+        res.json({ success: true, weeks });
+    } catch (error) {
+        console.error('Error getting processed weeks:', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 };
 
@@ -137,7 +160,7 @@ export class HoursController {
             const result = await HoursManagement.createRecord(
                 employee_id, 
                 week_start, 
-                week_end, 
+week_end, 
                 expected_hours, 
                 total_worked_hours
             );

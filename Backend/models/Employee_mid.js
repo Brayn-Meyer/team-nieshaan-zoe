@@ -48,30 +48,12 @@ export const UpdateEmp = async (employeeData) => {
       fields.push('leave_balance = ?');
       values.push(employeeData.leave_balance);
     }
-    if (employeeData.username !== undefined) {
-      fields.push('username = ?');
-      values.push(employeeData.username);
-    }
-    if (employeeData.password !== undefined && employeeData.password !== '') {
-      fields.push('password = ?');
-      values.push(employeeData.password);
-    }
+    // Note: username and password columns don't exist in employees table
+    // Note: employment_status column doesn't exist in employees table
     // Note: roles and department are in emp_classification table, not employees table
-    // if (employeeData.roles !== undefined) {
-    //   fields.push('roles = ?');
-    //   values.push(employeeData.roles);
-    // }
-    // if (employeeData.department !== undefined) {
-    //   fields.push('department = ?');
-    //   values.push(employeeData.department);
-    // }
     if (employeeData.classification_id !== undefined) {
       fields.push('classification_id = ?');
       values.push(employeeData.classification_id);
-    }
-    if (employeeData.employment_status !== undefined) {
-      fields.push('employment_status = ?');
-      values.push(employeeData.employment_status);
     }
 
     if (fields.length === 0) {
