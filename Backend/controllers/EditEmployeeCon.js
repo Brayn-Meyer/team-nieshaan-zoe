@@ -120,7 +120,7 @@ export const EditEmpCon = async (req, res) => {
 
     // Use new field names or fall back to legacy ones
     const employeeData = {
-      first_name: req.body.firstName,
+      first_name: firstName,
       last_name: lastName || last_name,
       contact_no: truncatedContactNo,
       email: email,

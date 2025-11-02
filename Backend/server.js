@@ -8,7 +8,7 @@ import { Server } from 'socket.io';
 import admin_cards_routes from './routes/admin_cards_routes.js';
 import clock_in_out_routes from './routes/clock_in_out_routes.js';
 import employeesRoutes from './routes/employeesRoutes.js';
-// import filterRoutes from './routes/filterRoutes.js';
+import historyRoutes from './routes/historyRoutes.js';
 import filterAllRoutes from './routes/filterAllRoutes.js';
 import EditEmployeeRoutes from './routes/EditEmployee.js';
 
@@ -33,7 +33,7 @@ app.set('io', io);
 app.use('/api/admin/cards', admin_cards_routes);
 app.use('/api/clock-in-out', clock_in_out_routes);
 app.use('/api/employees', employeesRoutes);
-// app.use('/api/filter', filterRoutes);
+app.use('/api/history', historyRoutes);
 app.use('/api/filter-all', filterAllRoutes);
 app.use('/api/edit-employee', EditEmployeeRoutes);
 

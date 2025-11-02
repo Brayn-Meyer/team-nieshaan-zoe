@@ -3,16 +3,16 @@
     <div class="d-md-none">
       <div
         v-for="record in paginatedRecords"
-        :key="record.id"
+        :key="`${record.employee_id}-${record.work_date}`"
         class="card mb-3"
       >
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <div>
-              <h6 class="card-title mb-1">{{ record.firstName }} {{ record.lastName }}</h6>
-              <small class="text-muted">{{ record.employeeId }}</small>
+              <h6 class="card-title mb-1">{{ record.first_name }} {{ record.last_name }}</h6>
+              <small class="text-muted">{{ record.employee_id }}</small>
             </div>
-            <span
+            <!-- <span
               class="badge"
               :class="{
                 'bg-success': record.status === 'active',
@@ -22,41 +22,41 @@
               }"
             >
               {{ record.status }}
-            </span>
+            </span> -->
           </div>
           <div class="mb-2">
             <small class="text-muted d-block">Date</small>
-            <strong>{{ record.date }}</strong>
+            <strong>{{ record.work_date }}</strong>
           </div>
           <div class="row g-2">
             <div class="col-6">
               <small class="text-muted d-block">Clock In</small>
-              <strong>{{ record.clockIn || '-' }}</strong>
+              <strong>{{ record.work_clockin || '-' }}</strong>
             </div>
             <div class="col-6">
               <small class="text-muted d-block">Clock Out</small>
-              <strong>{{ record.clockOut || '-' }}</strong>
+              <strong>{{ record.work_clockout || '-' }}</strong>
             </div>
             <div class="col-6">
               <small class="text-muted d-block">Tea Out</small>
-              <strong>{{ record.teaOut || '-' }}</strong>
+              <strong>{{ record.tea_clockout || '-' }}</strong>
             </div>
             <div class="col-6">
               <small class="text-muted d-block">Tea In</small>
-              <strong>{{ record.teaIn || '-' }}</strong>
+              <strong>{{ record.tea_clockin || '-' }}</strong>
             </div>
             <div class="col-6">
               <small class="text-muted d-block">Lunch Out</small>
-              <strong>{{ record.lunchOut || '-' }}</strong>
+              <strong>{{ record.lunch_clockout || '-' }}</strong>
             </div>
             <div class="col-6">
               <small class="text-muted d-block">Lunch In</small>
-              <strong>{{ record.lunchIn || '-' }}</strong>
+              <strong>{{ record.lunch_clockin || '-' }}</strong>
             </div>
           </div>
         </div>
       </div>
-      <div v-if="records.length === 0" class="text-center text-muted py-4">
+      <div v-if="recordsSource.length === 0" class="text-center text-muted py-4">
         No records found
       </div>
     </div>
@@ -66,7 +66,7 @@
           <tr>
             <th>Full Name</th>
             <th>Employee ID</th>
-            <th>Status</th>
+            <!-- <th>Status</th> -->
             <th>Date</th>
             <th>Clock In</th>
             <th>Tea Out</th>
@@ -77,23 +77,23 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="record in paginatedRecords" :key="record.id">
-            <td>{{ record.firstName }} {{ record.lastName }}</td>
-            <td>{{ record.employeeId }}</td>
-            <td>
+          <tr v-for="record in paginatedRecords" :key="`${record.employee_id}-${record.work_date}`">
+            <td>{{ record.first_name }} {{ record.last_name }}</td>
+            <td>{{ record.employee_id }}</td>
+            <!-- <td>
               <span class="status-badge" :class="record.status">
-                {{ record.status }}
+                {{ record.employment_status }}
               </span>
-            </td>
-            <td>{{ record.date }}</td>
-            <td>{{ record.clockIn || '-' }}</td>
-            <td>{{ record.teaOut || '-' }}</td>
-            <td>{{ record.teaIn || '-' }}</td>
-            <td>{{ record.lunchOut || '-' }}</td>
-            <td>{{ record.lunchIn || '-' }}</td>
-            <td>{{ record.clockOut || '-' }}</td>
+            </td> -->
+            <td>{{ formatDate(record.work_date) }}</td>
+            <td>{{ record.work_clockin || '-' }}</td>
+            <td>{{ record.tea_clockout || '-' }}</td>
+            <td>{{ record.tea_clockin || '-' }}</td>
+            <td>{{ record.lunch_clockout || '-' }}</td>
+            <td>{{ record.lunch_clockin || '-' }}</td>
+            <td>{{ record.work_clockout || '-' }}</td>
           </tr>
-          <tr v-if="records.length === 0">
+          <tr v-if="recordsSource.length === 0">
             <td colspan="10" class="text-center text-muted">No records found</td>
           </tr>
         </tbody>
@@ -124,89 +124,133 @@
       </ul>
     </nav>
     <div class="text-center text-muted small mt-2">
-      Showing {{ paginatedRecords.length }} of {{ records.length }} records
+      Showing {{ paginatedRecords.length }} of {{ recordsSource.length }} records
       <span class="d-none d-md-inline">({{ pageSize }} per page)</span>
       <span class="d-md-none">(5 per page)</span>
     </div>
   </div>
 </template>
 <script>
-export default {
-  name: "HistoryTable",
-  props: {
-    records: Array,
-  },
-  data() {
-    return {
-      sortColumn: null,
-      sortDirection: "asc",
-      currentPage: 1,
-      pageSize: 10,
-    };
-  },
-  computed: {
-    sortedRecords() {
-      if (!this.sortColumn) return this.records;
-      return [...this.records].sort((a, b) => {
-        const valA = a[this.sortColumn]?.toString().toLowerCase() || "";
-        const valB = b[this.sortColumn]?.toString().toLowerCase() || "";
-        if (valA < valB) return this.sortDirection === "asc" ? -1 : 1;
-        if (valA > valB) return this.sortDirection === "asc" ? 1 : -1;
-        return 0;
-      });
+  export default {
+    name: "HistoryTable",
+    props: {
+      records: Array,
     },
-    paginatedRecords() {
-      const start = (this.currentPage - 1) * this.pageSize;
-      return this.sortedRecords.slice(start, start + this.pageSize);
+    data() {
+      return {
+        sortColumn: null,
+        sortDirection: "asc",
+        currentPage: 1,
+        pageSize: 10,
+      };
     },
-    totalPages() {
-      return Math.ceil(this.records.length / this.pageSize);
+    computed: {
+      // Use store data if available, otherwise fall back to prop
+      recordsSource() {
+        const rawData = this.$store?.state?.history_info?.length
+          ? this.$store.state.history_info
+          : this.records || [];
+        
+        // Filter out records with null work_date (these are empty records)
+        return rawData.filter(record => record.work_date !== null && record.work_date !== undefined);
+      },
+
+      sortedRecords() {
+        if (!this.sortColumn) return this.recordsSource;
+        return [...this.recordsSource].sort((a, b) => {
+          const valA = a[this.sortColumn]?.toString().toLowerCase() || "";
+          const valB = b[this.sortColumn]?.toString().toLowerCase() || "";
+          if (valA < valB) return this.sortDirection === "asc" ? -1 : 1;
+          if (valA > valB) return this.sortDirection === "asc" ? 1 : -1;
+          return 0;
+        });
+      },
+
+      paginatedRecords() {
+        const start = (this.currentPage - 1) * this.pageSize;
+        return this.sortedRecords.slice(start, start + this.pageSize);
+      },
+
+      totalPages() {
+        return Math.ceil(this.recordsSource.length / this.pageSize);
+      },
+
+      visiblePages() {
+        const pages = [];
+        const maxVisible = window.innerWidth < 576 ? 3 : 5;
+        let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+        let end = Math.min(this.totalPages, start + maxVisible - 1);
+
+        if (end - start + 1 < maxVisible) {
+          start = Math.max(1, end - maxVisible + 1);
+        }
+
+        for (let i = start; i <= end; i++) {
+          pages.push(i);
+        }
+
+        return pages;
+      },
     },
-    visiblePages() {
-      const pages = [];
-      const maxVisible = window.innerWidth < 576 ? 3 : 5;
-      let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
-      let end = Math.min(this.totalPages, start + maxVisible - 1);
-      if (end - start + 1 < maxVisible) {
-        start = Math.max(1, end - maxVisible + 1);
+
+    methods: {
+      sortBy(column) {
+        if (this.sortColumn === column) {
+          this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+        } else {
+          this.sortColumn = column;
+          this.sortDirection = "asc";
+        }
+      },
+
+      formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      },
+
+      changePage(page) {
+        if (page >= 1 && page <= this.totalPages) this.currentPage = page;
+      },
+
+      updatePageSize() {
+        this.pageSize = window.innerWidth < 768 ? 5 : 10;
+        this.currentPage = 1;
+      },
+    },
+
+    async mounted() {
+      this.updatePageSize();
+      window.addEventListener("resize", this.updatePageSize);
+
+      // Fetch store data safely
+      if (this.$store && this.$store.dispatch) {
+        try {
+          await this.$store.dispatch("fetch_history_info");
+        } catch (err) {
+          console.warn("Failed to fetch history_info from store:", err);
+        }
       }
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-      return pages;
-    }
-  },
-  methods: {
-    sortBy(column) {
-      if (this.sortColumn === column) {
-        this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
-      } else {
-        this.sortColumn = column;
-        this.sortDirection = "asc";
-      }
+
+
     },
-    changePage(page) {
-      if (page >= 1 && page <= this.totalPages) this.currentPage = page;
+
+    beforeUnmount() {
+      window.removeEventListener("resize", this.updatePageSize);
     },
-    updatePageSize() {
-      this.pageSize = window.innerWidth < 768 ? 5 : 10;
-      this.currentPage = 1;
-    }
-  },
-  mounted() {
-    this.updatePageSize();
-    window.addEventListener('resize', this.updatePageSize);
-  },
-  beforeUnmount() {
-    window.removeEventListener('resize', this.updatePageSize);
-  },
-  watch: {
-    records() {
-      this.currentPage = 1;
-    }
-  }
-};
+
+    watch: {
+      records() {
+        this.currentPage = 1;
+      },
+    },
+  };
 </script>
+
 <style scoped>
 .table-container {
   background: white;

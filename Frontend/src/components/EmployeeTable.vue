@@ -744,7 +744,7 @@ export default {
       const q = (this.searchQuery || '').toLowerCase()
       return this.sourceEmployees.filter(item => {
         const matchesText = item.name?.toLowerCase().includes(q) ||
-                           (item.employee_id || '').toLowerCase().includes(q) ||
+                           (item.employee_id || item.employeeId || '').toString().toLowerCase().includes(q) ||
                            (item.roles || '').toLowerCase().includes(q) ||
                            (item.department || '').toLowerCase().includes(q)
         return matchesText
@@ -786,7 +786,6 @@ export default {
     },
     openAddEmployeeModal() {
       this.newEmployee = {
-        employeeId: '',
         firstName: '',
         lastName: '',
         contactNo: '',
@@ -823,7 +822,7 @@ export default {
 
       // validate against store-backed list
       const existing = this.sourceEmployees || [];
-      if (existing.some(emp => emp.employeeId === this.newEmployee.employeeId)) {
+      if (existing.some(emp => (emp.employeeId || emp.employee_id) === this.newEmployee.employeeId)) {
         alert('Employee ID already exists. Please use a unique ID.');
         return;
       }
@@ -899,7 +898,6 @@ export default {
       
       const defaultEmployee = {
         employeeId: '',
-        classificationId: '',
         firstName: '',
         lastName: '',
         contactNo: '',
@@ -954,7 +952,7 @@ export default {
 
     async saveEmployeeChanges() {
       const requiredFields = [
-        'employeeId', 'classificationId', 'firstName', 'lastName', 
+        'firstName', 'lastName', 
         'contactNo', 'email', 'address', 'idNumber', 'dateHired',
         'leaveBalance', 'username', 'roles', 'department'
       ];
@@ -968,15 +966,15 @@ export default {
 
       const existing = this.sourceEmployees || [];
       if (existing.some(emp => 
-        emp.id !== this.selectedEmployee.id && 
-        emp.employeeId === this.selectedEmployee.employeeId
+        (emp.id || emp.employee_id) !== (this.selectedEmployee.id || this.selectedEmployee.employee_id) && 
+        (emp.employeeId || emp.employee_id) === this.selectedEmployee.employeeId
       )) {
         alert('Employee ID already exists. Please use a unique ID.');
         return;
       }
 
       if (existing.some(emp => 
-        emp.id !== this.selectedEmployee.id && 
+        (emp.id || emp.employee_id) !== (this.selectedEmployee.id || this.selectedEmployee.employee_id) && 
         emp.username === this.selectedEmployee.username
       )) {
         alert('Username already exists. Please choose a different username.');
@@ -990,7 +988,7 @@ export default {
       }
       // ensure name is synced and prepare fields for backend
       const editPayload = {
-        employee_id: payload.employee_id || payload.employeeId, // Primary key for route param
+        employee_id: payload.employee_id || payload.id, // Primary key for route param
         name: `${payload.firstName} ${payload.lastName}`,
         firstName: payload.firstName,
         lastName: payload.lastName,
@@ -1025,7 +1023,8 @@ export default {
     async confirmDelete() {
       if (this.selectedEmployee) {
         try {
-          await this.$store.dispatch('delete_employee', this.selectedEmployee.id);
+          const employeeId = this.selectedEmployee.employee_id || this.selectedEmployee.id;
+          await this.$store.dispatch('delete_employee', employeeId);
           const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
           modal.hide();
           console.log(`Employee ${this.selectedEmployee.name} has been deleted.`);
