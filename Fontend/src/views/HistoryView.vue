@@ -27,7 +27,7 @@
         />
       </div>
     </div>
-    <!-- Added spacing class here -->
+
     <div class="row mb-3 mt-4 mt-md-3 mt-sm-2">
       <div class="col-12 text-end">
         <button class="btn download btn-sm" @click="downloadSheet">
@@ -401,6 +401,8 @@ export default {
 .download{
   color: white;
   background-color: #2EB28A !important;
+  margin-right: 6rem;
+  margin-bottom: -1rem;
 }
 
 /* Help Button Styles */
@@ -437,6 +439,21 @@ export default {
 @media (max-width: 768px) {
   .row.mb-3.mt-4.mt-md-3.mt-sm-2 {
     margin-top: 1rem !important;
+    margin-right: -5.5rem;
+  }
+  
+  .help-btn {
+    top: 80px;
+    right: 20px;
+    padding: 10px 16px;
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 1024px) {
+  .row.mb-3.mt-4.mt-md-3.mt-sm-2 {
+    margin-top: 1rem !important;
+    margin-right: -5.5rem;
   }
   
   .help-btn {
@@ -459,4 +476,6 @@ export default {
     font-size: 0.8em;
   }
 }
+
+
 </style>

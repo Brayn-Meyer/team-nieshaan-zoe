@@ -843,7 +843,6 @@ export default {
     }
   },
   mounted() {
-    // fetch employee_info from Vuex store when component mounts
     if (this.$store && this.$store.dispatch) {
       this.$store.dispatch('fetch_employee_info').catch(err => {
         console.warn('Failed to fetch employee_info from store:', err)
@@ -851,7 +850,6 @@ export default {
     }
   },
   computed: {
-    // use the store's employee_info if available, otherwise fall back to local `employees`
     sourceEmployees() {
       const storeList = this.$store && this.$store.state && Array.isArray(this.$store.state.employee_info)
         ? this.$store.state.employee_info
@@ -940,7 +938,6 @@ export default {
         }
       }
 
-      // validate against store-backed list
       const existing = this.sourceEmployees || [];
       if (existing.some(emp => emp.employeeId === this.newEmployee.employeeId)) {
         alert('Employee ID already exists. Please use a unique ID.');
@@ -952,7 +949,6 @@ export default {
         return;
       }
 
-      // send payload to store action (server should assign id)
       const payload = {
         name: `${this.newEmployee.firstName} ${this.newEmployee.lastName}`,
         employeeId: this.newEmployee.employeeId,
@@ -1022,14 +1018,12 @@ export default {
       modal.show();
     },
 
-    // Open View Times modal for given employee
     openViewTimesModal(employee) {
       this.selectedEmployee = employee;
       const modal = new bootstrap.Modal(document.getElementById('viewTimesModal'));
       modal.show();
     },
 
-    // Open Delete Confirmation modal and set selected employee
     openDeleteModal(employee) {
       this.selectedEmployee = employee || this.selectedEmployee;
       const el = document.getElementById('deleteConfirmationModal');
@@ -1075,12 +1069,11 @@ export default {
         return;
       }
 
-      // If password is empty, do not send password field so backend can keep it
       const payload = { ...this.selectedEmployee };
       if (!payload.password) {
         delete payload.password;
       }
-      // ensure name is synced
+    
       payload.name = `${payload.firstName} ${payload.lastName}`;
 
       try {
@@ -1185,15 +1178,57 @@ export default {
 .text-danger {
   color: #dc3545 !important;
 }
+
+/* Desktop Table View */
+.table-responsive {
+  overflow-x: auto;
+  border-radius: 8px; /* Add border radius to the table container */
+}
+
+.employee-table {
+  margin: 0 auto;
+  width: 95%;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* This ensures the border radius applies to child elements */
+  border-collapse: separate; /* Required for border-radius to work on table */
+  border-spacing: 0; /* Remove spacing between cells */
+}
+
+/* Add border radius to the first and last th elements in the thead */
+.employee-table thead th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.employee-table thead th:last-child {
+  border-top-right-radius: 8px;
+}
+
+/* Add border radius to the first and last td elements in the last tr */
+.employee-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.employee-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+/* If you want to add border radius to all table cells as well */
+.employee-table th,
+.employee-table td {
+  border: none; /* Remove default borders if any */
+}
+
 .employee-table thead {
   background-color: #2EB28A !important;
-  border-radius: 8px;
 }
+
 th {
   padding: 1.5rem;
   font-weight: 600;
   color: #FAFAFA;
 }
+
 /* Modal Styles */
 .modal-xl {
   max-width: 1140px;
@@ -1329,24 +1364,6 @@ th {
 .action-buttons .btn {
   padding: 8px 12px;
   border-radius: 6px;
-}
-
-/* Desktop Table View */
-.table-responsive {
-  overflow-x: auto;
-}
-
-.employee-table {
-  margin: 0 auto;
-  width: 95%;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-@media (min-width: 1200px) {
-  .employee-table {
-    width: 90%;
-  }
 }
 
 /* Modal Responsiveness */
