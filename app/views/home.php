@@ -1,0 +1,38 @@
+<?php
+// Include site header
+include_once __DIR__ . '/../../includes/header.php';
+?>
+
+<main class="app-main">
+	<div class="container">
+		<?php // Attendance KPI cards component ?>
+		<?php include_once __DIR__ . '/../components/attendanceKPICards.php'; ?>
+
+		<?php // Employee live table component ?>
+		<?php include_once __DIR__ . '/../components/employeeLiveTable.php'; ?>
+	</div>
+</main>
+
+<?php
+// Include site footer
+include_once __DIR__ . '/../../includes/footer.php';
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    </style>
+</head>
+<body>
+    <?php include_once __DIR__ . '/../../includes/header.php'; ?>
+    <br><br>
+    <?php include_once __DIR__ . '/../components/attendanceKPICards.php'; ?>
+    <br><br>
+    <?php include_once __DIR__ . '/../components/employeeLiveTable.php'; ?>
+</body>
+</html>
