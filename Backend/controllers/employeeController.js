@@ -11,7 +11,6 @@ export const searchEmployees = async (req, res) => {
         e.employee_id,
         e.first_name,
         e.last_name,
-        e.employment_status,
         DATE(rb.clockin_time) AS work_date,
         MIN(CASE WHEN rb.type = 'Work'  THEN rb.clockin_time END) AS work_clockin,
         MAX(CASE WHEN rb.type = 'Work'  THEN rb.clockout_time END) AS work_clockout,
@@ -28,10 +27,6 @@ export const searchEmployees = async (req, res) => {
     const params = [];
 
     // Apply filters
-    if (status) {
-      query += ` AND e.employment_status = ?`;
-      params.push(status);
-    }
 
     if (name) {
       query += ` AND (CONCAT(e.first_name, ' ', e.last_name) LIKE ? OR e.first_name LIKE ? OR e.last_name LIKE ?)`;
@@ -59,7 +54,7 @@ export const getEmployees = async (req, res) => {
     const [rows] = await pool.query(`
       SELECT
         employees.employee_id,
-        employees.first_name,employees.last_name,employees.employment_status,
+        employees.first_name,employees.last_name,
         DATE(clockin_time) AS work_date,
         MIN(CASE WHEN type = 'Work'  THEN clockin_time END) AS work_clockin,
         MAX(CASE WHEN type = 'Work'  THEN clockout_time END) AS work_clockout,
@@ -89,7 +84,6 @@ export const getEmployeeById = async (req, res) => {
         CONCAT(e.first_name, ' ', e.last_name) AS full_name,
         e.email,
         e.contact_no,
-        e.employment_status,
         e.date_hired,
         ec.department,
         ec.position,
