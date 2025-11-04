@@ -1,0 +1,505 @@
+/* History Container */
+.history-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.history-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.history-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.history-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+/* Filters Card */
+.filters-card {
+    background-color: #EBEBEB;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #DEE2E6;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.filters-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.apply-group {
+    flex: 0 0 auto;
+    min-width: auto;
+}
+
+.filter-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: #2EB28A;
+    box-shadow: 0 0 0 3px rgba(46, 178, 138, 0.1);
+}
+
+.btn-apply {
+    background-color: #2EB28A;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.btn-apply:hover {
+    background-color: #26a077;
+}
+
+.btn-apply i {
+    margin-right: 5px;
+}
+
+/* Active Filters */
+.active-filters {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.active-filters-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.active-filters-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.active-filters-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1;
+}
+
+.filter-badge {
+    background-color: #2EB28A;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-badge-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    font-size: 14px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.filter-badge-close:hover {
+    opacity: 1;
+}
+
+.btn-clear-all {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #999;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-clear-all:hover {
+    background-color: #f8f9fa;
+    border-color: #666;
+}
+
+/* Download Section */
+.download-section {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.btn-download {
+    background-color: #2EB28A;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-download:hover {
+    background-color: #26a077;
+}
+
+.btn-download i {
+    margin-right: 5px;
+}
+
+/* Mobile Cards */
+.mobile-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.history-card {
+    background-color: white;
+    border: 1px solid #DEE2E6;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 15px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+    color: #333;
+}
+
+.card-employee-id {
+    font-size: 12px;
+    color: #666;
+}
+
+.card-date-section {
+    margin-bottom: 15px;
+}
+
+.card-label {
+    font-size: 12px;
+    color: #666;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.card-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.card-times-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+/* Desktop Table */
+.desktop-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+    overflow: hidden;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table thead {
+    background-color: #2EB28A;
+}
+
+.history-table thead th {
+    padding: 15px;
+    font-weight: 600;
+    color: #FAFAFA;
+    text-align: left;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.history-table tbody tr {
+    border-bottom: 1px solid #DEE2E6;
+    transition: background-color 0.2s ease;
+}
+
+.history-table tbody tr:hover {
+    background-color: #F8F9FA;
+}
+
+.history-table tbody td {
+    padding: 15px;
+    font-size: 14px;
+    color: #333;
+}
+
+.history-table tbody td.text-center {
+    text-align: center;
+    color: #999;
+}
+
+.history-table tbody td.text-muted {
+    color: #999;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    background-color: white;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.no-results p {
+    margin: 0;
+    font-size: 18px;
+}
+
+/* Pagination */
+.pagination-nav {
+    margin-top: 30px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    flex-wrap: wrap;
+}
+
+.page-item {
+    list-style: none;
+}
+
+.page-link {
+    background-color: white;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    min-width: 44px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover:not(.disabled) {
+    background-color: #f8f9fa;
+    border-color: #2EB28A;
+}
+
+.page-item.active .page-link {
+    background-color: #2EB28A;
+    color: white;
+    border-color: #2EB28A;
+}
+
+.page-item.disabled .page-link {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-link .d-none {
+    display: none;
+}
+
+.pagination-info {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .filters-card {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-card {
+        max-width: 100%;
+    }
+
+    .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .apply-group {
+        width: 100%;
+    }
+
+    .btn-apply {
+        width: 100%;
+    }
+
+    .active-filters-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-clear-all {
+        width: 100%;
+    }
+
+    .download-section {
+        text-align: center;
+    }
+
+    .btn-download {
+        width: 100%;
+    }
+
+    .history-table {
+        font-size: 12px;
+    }
+
+    .history-table thead th,
+    .history-table tbody td {
+        padding: 10px 8px;
+    }
+
+    .page-link .d-sm-inline {
+        display: none;
+    }
+
+    .page-link .d-sm-none {
+        display: inline;
+    }
+}
+
+@media (max-width: 576px) {
+    .history-container {
+        padding: 15px;
+    }
+
+    .history-title {
+        font-size: 22px;
+    }
+
+    .history-subtitle {
+        font-size: 14px;
+    }
+
+    .filters-card {
+        padding: 15px;
+    }
+
+    .card-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page-link {
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: 36px;
+    }
+
+    .pagination {
+        gap: 3px;
+    }
+}
+
+@media (max-width: 360px) {
+    .history-card {
+        padding: 12px;
+    }
+
+    .card-times-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Utility Classes */
+.d-md-none {
+    display: block;
+}
+
+.d-none {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .d-md-none {
+        display: none;
+    }
+
+    .d-md-block {
+        display: block;
+    }
+}
