@@ -85,7 +85,7 @@
                 $totalEmployeesQuery = "SELECT COUNT(employee_id) AS total FROM employees";
                 $clockedInQuery      = "SELECT COUNT(clockin_time) AS checkedIn FROM record_backups WHERE clockin_time IS NOT NULL";
                 $clockedOutQuery     = "SELECT COUNT(clockout_time) AS checkedOut FROM record_backups WHERE clockout_time IS NOT NULL";
-                $absentEmployeesQuery= "SELECT COUNT(employment_status) AS absent FROM employees WHERE employment_status NOT IN ('Active', 'Terminated')";
+                $absentEmployeesQuery= "SELECT COUNT(employee_id) AS absent FROM employees";
 
                 // Fetch results
                 $totalEmployees = $pdo->query($totalEmployeesQuery)->fetch(PDO::FETCH_ASSOC)['total'];

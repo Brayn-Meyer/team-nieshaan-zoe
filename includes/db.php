@@ -44,7 +44,6 @@ $db_name     = $_ENV['DB_NAME']     ?? '';
 try {
     $pdo = new PDO("mysql:host=$db_server;dbname=$db_name;charset=utf8mb4", $db_user, $db_password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    echo "Connected successfully!";
 } catch (PDOException $e) {
     die("Could not connect to the database: " . $e->getMessage());
 }
