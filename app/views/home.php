@@ -9,6 +9,8 @@
     </style>
 </head>
 <body>
+    <?php include_once __DIR__ . '/../../includes/db.php'; ?>
+
     <?php include_once __DIR__ . '/../../includes/header.php'; ?>
     
     <br><br>

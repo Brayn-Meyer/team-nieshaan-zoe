@@ -81,43 +81,54 @@
     <div class="container">
         <div class="cards-row">
             <?php
-            // Sample data - in a real application, this would come from a database
-            $cards = [
-                [
-                    'title' => 'Total Employees',
-                    'icon' => 'fas fa-users',
-                    'value' => 124
-                ],
-                [
-                    'title' => 'Clocked In',
-                    'icon' => 'fas fa-user-check',
-                    'value' => 89
-                ],
-                [
-                    'title' => 'Clocked Out',
-                    'icon' => 'fas fa-user-clock',
-                    'value' => 22
-                ],
-                [
-                    'title' => 'Absent Employees',
-                    'icon' => 'fas fa-user-times',
-                    'value' => 13
-                ]
-            ];
-            
-            // Generate cards
-            foreach ($cards as $card) {
-                echo '
-                <div class="card">
-                    <div class="card-content">
-                        <i class="' . $card['icon'] . ' card-icon"></i>
-                        <div>
-                            <div class="card-title">' . $card['title'] . '</div>
-                            <div class="card-value">' . $card['value'] . '</div>
+                // Queries
+                $totalEmployeesQuery = "SELECT COUNT(employee_id) AS total FROM employees";
+                $clockedInQuery      = "SELECT COUNT(clockin_time) AS checkedIn FROM record_backups WHERE clockin_time IS NOT NULL";
+                $clockedOutQuery     = "SELECT COUNT(clockout_time) AS checkedOut FROM record_backups WHERE clockout_time IS NOT NULL";
+                $absentEmployeesQuery= "SELECT COUNT(employment_status) AS absent FROM employees WHERE employment_status NOT IN ('Active', 'Terminated')";
+
+                // Fetch results
+                $totalEmployees = $pdo->query($totalEmployeesQuery)->fetch(PDO::FETCH_ASSOC)['total'];
+                $clockedIn      = $pdo->query($clockedInQuery)->fetch(PDO::FETCH_ASSOC)['checkedIn'];
+                $clockedOut     = $pdo->query($clockedOutQuery)->fetch(PDO::FETCH_ASSOC)['checkedOut'];
+                $absentEmployees= $pdo->query($absentEmployeesQuery)->fetch(PDO::FETCH_ASSOC)['absent'];
+
+                // Cards array
+                $cards = [
+                    [
+                        'title' => 'Total Employees',
+                        'icon'  => 'fas fa-users',
+                        'value' => $totalEmployees
+                    ],
+                    [
+                        'title' => 'Clocked In',
+                        'icon'  => 'fas fa-user-check',
+                        'value' => $clockedIn
+                    ],
+                    [
+                        'title' => 'Clocked Out',
+                        'icon'  => 'fas fa-user-clock',
+                        'value' => $clockedOut
+                    ],
+                    [
+                        'title' => 'Absent Employees',
+                        'icon'  => 'fas fa-user-times',
+                        'value' => $absentEmployees
+                    ]
+                ];
+
+                foreach ($cards as $card) {
+                    echo '
+                    <div class="card">
+                        <div class="card-content">
+                            <i class="' . $card['icon'] . ' card-icon"></i>
+                            <div>
+                                <div class="card-title">' . $card['title'] . '</div>
+                                <div class="card-value">' . $card['value'] . '</div>
+                            </div>
                         </div>
-                    </div>
-                </div>';
-            }
+                    </div>';
+                }
             ?>
         </div>
     </div>
