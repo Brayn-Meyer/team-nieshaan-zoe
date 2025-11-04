@@ -29,6 +29,7 @@ function loadEnv($path)
 }
 
 // Load .env file (adjust path if needed)
+
 try {
     loadEnv(__DIR__ . '../../.env');
 } catch (Exception $e) {
