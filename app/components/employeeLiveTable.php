@@ -451,12 +451,59 @@
                             <th scope="col">Employee ID</th>
                             <th scope="col">Department</th>
                             <th scope="col">Roles</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Action</th>
+                            <th scope="col">Clock-in</th>
+                            <th scope="col">Clock-out</th>
                         </tr>
                     </thead>
                     <tbody id="employeesTableBody">
-                        <!-- Employee rows will be populated here by JavaScript -->
+                        <?php
+                            $employees = "SELECT 
+                                e.employee_id,
+                                e.first_name,
+                                e.last_name,
+                                c.role,
+                                c.department,
+                                DATE(rb.clockin_time) AS work_date,
+                                MAX(rb.clockin_time) AS last_clockin_time,
+                                MAX(rb.clockout_time) AS last_clockout_time
+                            FROM employees e
+                            LEFT JOIN emp_classification c 
+                                ON e.classification_id = c.classification_id
+                            LEFT JOIN record_backups rb 
+                                ON rb.employee_id = e.employee_id
+                            GROUP BY 
+                                e.employee_id, 
+                                e.first_name, 
+                                e.last_name, 
+                                c.role, 
+                                c.department, 
+                                DATE(rb.clockin_time)
+                            ORDER BY e.employee_id;
+                            ";
+
+                            $stmt = $pdo->query($employees);
+                            if ($stmt->rowCount() > 0) {
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    // Generate initials from name
+                                    $nameParts = explode(" ", $row["name"]);
+                                    $initials = "";
+                                    foreach ($nameParts as $part) {
+                                        $initials .= strtoupper(substr($part, 0, 1));
+                                    }
+                                    echo "<tr>";
+                                    echo    "<td class='intial-td'><div class='initial-badge'>" . htmlspecialchars($initials) . "</div></td>" .
+                                            "<td>" . htmlspecialchars($row["first_name"]) . htmlspecialchars($row["last_name"]) . "</td>" .  
+                                            "<td>" . $row["employee_id"]."</td>".
+                                            "<td>" . $row["department"]."</td>" .
+                                            "<td>" . $row["role"]."</td>" .
+                                            "<td>" . $row["last_clockin_time"]."</td>" .
+                                            "<td>" . $row["last_clockout_time"]."</td>";
+                                    echo "<tr>";
+                                }
+                            } else {
+                                echo "No attendance records found.";
+                            }
+                        ?>
                     </tbody>
                 </table>
             </div>
@@ -966,7 +1013,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="timeRecordsBody">
-                                    <!-- Time records will be populated here by JavaScript -->
+                                    <?php
+                                    
+                                    ?>
                                 </tbody>
                             </table>
                         </div>
