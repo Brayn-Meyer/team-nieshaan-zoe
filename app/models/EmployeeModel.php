@@ -15,15 +15,27 @@ class EmployeeModel {
         try {
             $query = "
                 SELECT 
-                    e.*,
-                    ec.department,
-                    ec.position,
-                    ec.role,
-                    ec.employment_type,
-                    ec.employee_level
+                    e.employee_id,
+                    e.first_name,
+                    e.last_name,
+                    c.role,
+                    c.department,
+                    DATE(rb.clockin_time) AS work_date,
+                    MAX(rb.clockin_time) AS last_clockin_time,
+                    MAX(rb.clockout_time) AS last_clockout_time
                 FROM employees e
-                LEFT JOIN emp_classification ec ON e.classification_id = ec.classification_id
-                ORDER BY e.first_name, e.last_name
+                LEFT JOIN emp_classification c 
+                    ON e.classification_id = c.classification_id
+                LEFT JOIN record_backups rb 
+                    ON rb.employee_id = e.employee_id
+                GROUP BY 
+                    e.employee_id, 
+                    e.first_name, 
+                    e.last_name, 
+                    c.role, 
+                    c.department, 
+                    DATE(rb.clockin_time)
+                ORDER BY e.employee_id;
             ";
             return db()->query($query);
         } catch (Exception $e) {
