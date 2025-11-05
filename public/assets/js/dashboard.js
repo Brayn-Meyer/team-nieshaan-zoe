@@ -66,7 +66,8 @@ function renderEmployees(employees) {
                 <td>${emp.employeeId}</td>
                 <td>${escapeHtml(emp.department)}</td>
                 <td>${escapeHtml(emp.roles)}</td>
-                <td>${escapeHtml(emp.status)}</td>
+                <td>${escapeHtml(emp.lastClockIn)}</td>
+                <td>${escapeHtml(emp.lastClockOut)}</td>
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" data-employee-id="${emp.id}">
@@ -345,6 +346,6 @@ function setupDropdowns() {
 }
 
 // Show user guide (placeholder)
-function showUserGuide() {
-    alert('User Guide functionality - to be implemented');
-}
+// function showUserGuide() {
+//     alert('User Guide functionality - to be implemented');
+// }

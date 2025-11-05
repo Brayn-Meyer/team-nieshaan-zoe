@@ -77,25 +77,20 @@ class EmployeeController {
             
             // Map to frontend expected format
             $formattedEmployees = array_map(function($emp) {
+                // The getAllEmployees query returns a summary per employee with latest clock-in/out
                 return [
                     'id' => $emp['employee_id'],
-                    'name' => trim($emp['first_name'] . ' ' . $emp['last_name']),
+                    'name' => trim(($emp['first_name'] ?? '') . ' ' . ($emp['last_name'] ?? '')),
                     'employeeId' => $emp['employee_id'],
-                    'classificationId' => $emp['classification_id'],
-                    'firstName' => $emp['first_name'],
-                    'lastName' => $emp['last_name'],
-                    'contactNo' => $emp['contact_no'],
-                    'email' => $emp['email'],
-                    'address' => $emp['address'],
-                    'idNumber' => $emp['id'],
-                    'userType' => $emp['is_admin'] ? 'Admin' : 'Employee',
-                    'dateHired' => $emp['date_hired'],
-                    'supervisorName' => $emp['supervisor_name'],
-                    'leaveBalance' => $emp['leave_balance'],
-                    'username' => $emp['username'] ?? $emp['email'], // fallback to email if no username
+                    // 'firstName' => $emp['first_name'] ?? '',
+                    // 'lastName' => $emp['last_name'] ?? '',
+                    // role/department come from emp_classification
                     'roles' => $emp['role'] ?? 'Employee',
                     'department' => $emp['department'] ?? 'General',
-                    'status' => $emp['employment_status'] ?? 'Active'
+                    // Time log summary fields
+                    'workDate' => $emp['work_date'] ?? null,
+                    'lastClockIn' => $emp['last_clockin_time'] ?? null,
+                    'lastClockOut' => $emp['last_clockout_time'] ?? null,
                 ];
             }, $employees);
             

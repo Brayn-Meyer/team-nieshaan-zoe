@@ -193,8 +193,8 @@ $earlierNotifications = array_filter($_SESSION['notifications'], fn($n) => $n['s
                         <th scope="col">Employee ID</th>
                         <th scope="col">Department</th>
                         <th scope="col">Roles</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Action</th>
+                        <th scope="col">Clock In</th>
+                        <th scope="col">Clock Out</th>
                     </tr>
                 </thead>
                 <tbody id="employeeTableBody">
