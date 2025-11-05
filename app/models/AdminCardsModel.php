@@ -28,13 +28,17 @@ class AdminCardsModel {
     public static function getTotalCheckedIn() {
         try {
             $today = date('Y-m-d');
-            $query = "SELECT COUNT(DISTINCT employee_id) AS checkedIn 
-                      FROM record_backups 
-                      WHERE clockin_time IS NOT NULL 
-                      AND date = ? 
-                      AND type = 'Work'";
+            $query = "SELECT 
+                        COUNT(DISTINCT e.employee_id) AS total_clocked_in_no_out
+                    FROM employees e
+                    LEFT JOIN record_backups rb 
+                        ON rb.employee_id = e.employee_id
+                    WHERE DATE(rb.clockin_time) = ?
+                        AND rb.clockin_time IS NOT NULL
+                        AND rb.clockout_time IS NULL;
+                    ";
             $result = db()->query($query, [$today], 's');
-            return $result[0]['checkedIn'] ?? 0;
+            return $result[0]['total_clocked_in_no_out'] ?? 0;
         } catch (Exception $e) {
             error_log("Error in getTotalCheckedIn: " . $e->getMessage());
             return 0;
@@ -47,13 +51,17 @@ class AdminCardsModel {
     public static function getTotalCheckedOut() {
         try {
             $today = date('Y-m-d');
-            $query = "SELECT COUNT(DISTINCT employee_id) AS checkedOut 
-                      FROM record_backups 
-                      WHERE clockout_time IS NOT NULL 
-                      AND date = ? 
-                      AND type = 'Work'";
+            $query = "SELECT 
+                        COUNT(DISTINCT e.employee_id) AS total_clocked_in_and_out
+                    FROM employees e
+                    LEFT JOIN record_backups rb 
+                        ON rb.employee_id = e.employee_id
+                    WHERE DATE(rb.clockin_time) = ?
+                        AND rb.clockin_time IS NOT NULL
+                        AND rb.clockout_time IS NOT NULL;
+                    ";
             $result = db()->query($query, [$today], 's');
-            return $result[0]['checkedOut'] ?? 0;
+            return $result[0]['total_clocked_in_and_out'] ?? 0;
         } catch (Exception $e) {
             error_log("Error in getTotalCheckedOut: " . $e->getMessage());
             return 0;
@@ -66,11 +74,15 @@ class AdminCardsModel {
     public static function getTotalAbsent() {
         try {
             $today = date('Y-m-d');
-            $query = "SELECT COUNT(DISTINCT employee_id) AS absent 
-                      FROM record_backups 
-                      WHERE status = 'Absent' 
-                      AND date = ? 
-                      AND type = 'Work'";
+            $query = "SELECT 
+                        COUNT(DISTINCT e.employee_id) AS total_clocked_in_and_out
+                    FROM employees e
+                    LEFT JOIN record_backups rb 
+                        ON rb.employee_id = e.employee_id
+                    WHERE DATE(rb.clockin_time) = ?
+                        AND rb.clockin_time IS NULL
+                        AND rb.clockout_time IS NULL;
+                    ";
             $result = db()->query($query, [$today], 's');
             return $result[0]['absent'] ?? 0;
         } catch (Exception $e) {
