@@ -346,6 +346,6 @@ function setupDropdowns() {
 }
 
 // Show user guide (placeholder)
-function showUserGuide() {
-    alert('User Guide functionality - to be implemented');
-}
+// function showUserGuide() {
+//     alert('User Guide functionality - to be implemented');
+// }

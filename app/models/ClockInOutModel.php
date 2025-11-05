@@ -37,14 +37,24 @@ class ClockInOutModel {
     public static function getAllRecords() {
         try {
             $query = "SELECT 
-                        r.*,
+                        e.employee_id,
                         e.first_name,
                         e.last_name,
-                        CONCAT(e.first_name, ' ', e.last_name) AS full_name
-                      FROM record_backups r
-                      LEFT JOIN employees e ON r.employee_id = e.employee_id
-                      WHERE r.type = 'Work' 
-                      ORDER BY r.date DESC, r.clockin_time DESC";
+                        c.role,
+                        c.department,
+                        DATE(rb.clockin_time) AS work_date,
+                        rb.clockin_time AS last_clockin_time,
+                        rb.clockout_time AS last_clockout_time
+                    FROM employees e
+                    JOIN emp_classification c ON e.classification_id = c.classification_id
+                    JOIN record_backups rb 
+                        ON rb.employee_id = e.employee_id
+                    WHERE rb.clockin_time = (
+                        SELECT MAX(rb2.clockin_time)
+                        FROM record_backups rb2
+                        WHERE rb2.employee_id = e.employee_id
+                    );
+                ";
             return db()->query($query);
         } catch (Exception $e) {
             error_log("Error in getAllRecords: " . $e->getMessage());

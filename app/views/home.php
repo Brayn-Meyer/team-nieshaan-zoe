@@ -3,16 +3,19 @@ require_once __DIR__ . '/../../includes/config.php';
 
 $pageTitle = 'Dashboard - Clock It';
 $currentPage = 'home';
-$additionalJS = ['/assets/js/dashboard.js'];
+$additionalCSS = ['/assets/css/userGuide.css'];
+$additionalJS = ['/assets/js/dashboard.js', '/assets/js/userGuide.js'];
 
 require_once __DIR__ . '/../../includes/header.php';
+
+require_once __DIR__ . '/../../app/components/helpGuide.php';
 ?>
 
 <!-- Help Button -->
-<button onclick="showUserGuide()" class="help-btn">
+<!-- <button onclick="showUserGuide()" class="help-btn">
     <i class="fa-solid fa-circle-question"></i>
     Help Guide
-</button>
+</button> -->
 
 <!-- Dashboard Container -->
 <div class="dashboard-container">
