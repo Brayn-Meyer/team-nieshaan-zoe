@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../includes/config.php';
 $pageTitle = 'Dashboard - Clock It';
 $currentPage = 'home';
 $additionalCSS = ['/assets/css/userGuide.css'];
-$additionalJS = ['/assets/js/dashboard.js', '/assets/js/userGuide.js'];
+$additionalJS = ['/assets/js/dashboard.js', '/assets/js/userGuide.js', '/assets/js/notification-component.js'];
 
 require_once __DIR__ . '/../../includes/header.php';
 
@@ -77,6 +77,11 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                         <i class="fa-solid fa-calendar"></i>
                         Time Log
                     </button>
+                    <?php 
+                        // Include and render notification bell
+                        require_once __DIR__ . '/../components/notification-bell.php';
+                        renderNotificationBell();
+                    ?>
                 </div>
             </div>
             
@@ -113,6 +118,7 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                         <th scope="col">Roles</th>
                         <th scope="col">Clock In</th>
                         <th scope="col">Clock Out</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody id="employeeTableBody">

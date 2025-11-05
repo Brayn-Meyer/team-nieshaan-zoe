@@ -7,7 +7,10 @@ $additionalJS = ['/assets/js/history.js'];
 $additionalCSS = ['/assets/css/history.css'];
 
 require_once __DIR__ . '/../../includes/header.php';
+
+require_once __DIR__ . '/../../app/components/HistoryUserGuide.php';
 ?>
+
 
 <div class="history-container">
     <div class="history-header">
