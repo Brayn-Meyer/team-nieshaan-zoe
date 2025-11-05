@@ -167,7 +167,7 @@ $earlierNotifications = array_filter($_SESSION['notifications'], fn($n) => $n['s
                     <input 
                         type="text" 
                         class="form-control search-input" 
-                        placeholder="Search employees..." 
+                        placeholder="            Search employees..." 
                         id="searchInput"
                         oninput="filterEmployees()"
                     >
