@@ -462,6 +462,11 @@ body.dark-mode .popup-content {
   color: #e6efec !important;
 }
 
+/* User Guide Overlay: dark mode fix for visibility */
+body.dark-mode .user-guide-overlay {
+    background: rgba(0, 0, 0, 0.1) !important;
+}
+
 
 /* Strong reset: remove any background / panel behind nav items entirely.
    This targets the navbar right area and all descendants and uses !important
@@ -501,3 +506,4 @@ body.dark-mode .app-navbar .nav-right #theme-toggle,
   color: var(--accent-dark) !important;
   border-radius: 30px !important;
 }
+
