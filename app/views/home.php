@@ -3,16 +3,19 @@ require_once __DIR__ . '/../../includes/config.php';
 
 $pageTitle = 'Dashboard - Clock It';
 $currentPage = 'home';
-$additionalJS = ['/assets/js/dashboard.js'];
+$additionalCSS = ['/assets/css/userGuide.css'];
+$additionalJS = ['/assets/js/dashboard.js', '/assets/js/userGuide.js', '/assets/js/notification-component.js'];
 
 require_once __DIR__ . '/../../includes/header.php';
+
+require_once __DIR__ . '/../../app/components/helpGuide.php';
 ?>
 
 <!-- Help Button -->
-<button onclick="showUserGuide()" class="help-btn">
+<!-- <button onclick="showUserGuide()" class="help-btn">
     <i class="fa-solid fa-circle-question"></i>
     Help Guide
-</button>
+</button> -->
 
 <!-- Dashboard Container -->
 <div class="dashboard-container">
@@ -74,6 +77,11 @@ require_once __DIR__ . '/../../includes/header.php';
                         <i class="fa-solid fa-calendar"></i>
                         Time Log
                     </button>
+                    <?php 
+                        // Include and render notification bell
+                        require_once __DIR__ . '/../components/notification-bell.php';
+                        renderNotificationBell();
+                    ?>
                 </div>
             </div>
             
@@ -110,6 +118,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <th scope="col">Roles</th>
                         <th scope="col">Clock In</th>
                         <th scope="col">Clock Out</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody id="employeeTableBody">
@@ -323,6 +332,7 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 
 <style>
+
 .dashboard-container {
     margin-top: 30px;
     background: #f8fafc;
@@ -365,6 +375,34 @@ require_once __DIR__ . '/../../includes/header.php';
 .align-items-center {
     align-items: center !important;
 }
+
+.theme-toggle-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.theme-toggle {
+  background-color: #f1f1f1;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background-color: #e0e0e0;
+}
+
+.theme-toggle i {
+  color: #333;
+}
+
 </style>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
