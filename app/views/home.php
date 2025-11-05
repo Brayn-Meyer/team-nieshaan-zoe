@@ -323,6 +323,7 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 
 <style>
+
 .dashboard-container {
     margin-top: 30px;
     background: #f8fafc;
@@ -365,6 +366,34 @@ require_once __DIR__ . '/../../includes/header.php';
 .align-items-center {
     align-items: center !important;
 }
+
+.theme-toggle-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.theme-toggle {
+  background-color: #f1f1f1;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background-color: #e0e0e0;
+}
+
+.theme-toggle i {
+  color: #333;
+}
+
 </style>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

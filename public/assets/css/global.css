@@ -1,0 +1,503 @@
+/* --- Toggle as sliding pill --- */
+.theme-toggle,
+.app-navbar .nav-right .theme-toggle,
+#theme-toggle {
+  position: relative !important;
+  width: 56px !important;
+  height: 28px !important;
+  padding: 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  border-radius: 30px !important;
+  background: #ffffff !important;
+  cursor: pointer !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
+  transition: all 0.3s ease !important;
+}
+
+.theme-toggle:hover,
+.app-navbar .nav-right .theme-toggle:hover,
+#theme-toggle:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 18px; /* adds spacing between links, toggle, and logout */
+}
+
+.theme-toggle i { font-size: 12px; color: #556; opacity: 0.85; transition: opacity 0.2s ease; pointer-events: none; }
+
+/* the knob */
+.theme-toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+  transition: transform 0.24s ease, background-color 0.24s ease;
+}
+
+/* active (dark) — move knob to the right and reduce sun opacity */
+.theme-toggle.active { background: #2b2b2b; }
+.theme-toggle.active::after { transform: translateX(28px); background: #111; }
+.theme-toggle.active i.fa-sun { opacity: 0.35; }
+.theme-toggle:not(.active) i.fa-moon { opacity: 0.35; }
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #20282a !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode h1 {
+    color: #fff !important;
+}
+
+/* Dark mode table styles */
+body.dark-mode table {
+    background-color: #20282a !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode th {
+    background-color: #26B07A  !important;
+    color: #ffffff !important;
+    border-color: #26B07A 
+     !important;
+}
+
+body.dark-mode td {
+    background-color: #263033 !important;
+    color: #ffffff !important;
+    border-color: #232e2f !important;
+}
+
+body.dark-mode .filters-card {
+    background-color: #263033 !important;
+    border-color: #232e2f !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode select {
+    background-color: #232e2f !important;
+    border-color: #263033 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .apply-filters,
+body.dark-mode .download-button {
+    background-color: #26B07A !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+body.dark-mode .clear-all {
+    color: #26B07A !important;
+    background: transparent !important;
+    border: 1px solid #26B07A !important;
+}
+
+/* Active filters styling in dark mode */
+body.dark-mode .active-filters {
+    background-color: #242937 !important;
+    border-color: #2c3344 !important;
+}
+
+/* --- Accent colors & KPI cards --- */
+:root {
+  /* Accent / brand colors tuned to match the screenshot */
+  --accent: #26B07A;         /* bright mint/teal */
+  --accent-dark: #1F8C67;    /* darker teal for headers */
+  --card-dark-bg: #232e2f;   /* KPI / card dark background */
+  --row-dark-bg: #263033;    /* table row dark shade */
+  --bg-dark-main: #20282a;   /* overall page dark background */
+  --header-start: #0f6b57;   /* navbar gradient start */
+  --header-end: #25b07a;     /* navbar gradient end */
+}
+
+/* KPI cards with left accent bar like the screenshot */
+.card {
+  border-radius: 12px;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 18px;
+  bottom: 18px;
+  width: 8px;
+  background: var(--accent);
+  border-radius: 6px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+}
+
+/* dark-mode card */
+body.dark-mode .card {
+  background: var(--card-dark-bg);
+  color: #e9f7f1;
+}
+
+/* --- Search + Add button styling --- */
+.search-container {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border-radius: 8px;
+  padding: 6px 10px;
+  border: 1px solid rgba(46,178,138,0.9); /* accent border */
+  background: rgba(46,178,138,0.03);
+}
+.search-container input {
+  border: none;
+  background: transparent;
+  color: inherit;
+  width:100%;
+  outline: none;
+}
+
+/* rounded green Add button */
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.btn-primary:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* --- Table look: green header, dark rows --- */
+.employee-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  color: inherit;
+}
+.employee-table thead th {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  padding: 16px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom: none;
+}
+.employee-table tbody tr {
+  background: #2b3b3b; /* default dark-ish row */
+  color: #e1e8e8;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.employee-table tbody tr td {
+  padding: 14px 16px;
+}
+
+/* light variant: if not in dark-mode, header still green but rows lighter */
+body:not(.dark-mode) .employee-table tbody tr { background: #f1f5f5; color: #2c3838; border-bottom: 1px solid rgba(0,0,0,0.06); }
+
+/* dark-mode overrides */
+body.dark-mode {
+  background-color: var(--bg-dark-main) !important;
+  color: #e9f0ef !important;
+}
+body.dark-mode .search-container { background: rgba(255,255,255,0.02); border-color: rgba(46,178,138,0.8); }
+body.dark-mode .employee-table thead th { background: var(--accent-dark); }
+body.dark-mode .employee-table tbody tr { background: var(--row-dark-bg); color: #d7e7e3; border-bottom: 1px solid rgba(255,255,255,0.04); }
+
+/* Make all containers and content areas dark */
+body.dark-mode .dashboard-container,
+body.dark-mode .main-container,
+body.dark-mode main,
+body.dark-mode .container,
+body.dark-mode .content-wrapper,
+body.dark-mode .app-content {
+  background-color: var(--bg-dark-main) !important; /* very dark */
+  color: #e9f0ef !important;
+}
+
+/* Navbar styling intentionally left to original styles in header/main.css.
+   Do not override navbar here so the header keeps its intended color in both
+   light and dark modes. */
+
+/* KPI cards: ensure dark card background and green left accent visible */
+body.dark-mode .card {
+  background: var(--card-dark-bg) !important;
+  color: #eaf5f0 !important;
+}
+body.dark-mode .card::before {
+  background: var(--accent) !important;
+}
+
+/* Employee table header: match the bright teal */
+body.dark-mode .employee-table thead th {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+
+/* Table body rows: slightly lighter than page bg but darker than card */
+body.dark-mode .employee-table tbody tr {
+  background: var(--row-dark-bg) !important;
+}
+
+/* Ensure the header/navbar keeps the original brand color when dark mode is toggled */
+body.dark-mode .app-navbar,
+body.dark-mode .app-navbar .app-navbar-inner {
+  background: #2EB28A !important; /* keep brand teal */
+  border-bottom: 1px solid #e6e9ee !important;
+}
+
+/* Keep nav links readable */
+body.dark-mode .app-navbar .nav-link {
+  color: #ffffff !important;
+}
+
+/* Remove any pseudo-elements that might be drawing a dark panel behind nav items */
+.app-navbar .app-navbar-inner::before,
+.app-navbar .app-navbar-inner::after,
+.app-navbar .nav-right::before,
+.app-navbar .nav-right::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Make sure nav items sit above any accidental background and keep spacing */
+.app-navbar .nav-right,
+.app-navbar .nav-right a,
+.app-navbar .nav-right button {
+  position: relative !important;
+  z-index: 5 !important;
+  background: transparent !important;
+}
+
+/* If any nav links were changed to display:block with background, force inline-block */
+.app-navbar .nav-right .nav-link {
+  display: inline-block !important;
+  background: transparent !important;
+}
+
+/* Make sure the logout button remains a white pill and visible on the teal header */
+.app-navbar .nav-right .logout-btn,
+.logout-btn {
+  background: #ffffff !important;
+  color: var(--accent) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+  border-radius: 25px !important;
+  padding: 8px 20px !important;
+  transition: all 0.3s ease !important;
+}
+
+.app-navbar .nav-right .logout-btn:hover,
+.logout-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15) !important;
+}
+
+/* Make the theme toggle clearly visible on the teal header in dark mode
+   (keep it light so the icons remain readable). Override .active here too.) */
+body.dark-mode .app-navbar #theme-toggle,
+body.dark-mode .app-navbar #theme-toggle.active {
+  background: #ffffff !important;
+  color: var(--accent-dark) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+}
+body.dark-mode .app-navbar #theme-toggle .fa-moon,
+body.dark-mode .app-navbar #theme-toggle .fa-sun {
+  color: #2c3838 !important;
+}
+
+body.dark-mode .dashboard-main,
+body.dark-mode .search-add-container,
+body.dark-mode .table-responsive {
+    background: transparent;
+    color: #e6efec;
+}
+
+/* If there's a white wrapper panel, dim it in dark mode */
+body.dark-mode .panel, body.dark-mode .card, body.dark-mode .search-add-container {
+    background-color: #2c3838 !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+}
+
+/* Force higher contrast text in dark mode */
+body.dark-mode,
+body.dark-mode .card,
+body.dark-mode .card .card-content,
+body.dark-mode .employee-table,
+body.dark-mode .employee-table td,
+body.dark-mode .employee-table th,
+body.dark-mode .mobile-employees-container,
+body.dark-mode .search-container,
+body.dark-mode .dashboard-main {
+    color: #ffffff !important;
+}
+
+/* Make table row text brighter and ensure icons/buttons remain visible */
+body.dark-mode .employee-table tbody tr td { color: #e6f0ee !important; }
+body.dark-mode .employee-table thead th { color: #ffffff !important; }
+body.dark-mode .btn, body.dark-mode .btn-primary { color: #ffffff !important; }
+body.dark-mode .card .card-title, body.dark-mode .card .card-value { color: #ffffff !important; }
+
+/* Force dark mode on most content elements, but exclude header/navbar so the
+   navbar keeps its original color from the site's header styles. */
+/* Force dark mode on all potential white elements (excluding header) */
+body.dark-mode div,
+body.dark-mode section,
+body.dark-mode aside,
+body.dark-mode footer,
+body.dark-mode .panel,
+body.dark-mode .card,
+body.dark-mode .box,
+body.dark-mode .container-fluid,
+body.dark-mode .content-section {
+  background-color: #2c3838!important;
+}
+
+/* Handle form elements in dark mode */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #232e2f !important;
+    color: #e6f0ee !important;
+    border-color: #263033 !important;
+}
+
+/* Theme toggle container positioning */
+.theme-toggle-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Dark-mode overrides for Time Log and History pages to ensure text is visible */
+body.dark-mode .timelog-filters,
+body.dark-mode .table-container,
+body.dark-mode .table-wrapper,
+body.dark-mode .filters-card,
+body.dark-mode .desktop-table-container,
+body.dark-mode .mobile-cards,
+body.dark-mode .history-card,
+body.dark-mode .no-results {
+  background-color: #2c3838 !important;
+  color: #e6efec !important;
+  border-color: rgba(255,255,255,0.04) !important;
+  box-shadow: none !important;
+}
+
+/* Inputs, selects, and text areas on those pages */
+body.dark-mode .search-container .search-input,
+body.dark-mode .week-select,
+body.dark-mode .filter-input,
+body.dark-mode input[type="date"] {
+  background-color: #1a2424 !important;
+  color: #e6efec !important;
+  border: 1px solid #2c3838 !important;
+}
+
+/* Table text/colors */
+body.dark-mode .time-log-table thead.th,
+body.dark-mode .history-table thead {
+  background: var(--accent-dark) !important;
+}
+body.dark-mode .time-log-table tbody tr,
+body.dark-mode .history-table tbody tr {
+  background: var(--row-dark-bg) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+}
+body.dark-mode .time-log-table tbody td,
+body.dark-mode .history-table tbody td,
+body.dark-mode .card-value,
+body.dark-mode .card-title,
+body.dark-mode .history-title,
+body.dark-mode .history-subtitle {
+  color: #e6efec !important;
+}
+
+/* Buttons on those pages */
+body.dark-mode .btn-apply,
+body.dark-mode .btn-download,
+body.dark-mode .btn-primary,
+body.dark-mode .filter-badge {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* Pagination tweaks */
+body.dark-mode .page-link {
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  color: #e6efec !important;
+}
+body.dark-mode .page-item.active .page-link {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+
+/* Ensure popup uses dark background and readable text */
+body.dark-mode .popup-container,
+body.dark-mode .popup-content {
+  background: #2c3838!important;
+  color: #e6efec !important;
+}
+
+
+/* Strong reset: remove any background / panel behind nav items entirely.
+   This targets the navbar right area and all descendants and uses !important
+   to ensure it overrides other rules that introduced the black rectangle. */
+body.dark-mode .app-navbar .nav-right,
+body.dark-mode .app-navbar .nav-right *,
+.app-navbar .nav-right,
+.app-navbar .nav-right * {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Keep spacing and readable colors for links/buttons */
+body.dark-mode .app-navbar .nav-right .nav-link,
+.app-navbar .nav-right .nav-link {
+  color: #ffffff !important;
+  padding: 8px 12px !important;
+  display: inline-block !important;
+}
+
+/* Ensure logout button and toggle remain visible but not covered */
+body.dark-mode .app-navbar .nav-right .logout-btn,
+.app-navbar .nav-right .logout-btn {
+  background: #ffffff !important;
+  color: var(--accent) !important;
+  border-radius: 25px !important;
+  padding: 8px 20px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+  transition: all 0.3s ease !important;
+}
+
+body.dark-mode .app-navbar .nav-right #theme-toggle,
+.app-navbar .nav-right #theme-toggle {
+  background: #ffffff !important;
+  color: var(--accent-dark) !important;
+  border-radius: 30px !important;
+}
