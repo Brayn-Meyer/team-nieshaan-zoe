@@ -67,8 +67,11 @@ class ClockInOutModel {
      */
     public static function getHoursWorked($weekStart = null) {
         try {
+            // record_backups table stores clockin_time/clockout_time as datetimes.
+            // Some deployments don't have separate `type`, `status`, or `date` columns
+            // so use the datetime fields and DATE()/TIME() helpers instead.
             $query = "
-                SELECT 
+                SELECT
                     e.employee_id,
                     CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
                     ROUND(SUM(
@@ -77,28 +80,26 @@ class ClockInOutModel {
                             TIMESTAMPDIFF(
                                 MINUTE,
                                 CASE
-                                    WHEN TIMESTAMP(r.date, TIME(r.clockin_time)) < TIMESTAMP(r.date, '08:30:00')
-                                        THEN TIMESTAMP(r.date, '08:30:00')
-                                    ELSE TIMESTAMP(r.date, TIME(r.clockin_time))
+                                    WHEN TIME(r.clockin_time) < '08:30:00' THEN TIMESTAMP(DATE(r.clockin_time), '08:30:00')
+                                    ELSE r.clockin_time
                                 END,
-                                TIMESTAMP(r.date, TIME(r.clockout_time))
+                                r.clockout_time
                             )
                         )
                     ) / 60.0) AS total_hours
                 FROM record_backups r
                 JOIN employees e ON e.employee_id = r.employee_id
-                WHERE r.type = 'Work'
-                AND r.status = 'Active'
-                AND DAYOFWEEK(r.date) NOT IN (1, 7)
-                AND r.clockin_time IS NOT NULL
+                WHERE r.clockin_time IS NOT NULL
                 AND r.clockout_time IS NOT NULL
+                AND DAYOFWEEK(r.clockin_time) NOT IN (1, 7)
             ";
 
             $params = [];
             $types = '';
             
             if ($weekStart) {
-                $query .= " AND r.date >= ? AND r.date <= DATE_ADD(?, INTERVAL 6 DAY)";
+                // Filter by the date portion of clockin_time
+                $query .= " AND DATE(r.clockin_time) >= ? AND DATE(r.clockin_time) <= DATE_ADD(?, INTERVAL 6 DAY)";
                 $params = [$weekStart, $weekStart];
                 $types = 'ss';
             }
