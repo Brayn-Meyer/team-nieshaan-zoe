@@ -1,12 +1,25 @@
 <?php
-// components/notification-bell.php
 function renderNotificationBell() {
+    // Calculate unread count
+    $unreadCount = 0;
+    if (isset($_SESSION['notifications'])) {
+        foreach ($_SESSION['notifications'] as $notification) {
+            if (!$notification['read']) {
+                $unreadCount++;
+            }
+        }
+    }
     ?>
+    
     <!-- Notification Bell Component -->
     <div class="notification-container">
         <div class="notification-bell" onclick="toggleNotificationDropdown()">
             <i class="fas fa-bell"></i>
-            <span class="notification-badge" id="notificationCount">0</span>
+            <?php if ($unreadCount > 0): ?>
+                <span class="notification-badge" id="notificationCount">
+                    <?php echo $unreadCount > 99 ? '99+' : $unreadCount; ?>
+                </span>
+            <?php endif; ?>
         </div>
         
         <div class="notification-dropdown" id="notificationDropdown">
@@ -17,9 +30,73 @@ function renderNotificationBell() {
                 </button>
             </div>
             <div class="notification-list" id="notificationList">
-                <div class="text-center text-muted py-4">
-                    <i class="fas fa-spinner fa-spin"></i> Loading notifications...
-                </div>
+                <?php if (empty($_SESSION['notifications'])): ?>
+                    <div class="notification-empty">
+                        <i class="fas fa-bell-slash"></i>
+                        <p>No new notifications</p>
+                    </div>
+                <?php else: ?>
+                    <?php 
+                    $todayNotifications = array_filter($_SESSION['notifications'], fn($n) => $n['section'] === 'today');
+                    $earlierNotifications = array_filter($_SESSION['notifications'], fn($n) => $n['section'] === 'earlier');
+                    ?>
+                    
+                    <?php if (!empty($todayNotifications)): ?>
+                        <div class="notification-section">
+                            <div class="notification-section-title">Today</div>
+                            <?php foreach ($todayNotifications as $notification): ?>
+                                <div class="notification-item <?php echo !$notification['read'] ? 'unread' : ''; ?>" 
+                                     data-id="<?php echo $notification['id']; ?>">
+                                    <div class="notification-content">
+                                        <div class="notification-employee"><?php echo htmlspecialchars($notification['employee']); ?></div>
+                                        <div class="notification-message"><?php echo htmlspecialchars($notification['message']); ?></div>
+                                        <div class="notification-time"><?php echo htmlspecialchars($notification['time']); ?></div>
+                                    </div>
+                                    <div class="notification-actions">
+                                        <button class="btn btn-sm <?php echo $notification['read'] ? 'btn-outline-secondary' : 'btn-outline-success'; ?>" 
+                                                onclick="toggleRead(<?php echo $notification['id']; ?>)"
+                                                title="<?php echo $notification['read'] ? 'Mark as unread' : 'Mark as read'; ?>">
+                                            <i class="fa-solid fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" 
+                                                onclick="openReplyModal('<?php echo addslashes($notification['employee']); ?>', '<?php echo addslashes($notification['message']); ?>')"
+                                                title="Reply to employee">
+                                            <i class="fa-solid fa-message"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if (!empty($earlierNotifications)): ?>
+                        <div class="notification-section">
+                            <div class="notification-section-title">Earlier</div>
+                            <?php foreach ($earlierNotifications as $notification): ?>
+                                <div class="notification-item <?php echo !$notification['read'] ? 'unread' : ''; ?>" 
+                                     data-id="<?php echo $notification['id']; ?>">
+                                    <div class="notification-content">
+                                        <div class="notification-employee"><?php echo htmlspecialchars($notification['employee']); ?></div>
+                                        <div class="notification-message"><?php echo htmlspecialchars($notification['message']); ?></div>
+                                        <div class="notification-time"><?php echo htmlspecialchars($notification['time']); ?></div>
+                                    </div>
+                                    <div class="notification-actions">
+                                        <button class="btn btn-sm <?php echo $notification['read'] ? 'btn-outline-secondary' : 'btn-outline-success'; ?>" 
+                                                onclick="toggleRead(<?php echo $notification['id']; ?>)"
+                                                title="<?php echo $notification['read'] ? 'Mark as unread' : 'Mark as read'; ?>">
+                                            <i class="fa-solid fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" 
+                                                onclick="openReplyModal('<?php echo addslashes($notification['employee']); ?>', '<?php echo addslashes($notification['message']); ?>')"
+                                                title="Reply to employee">
+                                            <i class="fa-solid fa-message"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
             <div class="notification-footer">
                 <a href="notifications.php" class="btn btn-sm btn-link w-100">View All Notifications</a>
@@ -43,6 +120,9 @@ function renderNotificationBell() {
         color: #6c757d;
         background: transparent;
         border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .notification-bell:hover {
@@ -108,12 +188,25 @@ function renderNotificationBell() {
         background: white;
     }
 
+    .notification-section {
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .notification-section-title {
+        padding: 0.5rem 1.25rem;
+        background: #f8f9fa;
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-weight: 600;
+    }
+
     .notification-item {
         padding: 1rem 1.25rem;
         border-bottom: 1px solid #e9ecef;
-        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
         transition: background-color 0.15s ease-in-out;
-        position: relative;
     }
 
     .notification-item:last-child {
@@ -129,36 +222,31 @@ function renderNotificationBell() {
         border-left: 3px solid #007bff;
     }
 
-    .notification-item.unread::before {
-        content: '';
-        position: absolute;
-        left: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 6px;
-        height: 6px;
-        background: #007bff;
-        border-radius: 50%;
+    .notification-content {
+        flex: 1;
     }
 
-    .notification-title {
-        font-weight: 600;
+    .notification-employee {
+        font-weight: bold;
+        color: #2eb28a;
         margin-bottom: 0.25rem;
-        color: #495057;
-        font-size: 0.9rem;
     }
 
     .notification-message {
         font-size: 0.85rem;
         color: #6c757d;
         margin-bottom: 0.5rem;
-        line-height: 1.4;
     }
 
     .notification-time {
         font-size: 0.75rem;
         color: #adb5bd;
-        font-weight: 500;
+    }
+
+    .notification-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: 1rem;
     }
 
     .notification-empty {
@@ -204,21 +292,168 @@ function renderNotificationBell() {
             right: -20px;
         }
     }
-
-    /* Loading states */
-    .text-muted {
-        color: #6c757d !important;
-    }
-
-    .text-center {
-        text-align: center !important;
-    }
-
-    .py-4 {
-        padding-top: 1.5rem !important;
-        padding-bottom: 1.5rem !important;
-    }
     </style>
+
+    <script>
+    // Notification functionality
+    function toggleNotificationDropdown() {
+        const dropdown = document.getElementById('notificationDropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    }
+
+    function toggleRead(notificationId) {
+        // Send AJAX request to toggle read status
+        fetch('/api/notifications/toggle-read.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ notification_id: notificationId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update UI
+                const notificationItem = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+                if (notificationItem) {
+                    notificationItem.classList.toggle('unread');
+                    const button = notificationItem.querySelector('.btn-outline-success, .btn-outline-secondary');
+                    if (button) {
+                        if (notificationItem.classList.contains('unread')) {
+                            button.classList.remove('btn-outline-secondary');
+                            button.classList.add('btn-outline-success');
+                            button.title = 'Mark as read';
+                        } else {
+                            button.classList.remove('btn-outline-success');
+                            button.classList.add('btn-outline-secondary');
+                            button.title = 'Mark as unread';
+                        }
+                    }
+                    
+                    // Update badge count
+                    updateNotificationBadge();
+                }
+            } else {
+                console.error('Error toggling read status:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function markAllAsRead() {
+        // Send AJAX request to mark all as read
+        fetch('/api/notifications/mark-all-read.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update UI
+                document.querySelectorAll('.notification-item.unread').forEach(item => {
+                    item.classList.remove('unread');
+                    const button = item.querySelector('.btn-outline-success');
+                    if (button) {
+                        button.classList.remove('btn-outline-success');
+                        button.classList.add('btn-outline-secondary');
+                        button.title = 'Mark as unread';
+                    }
+                });
+                
+                // Update badge count
+                updateNotificationBadge();
+                
+                showToast('All notifications marked as read', 'success');
+            } else {
+                showToast('Failed to mark notifications as read', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to mark notifications as read', 'error');
+        });
+    }
+
+    function updateNotificationBadge() {
+        const unreadItems = document.querySelectorAll('.notification-item.unread');
+        const badge = document.getElementById('notificationCount');
+        
+        if (unreadItems.length === 0) {
+            if (badge) badge.style.display = 'none';
+        } else {
+            if (badge) {
+                badge.textContent = unreadItems.length > 99 ? '99+' : unreadItems.length;
+                badge.style.display = 'flex';
+            }
+        }
+    }
+
+    function openReplyModal(employee, message) {
+        // Set the employee and message in the reply modal
+        document.getElementById('replyEmployeeName').textContent = employee;
+        document.getElementById('replyEmployee').value = employee;
+        document.getElementById('originalMessage').textContent = message;
+
+        // Open the reply modal (using Bootstrap)
+        const replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
+        replyModal.show();
+        
+        // Close notification dropdown
+        toggleNotificationDropdown();
+    }
+
+    function showToast(message, type = 'info') {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} alert-dismissible fade show`;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 250px;
+        `;
+        toast.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 3000);
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const notificationContainer = document.querySelector('.notification-container');
+        const dropdown = document.getElementById('notificationDropdown');
+        
+        if (notificationContainer && !notificationContainer.contains(e.target) && dropdown) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    // Close dropdown with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const dropdown = document.getElementById('notificationDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+    });
+    </script>
     <?php
 }
 ?>

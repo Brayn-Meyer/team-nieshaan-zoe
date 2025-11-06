@@ -77,16 +77,11 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                         <i class="fa-solid fa-calendar"></i>
                         Time Log
                     </button>
-                    <?php 
-                        // Include and render notification bell
-                        require_once __DIR__ . '/../components/notification-bell.php';
-                        renderNotificationBell();
-                    ?>
                 </div>
             </div>
             
             <div class="col">
-                <div class="search-container">
+                <div class="">
                     <input 
                         type="text" 
                         class="form-control search-input" 
