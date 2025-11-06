@@ -89,7 +89,7 @@ $earlierNotifications = array_filter($_SESSION['notifications'], fn($n) => $n['s
 
 <!-- Notifications Modal -->
 <div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-1g">
         <div class="modal-content rounded-3">
             <div class="modal-header d-flex justify-content-between align-items-center modal-header-custom">
                 <h5 class="modal-title mb-0 fw-semibold" id="notificationsModalLabel">Notifications</h5>

@@ -33,6 +33,9 @@ try {
     $controller = $uriParts[0] ?? '';
     $action = $uriParts[1] ?? '';
     
+    // Debug logging
+    error_log("API Request - Controller: $controller, Action: $action");
+    
     switch ($controller) {
         case 'admin':
             require_once __DIR__ . '/../../app/controllers/AdminCardsController.php';
