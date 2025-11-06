@@ -66,65 +66,61 @@ class ClockInOutModel {
      * Get hours worked for a specific week or all weeks
      */
     public static function getHoursWorked($weekStart = null) {
-        try {
-            // record_backups table stores clockin_time/clockout_time as datetimes.
-            // Some deployments don't have separate `type`, `status`, or `date` columns
-            // so use the datetime fields and DATE()/TIME() helpers instead.
-            $query = "
-                SELECT
-                    e.employee_id,
-                    CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
-                    ROUND(SUM(
-                        GREATEST(
-                            0,
-                            TIMESTAMPDIFF(
-                                MINUTE,
-                                CASE
-                                    WHEN TIME(r.clockin_time) < '08:30:00' THEN TIMESTAMP(DATE(r.clockin_time), '08:30:00')
-                                    ELSE r.clockin_time
-                                END,
-                                r.clockout_time
-                            )
+    try {
+        $query = "
+            SELECT
+                [hm.*](guide://action?prefill=Tell%20me%20more%20about%3A%20hm.*),
+                e.employee_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+                ROUND(SUM(
+                    GREATEST(
+                        0,
+                        TIMESTAMPDIFF(
+                            MINUTE,
+                            CASE
+                                WHEN TIME(r.clockin_time) < '08:30:00' THEN TIMESTAMP(DATE(r.clockin_time), '08:30:00')
+                                ELSE r.clockin_time
+                            END,
+                            r.clockout_time
                         )
-                    ) / 60.0) AS total_hours
-                FROM record_backups r
-                JOIN employees e ON e.employee_id = r.employee_id
-                WHERE r.clockin_time IS NOT NULL
-                AND r.clockout_time IS NOT NULL
-                AND DAYOFWEEK(r.clockin_time) NOT IN (1, 7)
-            ";
+                    )
+                ) / 60.0) AS total_hours
+            FROM hours_management hm
+            JOIN employees e ON e.employee_id = hm.employee_id
+            JOIN record_backups r ON r.employee_id = e.employee_id
+            WHERE r.clockin_time IS NOT NULL
+              AND r.clockout_time IS NOT NULL
+              AND DAYOFWEEK(r.clockin_time) NOT IN (1, 7)
+        ";
 
-            $params = [];
-            $types = '';
-            
-            if ($weekStart) {
-                // Filter by the date portion of clockin_time
-                $query .= " AND DATE(r.clockin_time) >= ? AND DATE(r.clockin_time) <= DATE_ADD(?, INTERVAL 6 DAY)";
-                $params = [$weekStart, $weekStart];
-                $types = 'ss';
-            }
-
-            $query .= "
-                GROUP BY e.employee_id, e.first_name, e.last_name
-                ORDER BY e.first_name, e.last_name
-            ";
-
-            $result = db()->query($query, $params, $types);
-            
-            // Add week_start and week_end to each row
-            if ($weekStart) {
-                $weekEnd = date('Y-m-d', strtotime($weekStart . ' +6 days'));
-                foreach ($result as &$row) {
-                    $row['week_start'] = $weekStart;
-                    $row['week_end'] = $weekEnd;
-                }
-            }
-            
-            return $result;
-        } catch (Exception $e) {
-            error_log("Error in getHoursWorked: " . $e->getMessage());
-            throw $e;
+        $params = [];
+        $types = '';
+        
+        if ($weekStart) {
+            $query .= " AND DATE(r.clockin_time) >= ? AND DATE(r.clockin_time) <= DATE_ADD(?, INTERVAL 6 DAY)";
+            $params = [$weekStart, $weekStart];
+            $types = 'ss';
         }
+
+        $query .= "
+            GROUP BY hm.hrs_id, e.employee_id, e.first_name, e.last_name
+            ORDER BY e.first_name, e.last_name
+        ";
+
+        $result = db()->query($query, $params, $types);
+        
+        if ($weekStart) {
+            $weekEnd = date('Y-m-d', strtotime($weekStart . ' +6 days'));
+            foreach ($result as &$row) {
+                $row['week_start'] = $weekStart;
+                $row['week_end'] = $weekEnd;
+            }
+        }
+        
+        return $result;
+    } catch (Exception $e) {
+        error_log("Error in getHoursWorked: " . $e->getMessage());
+        throw $e;
     }
 }
 
