@@ -89,7 +89,7 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                     <input 
                         type="text" 
                         class="form-control search-input" 
-                        placeholder="Search employees..." 
+                        placeholder="            Search employees..." 
                         id="searchInput"
                         oninput="filterEmployees()"
                     >
