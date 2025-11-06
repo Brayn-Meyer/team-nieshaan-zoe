@@ -77,6 +77,10 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                         <i class="fa-solid fa-calendar"></i>
                         Time Log
                     </button>
+                    <?php 
+                        // Include and render notification bell
+                        require_once __DIR__ . '/../components/NotificationsComponent.php';
+                    ?>
                 </div>
             </div>
             
