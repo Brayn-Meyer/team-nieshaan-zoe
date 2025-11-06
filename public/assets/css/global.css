@@ -158,7 +158,6 @@ body.dark-mode .card {
   align-items:center;
   gap:8px;
   border-radius: 8px;
-  padding: 6px 10px;
   border: 1px solid rgba(46,178,138,0.9); /* accent border */
   background: rgba(46,178,138,0.03);
 }
@@ -190,14 +189,15 @@ body.dark-mode .card {
   border-spacing: 0;
   background: transparent;
   color: inherit;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 .employee-table thead th {
   background: var(--accent);
   color: #fff;
   font-weight: 600;
   padding: 16px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+
   border-bottom: none;
 }
 .employee-table tbody tr {

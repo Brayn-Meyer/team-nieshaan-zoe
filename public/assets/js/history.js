@@ -25,12 +25,21 @@ async function loadHistoryData() {
     try {
         showLoadingState();
         const data = await HistoryAPI.getAllRecords();
+        console.log('API Response:', data);
         
         // Extract records array from response
         const records = data.records || [];
+        console.log('Extracted Records:', records);
         
-        // Filter out records with null work_date
-        allRecords = records.filter(record => record.date !== null && record.date !== undefined);
+        // Transform the records to match our expected format
+        allRecords = records.map(record => ({
+            ...record,
+            date: record.work_date,
+            clockin_time: record.last_clockin_time,
+            clockout_time: record.last_clockout_time
+        }));
+        console.log('Transformed Records:', allRecords);
+        
         filteredRecords = [...allRecords];
         
         currentPage = 1;
@@ -178,9 +187,12 @@ function clearAllFilters() {
 
 // Render history (both mobile and desktop)
 function renderHistory() {
+    console.log('Rendering History. Total Records:', filteredRecords.length);
+    
     const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
     const paginatedRecords = filteredRecords.slice(start, end);
+    console.log('Paginated Records:', paginatedRecords);
     
     renderMobileCards(paginatedRecords);
     renderDesktopTable(paginatedRecords);
@@ -189,6 +201,7 @@ function renderHistory() {
     // Show/hide no results message
     const noResults = document.getElementById('noResults');
     if (filteredRecords.length === 0) {
+        console.log('No results to display');
         noResults.style.display = 'block';
     } else {
         noResults.style.display = 'none';
@@ -206,7 +219,7 @@ function renderMobileCards(records) {
     
     container.innerHTML = records.map(record => {
         const fullName = `${record.first_name || ''} ${record.last_name || ''}`.trim();
-        const employeeId = record.employee_id || 'N/A';
+        // const employeeId = record.employee_id || 'N/A';
         const workDate = formatDate(record.date);
         
         return `
@@ -214,7 +227,7 @@ function renderMobileCards(records) {
                 <div class="card-header-row">
                     <div>
                         <h6 class="card-title">${escapeHtml(fullName)}</h6>
-                        <small class="card-employee-id">${escapeHtml(employeeId)}</small>
+                        <small class="card-employee-id">${escapeHtml(record.employee_id)}</small>
                     </div>
                 </div>
                 <div class="card-date-section">
@@ -224,11 +237,11 @@ function renderMobileCards(records) {
                 <div class="card-times-grid">
                     <div>
                         <small class="card-label">Clock In</small>
-                        <div class="card-value">${record.clockin_time || '-'}</div>
+                        <div class="card-value">${record.last_clockin_time || '-'}</div>
                     </div>
                     <div>
                         <small class="card-label">Clock Out</small>
-                        <div class="card-value">${record.clockout_time || '-'}</div>
+                        <div class="card-value">${record.last_clockin_time || '-'}</div>
                     </div>
                 </div>
             </div>
@@ -249,14 +262,16 @@ function renderDesktopTable(records) {
         const fullName = `${record.first_name || ''} ${record.last_name || ''}`.trim();
         const employeeId = record.employee_id || 'N/A';
         const workDate = formatDate(record.date);
+        const clockIn = record.clockin_time || record.last_clockin_time || '-';
+        const clockOut = record.clockout_time || record.last_clockout_time || '-';
         
         return `
             <tr>
                 <td>${escapeHtml(fullName)}</td>
                 <td>${escapeHtml(employeeId)}</td>
                 <td>${workDate}</td>
-                <td>${record.clockin_time || '-'}</td>
-                <td>${record.clockout_time || '-'}</td>
+                <td>${clockIn}</td>
+                <td>${clockOut}</td>
             </tr>
         `;
     }).join('');
