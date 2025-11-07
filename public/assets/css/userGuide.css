@@ -242,8 +242,8 @@ body[data-guide-active="history"].dark-mode .history-guide-clone {
 /* Help Button Styles */
 .help-btn {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
+    /* bottom: 60px;
+    right: 30px; */
     background: linear-gradient(135deg, #2EB28A 0%, #259673 100%);
     color: white;
     border: none;
@@ -325,7 +325,7 @@ body[data-guide-active="history"].dark-mode .history-guide-clone {
     }
     
     .help-btn {
-        bottom: 20px;
+        bottom: 40px;
         right: 20px;
         padding: 10px 16px;
         font-size: 0.813rem;
@@ -366,7 +366,7 @@ body[data-guide-active="history"].dark-mode .history-guide-clone {
     }
     
     .help-btn {
-        bottom: 15px;
+        bottom: 30px;
         right: 15px;
         padding: 10px 18px;
     }
@@ -385,7 +385,7 @@ body[data-guide-active="history"].dark-mode .history-guide-clone {
     }
     
     .help-btn {
-        bottom: 15px;
+        bottom: 30px;
         right: 15px;
         padding: 8px 16px;
     }
