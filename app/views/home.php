@@ -7,20 +7,26 @@ $additionalCSS = ['/assets/css/userGuide.css'];
 $additionalJS = ['/assets/js/dashboard.js', '/assets/js/userGuide.js', '/assets/js/notification-component.js'];
 
 require_once __DIR__ . '/../../includes/header.php';
-
 require_once __DIR__ . '/../../app/components/helpGuide.php';
-?>
 
-<!-- Help Button -->
-<!-- <button onclick="showUserGuide()" class="help-btn">
-    <i class="fa-solid fa-circle-question"></i>
-    Help Guide
-</button> -->
+$adminName = "John Doe"; 
+?>
 
 <!-- Dashboard Container -->
 <div class="dashboard-container">
+    <!-- Header with Welcome Message and Date/Time -->
+    <div class="dashboard-header">
+        <div class="welcome-message">
+            <h1>Welcome, <?php echo htmlspecialchars($adminName); ?>!</h1>
+            <p>Here's your employee management dashboard</p>
+        </div>
+        <div class="date-time-display">
+            <p class="current-date" id="currentDate">Loading date...</p>
+            <p class="current-time" id="currentTime">Loading time...</p>
+        </div>
+    </div>
+
     <main class="dashboard-main" id="kpiCards">
-        <!-- KPI Cards will be loaded here dynamically -->
         <div class="card">
             <div class="card-content">
                 <i class="fa-solid fa-users card-icon"></i>
@@ -29,6 +35,10 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                     <div class="card-value" id="totalEmployees">0</div>
                 </div>
             </div>
+
+
+
+
         </div>
 
         <div class="card">
@@ -61,8 +71,6 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
             </div>
         </div>
     </main>
-
-    <br><br>
 
     <!-- Employee Table Section -->
     <div class="search-add-container">
@@ -122,7 +130,7 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                 </thead>
                 <tbody id="employeeTableBody">
                     <tr>
-                        <td colspan="6" class="text-center text-muted">
+                        <td colspan="7" class="text-center text-muted">
                             <i class="fa-solid fa-spinner fa-spin"></i> Loading employees...
                         </td>
                     </tr>
@@ -330,89 +338,25 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
     </div>
 </div>
 
-<style>
-
-.dashboard-container {
-    margin-top: 30px;
-    background: #f8fafc;
-    min-height: 100vh;
-    padding: 120px 60px 50px;
-}
-
-/* Responsive Utilities */
-.d-none {
-    display: none !important;
-}
-
-.d-md-none {
-    display: block !important;
-}
-
-.d-md-block {
-    display: none !important;
-}
-
-@media (min-width: 768px) {
-    .d-md-none {
-        display: none !important;
-    }
+<script>
+// Update date and time in real-time
+function updateDateTime() {
+    const now = new Date();
     
-    .d-md-block {
-        display: block !important;
-    }
+    // Format date
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const dateString = now.toLocaleDateString('en-US', options);
+    
+    // Format time
+    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    
+    // Update elements
+    document.getElementById('currentDate').textContent = dateString;
+    document.getElementById('currentTime').textContent = timeString;
 }
 
-.col-auto {
-    flex: 0 0 auto;
-    width: auto;
-}
-
-.col {
-    flex: 1 1 0%;
-}
-
-.align-items-center {
-    align-items: center !important;
-}
-
-.theme-toggle-container {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 10px;
-}
-
-.theme-toggle {
-  background-color: #f1f1f1;
-  border: none;
-  border-radius: 20px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: 0.3s ease;
-}
-
-.theme-toggle:hover {
-  background-color: #e0e0e0;
-}
-
-.theme-toggle i {
-  color: #333;
-}
-
-#addEmployeeModal select.form-select,
-  #editEmployeeModal select.form-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    /* background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 16px 12px; */
-  }
-
-</style>
+updateDateTime();
+setInterval(updateDateTime, 1000);
+</script>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

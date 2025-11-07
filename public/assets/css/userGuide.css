@@ -47,8 +47,10 @@
     position: fixed;
     background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
-    min-width: 320px;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
+    min-width: 280px;
     max-width: 480px;
     /* Ensure tooltip sits above all page content and cloned elements */
     z-index: 2147483647 !important;
@@ -56,6 +58,24 @@
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
     animation: tooltipEntry 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 768px) {
+    .guide-tooltip {
+        min-width: 260px;
+        max-width: 90vw;
+        margin: 0 10px;
+        /* Ensure it's always below the highlighted element in mobile */
+        top: auto !important;
+        bottom: 20px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+    
+    /* Remove all directional arrows in mobile */
+    .guide-tooltip::before {
+        display: none;
+    }
 }
 
 @keyframes tooltipEntry {
@@ -399,45 +419,45 @@ body[data-guide-active="history"].dark-mode .history-guide-clone {
     }
 }
 
-/* Dark mode support (optional) */
-@media (prefers-color-scheme: dark) {
-    .guide-tooltip {
-        background: #1f2937;
-        box-shadow: 
-            0 20px 60px rgba(0, 0, 0, 0.6),
-            0 0 0 1px rgba(255, 255, 255, 0.1);
-    }
-    
-    .guide-title {
-        color: #f9fafb;
-    }
-    
-    .guide-content {
-        color: #d1d5db;
-    }
-    
-    .guide-footer {
-        border-top-color: #374151;
-    }
-    
-    .guide-btn-secondary {
-        background: #374151;
-        color: #d1d5db;
-    }
-    
-    .guide-btn-secondary:hover {
-        background: #4b5563;
-        color: #f9fafb;
-    }
-    
-    .guide-close {
-        color: #6b7280;
-    }
-    
-    .guide-close:hover {
-        background: #7f1d1d;
-        color: #fca5a5;
-    }
+/* Dark mode styles should only apply when the site-level dark mode
+   is active (body.dark-mode). Avoid using the system preference media
+   query here so the site theme toggle controls appearance consistently. */
+body.dark-mode .guide-tooltip {
+    background: #1f2937;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .guide-title {
+    color: #f9fafb;
+}
+
+body.dark-mode .guide-content {
+    color: #d1d5db;
+}
+
+body.dark-mode .guide-footer {
+    border-top-color: #374151;
+}
+
+body.dark-mode .guide-btn-secondary {
+    background: #374151;
+    color: #d1d5db;
+}
+
+body.dark-mode .guide-btn-secondary:hover {
+    background: #4b5563;
+    color: #f9fafb;
+}
+
+body.dark-mode .guide-close {
+    color: #6b7280;
+}
+
+body.dark-mode .guide-close:hover {
+    background: #7f1d1d;
+    color: #fca5a5;
 }
 
 /* Temporary high-contrast styles applied to the target element while the guide is active.

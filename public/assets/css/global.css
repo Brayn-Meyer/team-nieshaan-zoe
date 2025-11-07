@@ -185,13 +185,19 @@ body.dark-mode .card {
 /* --- Table look: green header, dark rows --- */
 .employee-table {
   width: 100%;
-  border-collapse: separate;
+  /* border-collapse: separate; */
+  border-radius: 10px;
   border-spacing: 0;
   background: transparent;
   color: inherit;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+
+table.employee-table thead tr{
+  border-top-left-radius: 10px !important;
+}
+
 .employee-table thead th {
   background: var(--accent);
   color: #fff;
@@ -321,6 +327,51 @@ body.dark-mode .app-navbar #theme-toggle.active {
 body.dark-mode .app-navbar #theme-toggle .fa-moon,
 body.dark-mode .app-navbar #theme-toggle .fa-sun {
   color: #2c3838 !important;
+}
+
+/* Ensure guide/modal inner banners are transparent in light mode.
+   Some guide components reuse class names and can get accidental
+   background fills from other CSS. These overrides force the
+   guide/header/body areas to be transparent unless site dark-mode
+   is active. */
+.guide-content .guide-header,
+.guide-content .guide-body,
+.guide-content .guide-body p,
+.guide-tooltip-inner .guide-header,
+.guide-tooltip-inner .guide-body,
+.guide-tooltip-inner .guide-body p {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Keep the overall guide container background as intended (white in light mode) */
+.guide-content {
+  background: #ffffff !important;
+}
+
+/* In dark mode, allow the existing dark backgrounds to apply */
+body.dark-mode .guide-content,
+body.dark-mode .guide-tooltip {
+  background: unset !important;
+}
+
+/* Remove the unwanted footer/banner background in light mode so the
+   buttons/step indicator area doesn't show a separate gray strip. Keep
+   dark-mode styling untouched. */
+.guide-content .guide-footer,
+.guide-tooltip-inner .guide-footer,
+.guide-footer,
+.guide-step-indicator,
+.guide-buttons {
+  background: transparent !important;
+  border-top: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure step indicator doesn't have its own background or border in light mode */
+.guide-step-indicator {
+  background: transparent !important;
+  border: none !important;
 }
 
 body.dark-mode .dashboard-main,

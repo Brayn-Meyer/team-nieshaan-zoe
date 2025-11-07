@@ -218,61 +218,60 @@
     font-size: 16px;
 }
 
-/* Dark mode variables */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --guide-bg: #1a202c;
-        --guide-border: #2d3748;
-        --guide-title: #f7fafc;
-        --guide-text: #e2e8f0;
-        --guide-text-secondary: #a0aec0;
-        --guide-hover: #2d3748;
-        --guide-secondary-bg: #22543d;
-        --guide-secondary-text: #c6f6d5;
-        --guide-secondary-hover: #276749;
-        --guide-secondary-text-hover: #ffffff;
-    }
+/* Dark mode variables and scoped rules — only apply when site-level
+   dark mode is active (body.dark-mode). Avoid relying on system
+   preference so the site's toggle controls appearance consistently. */
+body.dark-mode {
+    --guide-bg: #1a202c;
+    --guide-border: #2d3748;
+    --guide-title: #f7fafc;
+    --guide-text: #e2e8f0;
+    --guide-text-secondary: #a0aec0;
+    --guide-hover: #2d3748;
+    --guide-secondary-bg: #22543d;
+    --guide-secondary-text: #c6f6d5;
+    --guide-secondary-hover: #276749;
+    --guide-secondary-text-hover: #ffffff;
 }
 
-
-.dark-mode .guide-content {
+body.dark-mode .guide-content {
     background: #1a202c;
     border-color: #2d3748;
 }
 
-.dark-mode .guide-header h3 {
+body.dark-mode .guide-header h3 {
     color: #f7fafc;
 }
 
-.dark-mode .guide-body p {
+body.dark-mode .guide-body p {
     color: #e2e8f0;
 }
 
-.dark-mode .close-btn {
+body.dark-mode .close-btn {
     color: #a0aec0;
 }
 
-.dark-mode .close-btn:hover {
+body.dark-mode .close-btn:hover {
     background: #2d3748;
     color: #f7fafc;
 }
 
-.dark-mode .btn-secondary {
+body.dark-mode .btn-secondary {
     background: #22543d;
     color: #c6f6d5;
 }
 
-.dark-mode .btn-secondary:hover {
+body.dark-mode .btn-secondary:hover {
     background: #276749;
     color: #ffffff;
 }
 
-.dark-mode .step-indicator {
+body.dark-mode .step-indicator {
     border-top-color: #2d3748;
 }
 
-.dark-mode .guide-header,
-.dark-mode .guide-footer {
+body.dark-mode .guide-header,
+body.dark-mode .guide-footer {
     border-color: #2d3748;
 }
 
