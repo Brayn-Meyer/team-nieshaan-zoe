@@ -10,7 +10,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 99999;
+    z-index: 9999;
     pointer-events: all;
 }
 
@@ -19,9 +19,7 @@
     position: fixed;
     border: 3px solid #2EB28A;
     border-radius: 12px;
-    box-shadow: 
-        0 0 0 4px rgba(46, 178, 138, 0.3),
-        0 0 0 9999px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 0 4px rgba(46, 178, 138, 0.3), 0 0 0 9999px rgba(0,0,0,0.0);
     background: transparent;
     pointer-events: none;
     z-index: 99998;
@@ -49,12 +47,11 @@
     position: fixed;
     background: #ffffff;
     border-radius: 16px;
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
     min-width: 320px;
     max-width: 480px;
-    z-index: 99999;
+    /* Ensure tooltip sits above all page content and cloned elements */
+    z-index: 2147483647 !important;
     pointer-events: all;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
@@ -221,6 +218,26 @@
     background: #e5e7eb;
     color: #1f2937;
 }
+
+/* Scoped transparent overlay + transparent highlight for History guide in dark mode */
+body[data-guide-active="history"].dark-mode .user-guide-overlay {
+    background: transparent !important;
+}
+
+/* Make highlight show only the green outline and remove the large dark mask */
+body[data-guide-active="history"].dark-mode .guide-highlight {
+    box-shadow: 0 0 0 4px rgba(46, 178, 138, 0.3), 0 0 0 0 rgba(0,0,0,0) !important;
+    background: transparent !important;
+    animation: none !important;
+}
+
+/* Ensure cloned elements render normally */
+body[data-guide-active="history"].dark-mode .guide-clone,
+body[data-guide-active="history"].dark-mode .history-guide-clone {
+    filter: none !important;
+    mix-blend-mode: normal !important;
+}
+
 
 /* Help Button Styles */
 .help-btn {
@@ -422,6 +439,46 @@
         color: #fca5a5;
     }
 }
+
+/* Temporary high-contrast styles applied to the target element while the guide is active.
+   This forces components to show in light (high-contrast) appearance so they're readable
+   when the page is in dark-mode. It targets common container types used in the app.
+*/
+/* Minimal visual treatment for the real target while the guide is active.
+   Keep the target's original dark-mode appearance, but add a highlighted outline so
+   users can perceive which element is being referenced. Avoid forcing light theme styles.
+*/
+.guide-target-highlighted {
+    outline: 3px solid rgba(46,178,138,0.5);
+    outline-offset: 6px;
+}
+
+/* Clone used to render a visible copy of the target above the mask */
+.guide-clone {
+    box-sizing: border-box;
+    transform-origin: top left;
+}
+
+.guide-clone {
+    box-sizing: border-box;
+    transform-origin: top left;
+    pointer-events: none;
+    /* keep clone visually identical to the page; do not force color or background */
+}
+
+.guide-clone img,
+.guide-clone svg {
+    /* ensure media renders normally */
+    filter: none !important;
+}
+
+/* Target common app components so they become readable when highlighted */
+.guide-target-highlighted .card::before {
+    /* keep the card accent visible */
+    box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+}
+
+/* leave tooltip and help button styling to their own rules */
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {

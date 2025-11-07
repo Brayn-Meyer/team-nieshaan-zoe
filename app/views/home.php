@@ -402,6 +402,17 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
   color: #333;
 }
 
+#addEmployeeModal select.form-select,
+  #editEmployeeModal select.form-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px; */
+  }
+
 </style>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
