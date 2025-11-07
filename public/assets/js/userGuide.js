@@ -266,7 +266,7 @@ class UserGuide {
                     width: `${rect.width}px`,
                     height: `${rect.height}px`,
                     margin: '0',
-                    zIndex: '100000',
+                    zIndex: '1805',
                     pointerEvents: 'none',
                     overflow: 'hidden'
                 });

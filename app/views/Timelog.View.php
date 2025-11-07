@@ -40,7 +40,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 10000;
+    /* keep overlay below modals (modal.css uses z-index:2000) */
+    z-index: 1800;
     pointer-events: none;
 }
 
@@ -67,7 +68,8 @@
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     min-width: 350px;
     max-width: 450px;
-    z-index: 10001;
+    /* sit above the overlay but below modals */
+    z-index: 1811;
     pointer-events: all;
     border: 1px solid #e2e8f0;
     transition: all 0.4s ease;

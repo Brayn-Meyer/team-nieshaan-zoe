@@ -353,9 +353,14 @@ body.dark-mode .app-navbar #theme-toggle .fa-sun {
 }
 
 /* In dark mode, allow the existing dark backgrounds to apply (scoped). */
+/* In dark mode, ensure the guide container and its tooltip have explicit dark backgrounds
+   instead of unsetting them. This prevents other broad 'transparent' rules from making
+   the tooltip/modal appear see-through. */
 body.dark-mode .user-guide-overlay .guide-content,
 body.dark-mode .user-guide-overlay .guide-tooltip {
-  background: unset !important;
+  background: #1a202c !important;
+  color: #e6efec !important;
+  border-color: #2d3748 !important;
 }
 
 /* Remove the unwanted footer/banner background in light mode within the guide only */
@@ -510,18 +515,38 @@ body.dark-mode .page-item.active .page-link {
 /* Ensure popup uses dark background and readable text */
 body.dark-mode .popup-container,
 body.dark-mode .popup-content {
-  background: #2c3838!important;
+  background: #2c383800!important;
   color: #e6efec !important;
 }
 
 /* User Guide Overlay: dark mode fix for visibility */
+/* Make the overlay transparent as requested (tooltip remains opaque via its own rules) */
 body.dark-mode .user-guide-overlay {
-    background: rgba(0, 0, 0, 0.1) !important;
+  background: transparent !important;
+}
+
+/* === Fix: targeted search input styling ===
+   Prevent the broad `body.dark-mode input` rules from greying out the search bar.
+   Make the search input keep a dark background and a green outline in dark mode. */
+.search-container input,
+.search-container .search-input {
+  background: #0f1720 !important;
+  color: #e6f0ee !important;
+  border: 2px solid rgba(46, 178, 138, 0.9) !important;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+body.dark-mode .search-container input,
+body.dark-mode .search-container .search-input {
+  background: rgba(255,255,255,0.03) !important;
+  color: #e6f0ee !important;
+  border: 2px solid rgba(46,178,138,0.85) !important;
 }
 
 /* Guide tooltip specific styles in dark mode */
 body.dark-mode .guide-tooltip {
-    background: rgba(35,46,47,0.85) !important;
+    background: rgba(0, 0, 0, 0.85) !important;
     border: 2px solid #26B07A !important;
     color: #ffffff !important;
 }
@@ -567,4 +592,27 @@ body.dark-mode .app-navbar .nav-right #theme-toggle,
   background: #ffffff !important;
   color: var(--accent-dark) !important;
   border-radius: 30px !important;
+}
+
+/* Narrow the strong override: only make the overlay fully transparent when the
+   HISTORY guide is explicitly active. This prevents accidentally removing the
+   dimming mask on other pages (like the dashboard) while keeping the special
+   history behavior intact. */
+body[data-guide-active="history"] .user-guide-overlay,
+body[data-guide-active="history"] .user-guide-overlay *:not(.highlight-overlay),
+body[data-guide-active="history"] #userGuideOverlay {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure the highlight outline renders (green border + small glow) while keeping the large mask transparent */
+#highlightOverlay,
+.highlight-overlay,
+.guide-highlight {
+  border: 3px solid #2EB28A !important;
+  border-radius: 12px !important;
+  /* show the green outline and dim the rest of the page */
+  box-shadow: 0 0 0 4px rgba(46,178,138,0.3), 0 0 0 9999px rgba(0,0,0,0.6) !important;
+  background: transparent !important;
 }

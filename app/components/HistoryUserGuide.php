@@ -6,7 +6,7 @@
 
 <!-- User Guide Overlay -->
 <div id="userGuideOverlay" class="user-guide-overlay" style="display: none;">
-    <div id="highlightOverlay" class="highlight-overlay"></div>
+    <div id="highlightOverlay" class="highlight-overlay" style="box-shadow: 0 0 0 4px rgba(46,178,138,0.3), 0 0 0 9999px rgba(0,0,0,0.6); border:3px solid #2EB28A; border-radius:12px; background:transparent;"></div>
     
     <div id="guideContent" class="guide-content">
         <div class="guide-header">
@@ -37,7 +37,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 10000;
+    /* keep overlay below modals (modal.css uses z-index:2000) */
+    z-index: 1800;
     pointer-events: none;
 }
 
@@ -64,7 +65,8 @@
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     min-width: 350px;
     max-width: 450px;
-    z-index: 10001;
+    /* sit above overlay but below modals */
+    z-index: 1811;
     pointer-events: all;
     border: 1px solid #e2e8f0;
     transition: all 0.4s ease;
@@ -87,18 +89,19 @@
 }
 
 .close-btn {
-                Object.assign(clone.style, {
-                    position: 'fixed',
-                    top: rect.top + 'px',
-                    left: rect.left + 'px',
-                    width: rect.width + 'px',
-                    height: rect.height + 'px',
-                    margin: '0',
-                    // ensure clone sits well above any overlay/mask
-                    zIndex: '100000',
-                    pointerEvents: 'none',
-                    overflow: 'hidden'
-                });
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #718096;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .close-btn:hover {
@@ -217,8 +220,8 @@
     box-sizing: border-box;
     transform-origin: top left;
     pointer-events: none;
-    /* ensure clone visually sits above overlay mask */
-    z-index: 10002 !important;
+    /* ensure clone visually sits above overlay mask but below modal/dialog layers */
+    z-index: 1805 !important;
 }
 .history-guide-clone img,
 .history-guide-clone svg {
@@ -230,13 +233,13 @@ body[data-guide-active="history"].dark-mode #userGuideOverlay {
 }
 
 body[data-guide-active="history"].dark-mode .highlight-overlay {
-    /* keep only the green outline, remove the huge dark box-shadow */
+    /* show green outline and dim the rest of the page */
     border: 3px solid #2EB28A !important;
     border-radius: 12px !important;
-    box-shadow: 0 0 0 4px rgba(46, 178, 138, 0.3) !important;
+    box-shadow: 0 0 0 4px rgba(46, 178, 138, 0.3) !important, 0 0 0 9999px rgba(0,0,0,0.6) !important;
     background: transparent !important;
     animation: none !important;
-    z-index: 10002 !important;
+    z-index: 1802 !important;
 }
 /* Ensure clones render normally even when site-wide dark-mode rules apply
    and place them above any overlay mask. */
@@ -248,7 +251,7 @@ body[data-guide-active="history"].dark-mode .highlight-overlay {
     color: inherit !important;
 }
 .history-guide-clone {
-    z-index: 100000 !important;
+    z-index: 1805 !important;
 }
 
 /* Scoped dark-mode styles while the history guide is active so modal text
@@ -480,7 +483,7 @@ function updateGuide() {
                 const clone = element.cloneNode(true);
                 if (clone.id) clone.removeAttribute('id');
                 clone.classList.add('history-guide-clone');
-                Object.assign(clone.style, {
+                    Object.assign(clone.style, {
                     position: 'fixed',
                     top: rect.top + 'px',
                     left: rect.left + 'px',
@@ -488,7 +491,7 @@ function updateGuide() {
                     height: rect.height + 'px',
                     margin: '0',
                     // make sure clone sits above the overlay mask
-                    zIndex: '10002',
+                    zIndex: '1805',
                     pointerEvents: 'none',
                     overflow: 'hidden'
                 });
@@ -547,7 +550,7 @@ function updateGuide() {
                                 width: rect.width + 'px',
                                 height: rect.height + 'px',
                                 margin: '0',
-                                zIndex: '10002',
+                                zIndex: '1805',
                                 pointerEvents: 'none',
                                 overflow: 'hidden'
                             });
