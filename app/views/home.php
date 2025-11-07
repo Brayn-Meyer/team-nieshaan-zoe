@@ -7,20 +7,14 @@ $additionalCSS = ['/assets/css/userGuide.css'];
 $additionalJS = ['/assets/js/dashboard.js', '/assets/js/userGuide.js', '/assets/js/notification-component.js'];
 
 require_once __DIR__ . '/../../includes/header.php';
-
 require_once __DIR__ . '/../../app/components/helpGuide.php';
 ?>
 
 <!-- Help Button -->
-<!-- <button onclick="showUserGuide()" class="help-btn">
-    <i class="fa-solid fa-circle-question"></i>
-    Help Guide
-</button> -->
 
 <!-- Dashboard Container -->
 <div class="dashboard-container">
     <main class="dashboard-main" id="kpiCards">
-        <!-- KPI Cards will be loaded here dynamically -->
         <div class="card">
             <div class="card-content">
                 <i class="fa-solid fa-users card-icon"></i>
@@ -77,10 +71,9 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                         <i class="fa-solid fa-calendar"></i>
                         Time Log
                     </button>
-                    <?php 
-                        // Include and render notification bell
-                        require_once __DIR__ . '/../components/NotificationsComponent.php';
-                    ?>
+
+                    <!-- Notifications Bell -->
+                    <?php require_once __DIR__ . '/../components/NotificationsComponent.php'; ?>
                 </div>
             </div>
             
@@ -150,7 +143,6 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
             <div class="modal-body">
                 <form id="addEmployeeForm" onsubmit="addEmployee(event)">
                     <div class="row g-3">
-                        <!-- Personal Information -->
                         <div class="col-12">
                             <h6 class="section-title">Personal Information</h6>
                         </div>
@@ -185,7 +177,6 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                             <input type="text" class="form-control" id="address" required>
                         </div>
                         
-                        <!-- Employment Information -->
                         <div class="col-12">
                             <h6 class="section-title">Employment Information</h6>
                         </div>
@@ -254,7 +245,6 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
             <div class="modal-body">
                 <form id="editEmployeeForm" onsubmit="updateEmployee(event)">
                     <input type="hidden" id="editEmployeeId">
-                    <!-- Same fields as add form -->
                     <div class="row g-3">
                         <div class="col-12"><h6 class="section-title">Personal Information</h6></div>
                         <div class="col-md-6">
@@ -331,7 +321,6 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
 </div>
 
 <style>
-
 .dashboard-container {
     margin-top: 30px;
     background: #f8fafc;
@@ -401,7 +390,6 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
 .theme-toggle i {
   color: #333;
 }
-
 </style>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
