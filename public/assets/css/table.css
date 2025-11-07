@@ -1,27 +1,40 @@
 /* Table Styles */
 .table-responsive {
     background: white;
-    border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
+.dashboard-header{
+
+    margin-top: -100px;
+}
+
 .employee-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     margin: 0;
 }
 
 .employee-table thead {
     background: #2EB28A;
     color: white;
+   
 }
 
 .employee-table thead th {
     padding: 15px 20px;
-    text-align: left;
     font-weight: 600;
     border: none;
+}
+
+.employee-table thead th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.employee-table thead th:last-child {
+    border-top-right-radius: 12px;
 }
 
 .employee-table tbody tr {
@@ -46,17 +59,19 @@
 .search-add-container {
     background: white;
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 25px;
+    padding-top: 40px;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 .search-container {
     position: relative;
+    padding-left: 35px;
 }
 
 .search-input {
-    padding: 10px 15px;
+    /* padding: 10px 15px; */
     padding-left: 40px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -204,10 +219,6 @@
     color: #dc3545;
 }
 
-.dropdown-item.text-danger:hover {
-    background: #dc3545;
-    color: white;
-}
 
 /* Mobile Employee Cards */
 .mobile-employees-container {
@@ -221,6 +232,7 @@
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    margin-bottom: 15px;
 }
 
 .employee-card .card-header {
@@ -261,15 +273,19 @@
 .detail-item {
     display: flex;
     justify-content: space-between;
+    padding: 8px 0;
 }
 
 .detail-item .label {
     font-weight: 600;
     color: #666;
+    min-width: 100px;
 }
 
 .detail-item .value {
     color: #333;
+    flex: 1;
+    text-align: right;
 }
 
 .employee-card .card-footer {
@@ -284,15 +300,92 @@
     justify-content: flex-end;
 }
 
+/* Header Styles */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    margin-bottom: 20px;
+}
+
+.welcome-message h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.welcome-message p {
+    margin: 5px 0 0 0;
+    color: #666;
+    font-size: 1rem;
+}
+
+.date-time-display {
+    text-align: right;
+}
+
+.current-date {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.current-time {
+    font-size: 1rem;
+    color: #666;
+    margin: 5px 0 0 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .search-add-container {
         padding: 15px;
+        margin-bottom: 15px;
+        border-bottom-left-radius: 10px ;
+        border-bottom-right-radius: 10px ;
     }
 
     .employee-table thead th,
     .employee-table tbody td {
         padding: 12px 15px;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .date-time-display {
+        text-align: left;
+    }
+    
+    .employee-card .card-body {
+        padding: 12px;
+    }
+    
+    .detail-item {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .detail-item .value {
+        text-align: left;
+    }
+}
+
+@media (max-width: 576px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        justify-content: center;
     }
 }
 
@@ -308,4 +401,78 @@
 .py-4 {
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
+}
+
+/* Dashboard Container */
+.dashboard-container { 
+    background: #f8fafc;
+    min-height: 100vh;
+    padding: 50px 30px 30px;
+}
+
+/* Responsive Utilities */
+.d-none {
+    display: none !important;
+}
+
+.d-md-none {
+    display: block !important;
+}
+
+.d-md-block {
+    display: none !important;
+}
+
+@media (min-width: 768px) {
+    .d-md-none {
+        display: none !important;
+    }
+    
+    .d-md-block {
+        display: block !important;
+    }
+    
+    .dashboard-container {
+        padding: 120px 60px 50px;
+    }
+}
+
+.col-auto {
+    flex: 0 0 auto;
+    width: auto;
+}
+
+.col {
+    flex: 1 1 0%;
+}
+
+.align-items-center {
+    align-items: center !important;
+}
+
+.theme-toggle-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.theme-toggle {
+  background-color: #f1f1f1;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background-color: #e0e0e0;
+}
+
+.theme-toggle i {
+  color: #333;
 }

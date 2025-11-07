@@ -185,13 +185,19 @@ body.dark-mode .card {
 /* --- Table look: green header, dark rows --- */
 .employee-table {
   width: 100%;
-  border-collapse: separate;
+  /* border-collapse: separate; */
+  border-radius: 10px;
   border-spacing: 0;
   background: transparent;
   color: inherit;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+
+table.employee-table thead tr{
+  border-top-left-radius: 10px !important;
+}
+
 .employee-table thead th {
   background: var(--accent);
   color: #fff;

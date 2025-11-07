@@ -2,33 +2,74 @@
 .history-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px;
 }
 
-.history-header {
+/* Header Styles */
+h1 {
     text-align: center;
-    margin-bottom: 30px;
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+    margin-top: 20px; /* Reduced from 40px */
+    margin-bottom: 10px; /* Reduced from 20px */
+    font-size: 28px;
 }
 
-.history-title {
-    font-size: 28px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 10px;
+p {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .history-subtitle {
-    font-size: 16px;
+    font-size: 14px;
     color: #666;
-    margin: 0;
 }
 
-/* Filters Card */
+/* Mobile-specific header positioning */
+@media (max-width: 768px) {
+    .history-container {
+        padding: 10px;
+    }
+    
+    h1 {
+        margin-top: 10px; /* Much smaller top margin on mobile */
+        margin-bottom: 8px;
+        font-size: 24px; /* Slightly smaller on mobile */
+    }
+    
+    .history-subtitle {
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+    
+    /* Remove the negative margin approach */
+    .history-header {
+        margin-top: 0;
+        margin-bottom: 15px;
+        padding-top: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        margin-top: -70px; /* Even less space on very small screens */
+        margin-bottom: 5px;
+        font-size: 22px;
+    }
+    
+    .history-subtitle {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+}
+
+/* The rest of your existing CSS remains the same */
 .filters-card {
     background-color: #EBEBEB;
     border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 15px;
+    margin-bottom: 15px;
     border: 1px solid #DEE2E6;
     max-width: 800px;
     margin-left: auto;
@@ -343,7 +384,6 @@
     color: #333;
     padding: 8px 12px;
     border-radius: 6px;
-    cursor: pointer;
     font-size: 14px;
     min-width: 44px;
     text-align: center;
@@ -387,11 +427,13 @@
 @media (max-width: 768px) {
     .filters-card {
         max-width: 100%;
+        padding: 12px;
     }
 
     .filters-row {
         flex-direction: column;
         align-items: stretch;
+        gap: 12px;
     }
 
     .filter-group {
@@ -414,6 +456,7 @@
 
     .btn-clear-all {
         width: 100%;
+        margin-top: 10px;
     }
 
     .download-section {
@@ -440,23 +483,24 @@
     .page-link .d-sm-none {
         display: inline;
     }
+    
+    /* Mobile cards styling */
+    .mobile-cards {
+        display: flex;
+    }
+    
+    .desktop-table-container {
+        display: none;
+    }
 }
 
 @media (max-width: 576px) {
     .history-container {
-        padding: 15px;
-    }
-
-    .history-title {
-        font-size: 22px;
-    }
-
-    .history-subtitle {
-        font-size: 14px;
+        padding: 8px;
     }
 
     .filters-card {
-        padding: 15px;
+        padding: 10px;
     }
 
     .card-header-row {
@@ -473,11 +517,15 @@
     .pagination {
         gap: 3px;
     }
+    
+    .card-times-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 360px) {
     .history-card {
-        padding: 12px;
+        padding: 10px;
     }
 
     .card-times-grid {
@@ -494,12 +542,20 @@
     display: none;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .d-md-none {
         display: none;
     }
 
     .d-md-block {
+        display: block;
+    }
+    
+    .mobile-cards {
+        display: none;
+    }
+    
+    .desktop-table-container {
         display: block;
     }
 }

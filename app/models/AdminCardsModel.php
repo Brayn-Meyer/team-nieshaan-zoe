@@ -29,7 +29,7 @@ class AdminCardsModel {
         try {
             $today = date('Y-m-d');
             $query = "SELECT 
-                        COUNT(DISTINCT e.employee_id) AS total_clocked_in_no_out
+                        COUNT(DISTINCT e.employee_id) AS total_clocked_in
                     FROM employees e
                     LEFT JOIN record_backups rb 
                         ON rb.employee_id = e.employee_id
@@ -38,7 +38,7 @@ class AdminCardsModel {
                         AND rb.clockout_time IS NULL;
                     ";
             $result = db()->query($query, [$today], 's');
-            return $result[0]['total_clocked_in_no_out'] ?? 0;
+            return $result[0]['total_clocked_in'] ?? 0;
         } catch (Exception $e) {
             error_log("Error in getTotalCheckedIn: " . $e->getMessage());
             return 0;
@@ -52,7 +52,7 @@ class AdminCardsModel {
         try {
             $today = date('Y-m-d');
             $query = "SELECT 
-                        COUNT(DISTINCT e.employee_id) AS total_clocked_in_and_out
+                        COUNT(DISTINCT e.employee_id) AS total_clocked_out
                     FROM employees e
                     LEFT JOIN record_backups rb 
                         ON rb.employee_id = e.employee_id
@@ -61,7 +61,7 @@ class AdminCardsModel {
                         AND rb.clockout_time IS NOT NULL;
                     ";
             $result = db()->query($query, [$today], 's');
-            return $result[0]['total_clocked_in_and_out'] ?? 0;
+            return $result[0]['total_clocked_out'] ?? 0;
         } catch (Exception $e) {
             error_log("Error in getTotalCheckedOut: " . $e->getMessage());
             return 0;
@@ -75,7 +75,7 @@ class AdminCardsModel {
         try {
             $today = date('Y-m-d');
             $query = "SELECT 
-                        COUNT(DISTINCT e.employee_id) AS total_clocked_in_and_out
+                        COUNT(DISTINCT e.employee_id) AS total_absent
                     FROM employees e
                     LEFT JOIN record_backups rb 
                         ON rb.employee_id = e.employee_id
@@ -84,7 +84,7 @@ class AdminCardsModel {
                         AND rb.clockout_time IS NULL;
                     ";
             $result = db()->query($query, [$today], 's');
-            return $result[0]['absent'] ?? 0;
+            return $result[0]['total_absent'] ?? 0;
         } catch (Exception $e) {
             error_log("Error in getTotalAbsent: " . $e->getMessage());
             return 0;
