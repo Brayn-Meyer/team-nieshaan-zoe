@@ -278,9 +278,12 @@ body.dark-mode .app-navbar .nav-link {
 }
 
 /* Make sure nav items sit above any accidental background and keep spacing */
-.app-navbar .nav-right,
-.app-navbar .nav-right a,
-.app-navbar .nav-right button {
+/* Ensure nav-right positioning/background overrides only apply in dark mode.
+   Previously these rules ran unscoped and affected the header in light mode.
+   Scope them to `body.dark-mode` so light mode preserves its intended styles. */
+body.dark-mode .app-navbar .nav-right,
+body.dark-mode .app-navbar .nav-right a,
+body.dark-mode .app-navbar .nav-right button {
   position: relative !important;
   z-index: 5 !important;
   background: transparent !important;
@@ -323,47 +326,45 @@ body.dark-mode .app-navbar #theme-toggle .fa-sun {
   color: #2c3838 !important;
 }
 
-/* Ensure guide/modal inner banners are transparent in light mode.
-   Some guide components reuse class names and can get accidental
-   background fills from other CSS. These overrides force the
-   guide/header/body areas to be transparent unless site dark-mode
-   is active. */
-.guide-content .guide-header,
-.guide-content .guide-body,
-.guide-content .guide-body p,
-.guide-tooltip-inner .guide-header,
-.guide-tooltip-inner .guide-body,
-.guide-tooltip-inner .guide-body p {
+/* Scope guide/modal inner-banner fixes to the guide overlay only.
+   Previously these rules were global and could affect other components
+   that reuse the same class names. Prefixing with `.user-guide-overlay`
+   confines these overrides to the user guide markup. */
+.user-guide-overlay .guide-content .guide-header,
+.user-guide-overlay .guide-content .guide-body,
+.user-guide-overlay .guide-content .guide-body p,
+.user-guide-overlay .guide-tooltip-inner .guide-header,
+.user-guide-overlay .guide-tooltip-inner .guide-body,
+.user-guide-overlay .guide-tooltip-inner .guide-body p {
   background: transparent !important;
   box-shadow: none !important;
 }
 
-/* Keep the overall guide container background as intended (white in light mode) */
-.guide-content {
+/* Keep the overall guide container background as intended (white in light mode)
+   but scoped so other `.guide-content` usages are unaffected. */
+.user-guide-overlay .guide-content {
   background: #ffffff !important;
 }
 
-/* In dark mode, allow the existing dark backgrounds to apply */
-body.dark-mode .guide-content,
-body.dark-mode .guide-tooltip {
+/* In dark mode, allow the existing dark backgrounds to apply (scoped). */
+body.dark-mode .user-guide-overlay .guide-content,
+body.dark-mode .user-guide-overlay .guide-tooltip {
   background: unset !important;
 }
 
-/* Remove the unwanted footer/banner background in light mode so the
-   buttons/step indicator area doesn't show a separate gray strip. Keep
-   dark-mode styling untouched. */
-.guide-content .guide-footer,
-.guide-tooltip-inner .guide-footer,
-.guide-footer,
-.guide-step-indicator,
-.guide-buttons {
+/* Remove the unwanted footer/banner background in light mode within the guide only */
+.user-guide-overlay .guide-content .guide-footer,
+.user-guide-overlay .guide-tooltip-inner .guide-footer,
+.user-guide-overlay .guide-footer,
+.user-guide-overlay .guide-step-indicator,
+.user-guide-overlay .guide-buttons {
   background: transparent !important;
   border-top: none !important;
   box-shadow: none !important;
 }
 
-/* Ensure step indicator doesn't have its own background or border in light mode */
-.guide-step-indicator {
+/* Ensure step indicator doesn't have its own background or border in light mode (scoped) */
+.user-guide-overlay .guide-step-indicator {
   background: transparent !important;
   border: none !important;
 }
@@ -525,10 +526,11 @@ body.dark-mode .guide-tooltip-inner {
 /* Strong reset: remove any background / panel behind nav items entirely.
    This targets the navbar right area and all descendants and uses !important
    to ensure it overrides other rules that introduced the black rectangle. */
+/* Strong reset: remove any background / panel behind nav items only when dark mode is active.
+   Avoid applying the reset in light mode which was causing unexpected transparent/blank
+   areas behind the navbar items. */
 body.dark-mode .app-navbar .nav-right,
-body.dark-mode .app-navbar .nav-right *,
-.app-navbar .nav-right,
-.app-navbar .nav-right * {
+body.dark-mode .app-navbar .nav-right * {
   background: transparent !important;
   background-image: none !important;
   box-shadow: none !important;
@@ -536,8 +538,8 @@ body.dark-mode .app-navbar .nav-right *,
 }
 
 /* Keep spacing and readable colors for links/buttons */
-body.dark-mode .app-navbar .nav-right .nav-link,
-.app-navbar .nav-right .nav-link {
+/* Nav links: color/padding/display override should only apply in dark mode. */
+body.dark-mode .app-navbar .nav-right .nav-link {
   color: #ffffff !important;
   padding: 8px 12px !important;
   display: inline-block !important;

@@ -103,6 +103,11 @@ class UserGuide {
     // Create highlight box (creates backdrop via box-shadow)
     this.highlightBox = document.createElement('div');
     this.highlightBox.className = 'guide-highlight';
+    // Start hidden to avoid flashing / incorrect initial sizing
+    this.highlightBox.style.visibility = 'hidden';
+    this.highlightBox.style.opacity = '0';
+    this.highlightBox.style.transition = 'none';
+    this.highlightBox.style.animation = 'none';
         
         // Create tooltip
         this.tooltipBox = document.createElement('div');
@@ -138,6 +143,10 @@ class UserGuide {
     this.overlay.appendChild(this.highlightBox);
     document.body.appendChild(this.overlay);
     document.body.appendChild(this.tooltipBox);
+    // Keep tooltip hidden until positioned to avoid flicker
+    this.tooltipBox.style.visibility = 'hidden';
+    this.tooltipBox.style.opacity = '0';
+    this.tooltipBox.style.transition = 'none';
         
         // Prevent scrolling while guide is active
         document.body.style.overflow = 'hidden';
@@ -293,6 +302,15 @@ class UserGuide {
         this.highlightBox.style.left = `${rect.left - padding}px`;
         this.highlightBox.style.width = `${rect.width + (padding * 2)}px`;
         this.highlightBox.style.height = `${rect.height + (padding * 2)}px`;
+        // Reveal highlight smoothly after sizing to avoid seeing it at full-viewport size
+        // Small timeout lets layout settle (use requestAnimationFrame for accuracy)
+        requestAnimationFrame(() => {
+            this.highlightBox.style.visibility = 'visible';
+            // restore transition if previously disabled
+            this.highlightBox.style.transition = this.highlightBox.style.transition || 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            // fade/animate in
+            this.highlightBox.style.opacity = '1';
+        });
     }
 
     positionTooltip(target, position) {
