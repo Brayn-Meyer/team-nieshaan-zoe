@@ -35,6 +35,10 @@ $adminName = "John Doe";
                     <div class="card-value" id="totalEmployees">0</div>
                 </div>
             </div>
+
+
+
+
         </div>
 
         <div class="card">
@@ -68,8 +72,6 @@ $adminName = "John Doe";
         </div>
     </main>
 
-    <br><br>
-
     <!-- Employee Table Section -->
     <div class="search-add-container">
         <div class="row g-3 align-items-center">
@@ -84,18 +86,18 @@ $adminName = "John Doe";
                         Time Log
                     </button>
                     <?php 
-                        require_once __DIR__ . '/../components/notification-bell.php';
-                        renderNotificationBell();
+                        // Include and render notification bell
+                        require_once __DIR__ . '/../components/NotificationsComponent.php';
                     ?>
                 </div>
             </div>
             
             <div class="col">
-                <div class="search-container">
+                <div class="">
                     <input 
                         type="text" 
                         class="form-control search-input" 
-                        placeholder="Search employees..." 
+                        placeholder="            Search employees..." 
                         id="searchInput"
                         oninput="filterEmployees()"
                     >

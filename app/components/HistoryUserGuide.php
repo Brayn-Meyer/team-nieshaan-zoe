@@ -87,18 +87,18 @@
 }
 
 .close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5em;
-    cursor: pointer;
-    color: #718096;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+                Object.assign(clone.style, {
+                    position: 'fixed',
+                    top: rect.top + 'px',
+                    left: rect.left + 'px',
+                    width: rect.width + 'px',
+                    height: rect.height + 'px',
+                    margin: '0',
+                    // ensure clone sits well above any overlay/mask
+                    zIndex: '100000',
+                    pointerEvents: 'none',
+                    overflow: 'hidden'
+                });
 }
 
 .close-btn:hover {
@@ -211,6 +211,60 @@
         padding: 6px 0;
     }
 }
+
+/* Clone styling used to render a visible copy of the target above the mask */
+.history-guide-clone {
+    box-sizing: border-box;
+    transform-origin: top left;
+    pointer-events: none;
+    /* ensure clone visually sits above overlay mask */
+    z-index: 10002 !important;
+}
+.history-guide-clone img,
+.history-guide-clone svg {
+    filter: none !important;
+}
+/* Scoped overrides to remove the large dark mask for History guide when active */
+body[data-guide-active="history"].dark-mode #userGuideOverlay {
+    background: transparent !important;
+}
+
+body[data-guide-active="history"].dark-mode .highlight-overlay {
+    /* keep only the green outline, remove the huge dark box-shadow */
+    border: 3px solid #2EB28A !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0 0 4px rgba(46, 178, 138, 0.3) !important;
+    background: transparent !important;
+    animation: none !important;
+    z-index: 10002 !important;
+}
+/* Ensure clones render normally even when site-wide dark-mode rules apply
+   and place them above any overlay mask. */
+.history-guide-clone,
+.history-guide-clone * {
+    filter: none !important;
+    mix-blend-mode: normal !important;
+    background: transparent !important;
+    color: inherit !important;
+}
+.history-guide-clone {
+    z-index: 100000 !important;
+}
+
+/* Scoped dark-mode styles while the history guide is active so modal text
+   remains readable. This only applies when the guide is open via the
+   data-guide-active="history" attribute on <body>. */
+body[data-guide-active="history"].dark-mode .guide-content,
+body[data-guide-active="history"].dark-mode .guide-header h3,
+body[data-guide-active="history"].dark-mode .guide-body p,
+body[data-guide-active="history"].dark-mode .step-indicator,
+body[data-guide-active="history"].dark-mode .guide-footer,
+body[data-guide-active="history"].dark-mode .guide-header {
+    color: #e5e7eb !important;
+}
+body[data-guide-active="history"].dark-mode .guide-content {
+    background: #0b1220 !important;
+}
 </style>
 
 <script>
@@ -261,15 +315,23 @@ const guideSteps = [
 ];
 
 let currentStepIndex = 0;
+let guideClone = null;
 
 function showUserGuide() {
     currentStepIndex = 0;
     document.getElementById('userGuideOverlay').style.display = 'block';
+    // mark body so we can apply any guide-specific CSS overrides if needed
+    try { document.body.setAttribute('data-guide-active', 'history'); } catch (e) {}
     updateGuide();
 }
 
 function closeGuide() {
     document.getElementById('userGuideOverlay').style.display = 'none';
+    if (guideClone) {
+        guideClone.remove();
+        guideClone = null;
+    }
+    try { document.body.removeAttribute('data-guide-active'); } catch (e) {}
 }
 
 function nextStep() {
@@ -378,6 +440,11 @@ function calculateSmartPosition(elementRect, guideContentHeight) {
 
 function updateGuide() {
     const step = guideSteps[currentStepIndex];
+    // remove any existing clone from previous step
+    if (guideClone) {
+        guideClone.remove();
+        guideClone = null;
+    }
     
     document.getElementById('guideTitle').textContent = step.title;
     document.getElementById('guideDescription').textContent = step.content;
@@ -407,6 +474,35 @@ function updateGuide() {
             highlightOverlay.style.width = rect.width + 'px';
             highlightOverlay.style.height = rect.height + 'px';
             highlightOverlay.style.display = 'block';
+
+            // create a visual clone positioned above the overlay so its content remains visible
+            try {
+                const clone = element.cloneNode(true);
+                if (clone.id) clone.removeAttribute('id');
+                clone.classList.add('history-guide-clone');
+                Object.assign(clone.style, {
+                    position: 'fixed',
+                    top: rect.top + 'px',
+                    left: rect.left + 'px',
+                    width: rect.width + 'px',
+                    height: rect.height + 'px',
+                    margin: '0',
+                    // make sure clone sits above the overlay mask
+                    zIndex: '10002',
+                    pointerEvents: 'none',
+                    overflow: 'hidden'
+                });
+                // copy border radius and add subtle shadow to blend with page
+                try {
+                    const computed = window.getComputedStyle(element);
+                    clone.style.borderRadius = computed.borderRadius;
+                    clone.style.boxShadow = '0 8px 24px rgba(0,0,0,0.45)';
+                } catch (e) {}
+                document.body.appendChild(clone);
+                guideClone = clone;
+            } catch (e) {
+                guideClone = null;
+            }
             
             if (step.position === 'auto') {
                 const guideHeight = guideContent.offsetHeight || 250;
@@ -431,6 +527,41 @@ function updateGuide() {
                 highlightOverlay.style.width = step.highlight.width;
                 highlightOverlay.style.height = step.highlight.height;
                 highlightOverlay.style.display = 'block';
+
+                    // Create a visual clone for the highlighted area (when no specific element is present)
+                    // This grabs the element near the center of the highlight and clones it so the region
+                    // remains visible above the overlay mask in dark-mode.
+                    try {
+                        const rect = highlightOverlay.getBoundingClientRect();
+                        const cx = rect.left + (rect.width / 2);
+                        const cy = rect.top + (rect.height / 2);
+                        const centerEl = document.elementFromPoint(cx, cy);
+                        if (centerEl && centerEl !== document.body && centerEl !== document.documentElement) {
+                            const clone = centerEl.cloneNode(true);
+                            if (clone.id) clone.removeAttribute('id');
+                            clone.classList.add('history-guide-clone');
+                            Object.assign(clone.style, {
+                                position: 'fixed',
+                                top: rect.top + 'px',
+                                left: rect.left + 'px',
+                                width: rect.width + 'px',
+                                height: rect.height + 'px',
+                                margin: '0',
+                                zIndex: '10002',
+                                pointerEvents: 'none',
+                                overflow: 'hidden'
+                            });
+                            try {
+                                const computed = window.getComputedStyle(centerEl);
+                                clone.style.borderRadius = computed.borderRadius;
+                                clone.style.boxShadow = '0 8px 24px rgba(0,0,0,0.45)';
+                            } catch (e) {}
+                            document.body.appendChild(clone);
+                            guideClone = clone;
+                        }
+                    } catch (e) {
+                        guideClone = null;
+                    }
             } else {
                 highlightOverlay.style.display = 'none';
             }
@@ -495,5 +626,45 @@ document.addEventListener('DOMContentLoaded', function() {
     if (pagination) {
 
     }
+});
+
+// Keep the clone positioned during scroll/resize while the guide is open
+window.addEventListener('scroll', () => {
+    if (!guideClone || document.getElementById('userGuideOverlay').style.display === 'none') return;
+    const step = guideSteps[currentStepIndex];
+    if (!step) return;
+    // Determine the rect to follow: prefer a specific element, otherwise use the highlight overlay rect
+    let rect = null;
+    if (step.element) {
+        const element = document.getElementById(step.element);
+        if (element) rect = element.getBoundingClientRect();
+    }
+    if (!rect) {
+        const highlightOverlay = document.getElementById('highlightOverlay');
+        if (highlightOverlay && highlightOverlay.style.display !== 'none') {
+            rect = highlightOverlay.getBoundingClientRect();
+        }
+    }
+    if (!rect) return;
+    Object.assign(guideClone.style, { top: rect.top + 'px', left: rect.left + 'px' });
+});
+
+window.addEventListener('resize', () => {
+    if (!guideClone || document.getElementById('userGuideOverlay').style.display === 'none') return;
+    const step = guideSteps[currentStepIndex];
+    if (!step) return;
+    let rect = null;
+    if (step.element) {
+        const element = document.getElementById(step.element);
+        if (element) rect = element.getBoundingClientRect();
+    }
+    if (!rect) {
+        const highlightOverlay = document.getElementById('highlightOverlay');
+        if (highlightOverlay && highlightOverlay.style.display !== 'none') {
+            rect = highlightOverlay.getBoundingClientRect();
+        }
+    }
+    if (!rect) return;
+    Object.assign(guideClone.style, { top: rect.top + 'px', left: rect.left + 'px', width: rect.width + 'px', height: rect.height + 'px' });
 });
 </script>

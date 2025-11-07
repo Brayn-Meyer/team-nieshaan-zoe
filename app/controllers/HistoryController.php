@@ -28,9 +28,25 @@ class HistoryController {
     
     private static function getAllRecords() {
         try {
+            error_log("HistoryController::getAllRecords - Starting");
+            
             $records = ClockInOutModel::getAllRecords();
-            echo json_encode(['records' => $records]);
+            error_log("Records retrieved from model: " . ($records ? 'yes' : 'no'));
+            error_log("Records count: " . count($records));
+            
+            if (!empty($records)) {
+                error_log("Sample record: " . print_r($records[0], true));
+            } else {
+                error_log("No records found in database");
+            }
+            
+            $response = json_encode(['records' => $records]);
+            error_log("Response JSON: " . $response);
+            
+            echo $response;
         } catch (Exception $e) {
+            error_log("HistoryController Error: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             http_response_code(500);
             echo json_encode(['error' => $e->getMessage()]);
         }

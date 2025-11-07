@@ -127,6 +127,19 @@
     opacity: 1;
 }
 
+/* Time Log Table */
+.table-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
 .time-log-table {
     width: 100%;
     border-collapse: separate;

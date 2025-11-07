@@ -202,8 +202,8 @@ function renderTimeLog() {
             <tr style="${rowStyle}" ${rowOnClick}>
                 <td>${escapeHtml(fullName)}</td>
                 <td>${escapeHtml(employee.id || 'N/A')}</td>
-                <td>${hoursWorked}</td>
                 <td>${hoursOwed}</td>
+                <td>${hoursWorked}</td>
                 <td>${overtime}</td>
                 <td><span class="indicator-circle ${indicatorClass}"></span></td>
             </tr>

@@ -1,8 +1,3 @@
-/**
- * API Helper Functions
- * Provides wrapper functions for all API calls using Fetch API
- */
-
 const API_BASE_URL = window.location.origin + '/team-nieshaan-zoe/public/api';
 
 // Helper function to handle API responses

@@ -158,7 +158,6 @@ body.dark-mode .card {
   align-items:center;
   gap:8px;
   border-radius: 8px;
-  padding: 6px 10px;
   border: 1px solid rgba(46,178,138,0.9); /* accent border */
   background: rgba(46,178,138,0.03);
 }
@@ -191,6 +190,8 @@ body.dark-mode .card {
   border-spacing: 0;
   background: transparent;
   color: inherit;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 table.employee-table thead tr{
@@ -202,6 +203,7 @@ table.employee-table thead tr{
   color: #fff;
   font-weight: 600;
   padding: 16px;
+
   border-bottom: none;
 }
 .employee-table tbody tr {
@@ -327,6 +329,51 @@ body.dark-mode .app-navbar #theme-toggle .fa-sun {
   color: #2c3838 !important;
 }
 
+/* Ensure guide/modal inner banners are transparent in light mode.
+   Some guide components reuse class names and can get accidental
+   background fills from other CSS. These overrides force the
+   guide/header/body areas to be transparent unless site dark-mode
+   is active. */
+.guide-content .guide-header,
+.guide-content .guide-body,
+.guide-content .guide-body p,
+.guide-tooltip-inner .guide-header,
+.guide-tooltip-inner .guide-body,
+.guide-tooltip-inner .guide-body p {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Keep the overall guide container background as intended (white in light mode) */
+.guide-content {
+  background: #ffffff !important;
+}
+
+/* In dark mode, allow the existing dark backgrounds to apply */
+body.dark-mode .guide-content,
+body.dark-mode .guide-tooltip {
+  background: unset !important;
+}
+
+/* Remove the unwanted footer/banner background in light mode so the
+   buttons/step indicator area doesn't show a separate gray strip. Keep
+   dark-mode styling untouched. */
+.guide-content .guide-footer,
+.guide-tooltip-inner .guide-footer,
+.guide-footer,
+.guide-step-indicator,
+.guide-buttons {
+  background: transparent !important;
+  border-top: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure step indicator doesn't have its own background or border in light mode */
+.guide-step-indicator {
+  background: transparent !important;
+  border: none !important;
+}
+
 body.dark-mode .dashboard-main,
 body.dark-mode .search-add-container,
 body.dark-mode .table-responsive {
@@ -356,7 +403,7 @@ body.dark-mode .dashboard-main {
 /* Make table row text brighter and ensure icons/buttons remain visible */
 body.dark-mode .employee-table tbody tr td { color: #e6f0ee !important; }
 body.dark-mode .employee-table thead th { color: #ffffff !important; }
-body.dark-mode .btn, body.dark-mode .btn-primary { color: #ffffff !important; }
+body.dark-mode .btn, body.dark-mode .btn-primary { color: #ffffff !important; background-color:#2c3838 }
 body.dark-mode .card .card-title, body.dark-mode .card .card-value { color: #ffffff !important; }
 
 /* Force dark mode on most content elements, but exclude header/navbar so the
@@ -371,7 +418,7 @@ body.dark-mode .card,
 body.dark-mode .box,
 body.dark-mode .container-fluid,
 body.dark-mode .content-section {
-  background-color: #2c3838!important;
+  background-color: #2c3838;
 }
 
 /* Handle form elements in dark mode */
@@ -471,6 +518,15 @@ body.dark-mode .user-guide-overlay {
     background: rgba(0, 0, 0, 0.1) !important;
 }
 
+/* Guide tooltip specific styles in dark mode */
+body.dark-mode .guide-tooltip {
+    background: rgba(35,46,47,0.85) !important;
+    border: 2px solid #26B07A !important;
+    color: #ffffff !important;
+}
+body.dark-mode .guide-tooltip-inner {
+    background: transparent !important;
+}
 
 /* Strong reset: remove any background / panel behind nav items entirely.
    This targets the navbar right area and all descendants and uses !important
@@ -510,4 +566,3 @@ body.dark-mode .app-navbar .nav-right #theme-toggle,
   color: var(--accent-dark) !important;
   border-radius: 30px !important;
 }
-
