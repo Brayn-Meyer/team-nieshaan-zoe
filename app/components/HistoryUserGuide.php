@@ -6,10 +6,8 @@
 
 <!-- User Guide Overlay -->
 <div id="userGuideOverlay" class="user-guide-overlay" style="display: none;">
-    <!-- Highlight Overlay -->
     <div id="highlightOverlay" class="highlight-overlay"></div>
     
-    <!-- Guide Content -->
     <div id="guideContent" class="guide-content">
         <div class="guide-header">
             <h3 id="guideTitle">Guide Title</h3>
@@ -304,63 +302,71 @@ function calculateSmartPosition(elementRect, guideContentHeight) {
     let position = {};
     
     if (isMobile) {
-        // Mobile positioning logic
+        // For mobile, always center horizontally
+        position.left = '50%';
+        position.transform = 'translateX(-50%)';
+        
         const elementMiddle = elementRect.top + (elementRect.height / 2);
         const spaceAbove = elementRect.top;
         const spaceBelow = viewportHeight - elementRect.bottom;
         
-        // Check if there's more space above or below
-        if (spaceBelow > guideContentHeight + padding && spaceBelow > spaceAbove) {
-            // Position below the element
-            position.top = (elementRect.bottom + padding) + 'px';
-        } else if (spaceAbove > guideContentHeight + padding) {
-            // Position above the element
+        // Check if guide content would overlap with the highlighted element
+        const guideBottomFromTop = elementRect.top - guideContentHeight - padding;
+        const guideTopFromBottom = elementRect.bottom + padding + guideContentHeight;
+        
+        // If placing below would cause overlap and there's more space above, place above
+        if (elementRect.bottom + padding + guideContentHeight > viewportHeight - padding && spaceAbove > guideContentHeight + padding) {
             position.top = (elementRect.top - guideContentHeight - padding) + 'px';
-        } else {
-            // Not enough space, position in center but offset from element
-            if (elementMiddle < viewportHeight / 2) {
-                // Element is in top half, position tooltip in bottom half
-                position.top = '60%';
+        }
+        // If placing above would cause overlap and there's more space below, place below
+        else if (elementRect.top - guideContentHeight - padding < padding && spaceBelow > guideContentHeight + padding) {
+            position.top = (elementRect.bottom + padding) + 'px';
+        }
+        // If both placements would cause overlap, find the best position
+        else {
+            const overlapAbove = Math.max(0, padding - (elementRect.top - guideContentHeight - padding));
+            const overlapBelow = Math.max(0, (elementRect.bottom + padding + guideContentHeight) - (viewportHeight - padding));
+            
+            if (overlapAbove <= overlapBelow && spaceAbove > spaceBelow) {
+                position.top = (elementRect.top - guideContentHeight - padding) + 'px';
             } else {
-                // Element is in bottom half, position tooltip in top half
-                position.top = '20%';
+                position.top = (elementRect.bottom + padding) + 'px';
             }
         }
         
-        position.left = '50%';
-        position.transform = 'translateX(-50%)';
+        // Ensure the guide stays within viewport bounds
+        const guideTop = parseInt(position.top);
+        if (guideTop < padding) {
+            position.top = padding + 'px';
+        } else if (guideTop + guideContentHeight > viewportHeight - padding) {
+            position.top = (viewportHeight - guideContentHeight - padding) + 'px';
+        }
     } else {
-        // Desktop positioning logic
+        // Desktop positioning logic (unchanged)
         const elementMiddle = elementRect.top + (elementRect.height / 2);
         const spaceAbove = elementRect.top;
         const spaceBelow = viewportHeight - elementRect.bottom;
         const spaceLeft = elementRect.left;
         const spaceRight = viewportWidth - elementRect.right;
         
-        // Try to position beside the element first (left or right)
         if (spaceRight > 500) {
-            // Position to the right
             position.left = (elementRect.right + padding) + 'px';
             position.top = Math.max(padding, elementMiddle - (guideContentHeight / 2)) + 'px';
             position.transform = 'none';
         } else if (spaceLeft > 500) {
-            // Position to the left
             position.right = (viewportWidth - elementRect.left + padding) + 'px';
             position.left = 'auto';
             position.top = Math.max(padding, elementMiddle - (guideContentHeight / 2)) + 'px';
             position.transform = 'none';
         } else if (spaceBelow > guideContentHeight + padding && spaceBelow > spaceAbove) {
-            // Position below
             position.top = (elementRect.bottom + padding) + 'px';
             position.left = '50%';
             position.transform = 'translateX(-50%)';
         } else if (spaceAbove > guideContentHeight + padding) {
-            // Position above
             position.top = (elementRect.top - guideContentHeight - padding) + 'px';
             position.left = '50%';
             position.transform = 'translateX(-50%)';
         } else {
-            // Fallback to center
             position.top = '50%';
             position.left = '50%';
             position.transform = 'translate(-50%, -50%)';
@@ -373,32 +379,26 @@ function calculateSmartPosition(elementRect, guideContentHeight) {
 function updateGuide() {
     const step = guideSteps[currentStepIndex];
     
-    // Update text content
     document.getElementById('guideTitle').textContent = step.title;
     document.getElementById('guideDescription').textContent = step.content;
     document.getElementById('currentStep').textContent = currentStepIndex + 1;
     document.getElementById('totalSteps').textContent = guideSteps.length;
     
-    // Update button visibility
     document.getElementById('backBtn').style.display = currentStepIndex > 0 ? 'block' : 'none';
     
-    // Update button text
     const nextBtn = document.querySelector('.guide-footer .btn-primary');
     nextBtn.textContent = currentStepIndex === guideSteps.length - 1 ? 'Finish' : 'Next';
     
     const guideContent = document.getElementById('guideContent');
     const highlightOverlay = document.getElementById('highlightOverlay');
     
-    // Show active filters container when on that step
     const activeFiltersContainer = document.getElementById('activeFiltersContainer');
     if (step.element === 'activeFiltersContainer' && activeFiltersContainer) {
         activeFiltersContainer.style.display = 'block';
         activeFiltersContainer.style.visibility = 'visible';
     }
     
-    // Update highlight overlay and position guide content
     if (step.element) {
-        // Highlight specific element
         const element = document.getElementById(step.element);
         if (element) {
             const rect = element.getBoundingClientRect();
@@ -408,9 +408,7 @@ function updateGuide() {
             highlightOverlay.style.height = rect.height + 'px';
             highlightOverlay.style.display = 'block';
             
-            // Calculate smart position for guide content
             if (step.position === 'auto') {
-                // Get approximate height of guide content
                 const guideHeight = guideContent.offsetHeight || 250;
                 const smartPosition = calculateSmartPosition(rect, guideHeight);
                 
@@ -427,7 +425,6 @@ function updateGuide() {
                 guideContent.style.transform = step.position.transform || 'none';
             }
         } else {
-            // If element not found, use the predefined highlight
             if (step.highlight) {
                 highlightOverlay.style.top = step.highlight.top;
                 highlightOverlay.style.left = step.highlight.left;
@@ -447,7 +444,6 @@ function updateGuide() {
             }
         }
     } else if (step.highlight) {
-        // Use predefined highlight area
         highlightOverlay.style.top = step.highlight.top;
         highlightOverlay.style.left = step.highlight.left;
         highlightOverlay.style.width = step.highlight.width;
@@ -474,36 +470,30 @@ function updateGuide() {
     }
 }
 
-// Add IDs to elements that need to be highlighted
 document.addEventListener('DOMContentLoaded', function() {
-    // Add ID to Apply Filters button
     const applyBtn = document.querySelector('.btn-apply');
     if (applyBtn) {
         applyBtn.id = 'applyFiltersBtn';
     }
     
-    // Add ID to Download button
     const downloadBtn = document.querySelector('.btn-download');
     if (downloadBtn) {
         downloadBtn.id = 'downloadBtn';
     }
-    
-    // Add ID to Desktop Table Container
+
     const desktopTable = document.querySelector('.desktop-table-container');
     if (desktopTable) {
         desktopTable.id = 'desktopTableContainer';
     }
     
-    // Add ID to Mobile Cards
     const mobileCards = document.getElementById('mobileCards');
     if (mobileCards) {
-        // Already has ID
+    
     }
     
-    // Add ID to Pagination
     const pagination = document.getElementById('paginationNav');
     if (pagination) {
-        // Already has ID
+
     }
 });
 </script>

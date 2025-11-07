@@ -7,20 +7,26 @@ $additionalCSS = ['/assets/css/userGuide.css'];
 $additionalJS = ['/assets/js/dashboard.js', '/assets/js/userGuide.js', '/assets/js/notification-component.js'];
 
 require_once __DIR__ . '/../../includes/header.php';
-
 require_once __DIR__ . '/../../app/components/helpGuide.php';
-?>
 
-<!-- Help Button -->
-<!-- <button onclick="showUserGuide()" class="help-btn">
-    <i class="fa-solid fa-circle-question"></i>
-    Help Guide
-</button> -->
+$adminName = "John Doe"; 
+?>
 
 <!-- Dashboard Container -->
 <div class="dashboard-container">
+    <!-- Header with Welcome Message and Date/Time -->
+    <div class="dashboard-header">
+        <div class="welcome-message">
+            <h1>Welcome, <?php echo htmlspecialchars($adminName); ?>!</h1>
+            <p>Here's your employee management dashboard</p>
+        </div>
+        <div class="date-time-display">
+            <p class="current-date" id="currentDate">Loading date...</p>
+            <p class="current-time" id="currentTime">Loading time...</p>
+        </div>
+    </div>
+
     <main class="dashboard-main" id="kpiCards">
-        <!-- KPI Cards will be loaded here dynamically -->
         <div class="card">
             <div class="card-content">
                 <i class="fa-solid fa-users card-icon"></i>
@@ -78,7 +84,6 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                         Time Log
                     </button>
                     <?php 
-                        // Include and render notification bell
                         require_once __DIR__ . '/../components/notification-bell.php';
                         renderNotificationBell();
                     ?>
@@ -123,7 +128,7 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                 </thead>
                 <tbody id="employeeTableBody">
                     <tr>
-                        <td colspan="6" class="text-center text-muted">
+                        <td colspan="7" class="text-center text-muted">
                             <i class="fa-solid fa-spinner fa-spin"></i> Loading employees...
                         </td>
                     </tr>
@@ -331,78 +336,25 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
     </div>
 </div>
 
-<style>
-
-.dashboard-container {
-    margin-top: 30px;
-    background: #f8fafc;
-    min-height: 100vh;
-    padding: 120px 60px 50px;
-}
-
-/* Responsive Utilities */
-.d-none {
-    display: none !important;
-}
-
-.d-md-none {
-    display: block !important;
-}
-
-.d-md-block {
-    display: none !important;
-}
-
-@media (min-width: 768px) {
-    .d-md-none {
-        display: none !important;
-    }
+<script>
+// Update date and time in real-time
+function updateDateTime() {
+    const now = new Date();
     
-    .d-md-block {
-        display: block !important;
-    }
+    // Format date
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const dateString = now.toLocaleDateString('en-US', options);
+    
+    // Format time
+    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    
+    // Update elements
+    document.getElementById('currentDate').textContent = dateString;
+    document.getElementById('currentTime').textContent = timeString;
 }
 
-.col-auto {
-    flex: 0 0 auto;
-    width: auto;
-}
-
-.col {
-    flex: 1 1 0%;
-}
-
-.align-items-center {
-    align-items: center !important;
-}
-
-.theme-toggle-container {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 10px;
-}
-
-.theme-toggle {
-  background-color: #f1f1f1;
-  border: none;
-  border-radius: 20px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: 0.3s ease;
-}
-
-.theme-toggle:hover {
-  background-color: #e0e0e0;
-}
-
-.theme-toggle i {
-  color: #333;
-}
-
-</style>
+updateDateTime();
+setInterval(updateDateTime, 1000);
+</script>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

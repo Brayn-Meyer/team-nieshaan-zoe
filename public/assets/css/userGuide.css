@@ -52,13 +52,31 @@
     box-shadow: 
         0 20px 60px rgba(0, 0, 0, 0.3),
         0 0 0 1px rgba(0, 0, 0, 0.05);
-    min-width: 320px;
+    min-width: 280px;
     max-width: 480px;
     z-index: 99999;
     pointer-events: all;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
     animation: tooltipEntry 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 768px) {
+    .guide-tooltip {
+        min-width: 260px;
+        max-width: 90vw;
+        margin: 0 10px;
+        /* Ensure it's always below the highlighted element in mobile */
+        top: auto !important;
+        bottom: 20px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+    
+    /* Remove all directional arrows in mobile */
+    .guide-tooltip::before {
+        display: none;
+    }
 }
 
 @keyframes tooltipEntry {

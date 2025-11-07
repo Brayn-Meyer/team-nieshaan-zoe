@@ -14,7 +14,7 @@ require_once __DIR__ . '/../../app/components/HistoryUserGuide.php';
 
 <div class="history-container">
     <div class="history-header">
-        <h2 class="history-title">Attendance History</h2>
+        <h1 class="history-title">Attendance History</h1>
         <p class="history-subtitle">Filter Employees History</p>
     </div>
 
