@@ -67,6 +67,8 @@ class UserGuide {
         this.overlay = null;
         this.highlightBox = null;
         this.tooltipBox = null;
+        this.highlightedTarget = null;
+        this.cloneTarget = null;
     }
 
     start() {
@@ -98,10 +100,14 @@ class UserGuide {
         this.overlay = document.createElement('div');
         this.overlay.className = 'user-guide-overlay';
         
-        // Create highlight box (creates backdrop via box-shadow)
-        this.highlightBox = document.createElement('div');
-        this.highlightBox.className = 'guide-highlight';
-        this.overlay.appendChild(this.highlightBox);
+    // Create highlight box (creates backdrop via box-shadow)
+    this.highlightBox = document.createElement('div');
+    this.highlightBox.className = 'guide-highlight';
+    // Start hidden to avoid flashing / incorrect initial sizing
+    this.highlightBox.style.visibility = 'hidden';
+    this.highlightBox.style.opacity = '0';
+    this.highlightBox.style.transition = 'none';
+    this.highlightBox.style.animation = 'none';
         
         // Create tooltip
         this.tooltipBox = document.createElement('div');
@@ -132,9 +138,15 @@ class UserGuide {
                 </div>
             </div>
         `;
-        this.overlay.appendChild(this.tooltipBox);
-        
-        document.body.appendChild(this.overlay);
+    // Append highlight to overlay, but place the tooltip directly on body so it
+    // is not affected by any stacking/overflow quirks of the overlay container.
+    this.overlay.appendChild(this.highlightBox);
+    document.body.appendChild(this.overlay);
+    document.body.appendChild(this.tooltipBox);
+    // Keep tooltip hidden until positioned to avoid flicker
+    this.tooltipBox.style.visibility = 'hidden';
+    this.tooltipBox.style.opacity = '0';
+    this.tooltipBox.style.transition = 'none';
         
         // Prevent scrolling while guide is active
         document.body.style.overflow = 'hidden';
@@ -186,6 +198,12 @@ class UserGuide {
             return;
         }
 
+        // Remove previous temporary highlight class if applied
+        if (this.highlightedTarget) {
+            this.highlightedTarget.classList.remove('guide-target-highlighted');
+            this.highlightedTarget = null;
+        }
+
         // Update tooltip content
         this.tooltipBox.querySelector('.guide-title').textContent = step.title;
         this.tooltipBox.querySelector('.guide-content').textContent = step.content;
@@ -218,7 +236,61 @@ class UserGuide {
         // Wait for scroll to complete before positioning
         setTimeout(() => {
             this.positionHighlight(target);
-            this.positionTooltip(target, step.position);
+            // If this is the last step, prefer centering the tooltip so it's fully visible
+            const isLastStep = this.currentStepIndex === this.guideSteps.length - 1;
+            if (isLastStep) {
+                this.positionTooltip(target, 'center');
+            } else {
+                this.positionTooltip(target, step.position);
+            }
+
+            // Remove any previous clone
+            if (this.cloneTarget) {
+                this.cloneTarget.remove();
+                this.cloneTarget = null;
+            }
+
+            // Create a visual clone of the target and place it above the highlight so
+            // dark-mode global rules or stacking contexts can't obscure its content.
+            try {
+                const rect = target.getBoundingClientRect();
+                const clone = target.cloneNode(true);
+                clone.classList.add('guide-clone');
+                // Reset ids to avoid duplicates
+                if (clone.id) clone.removeAttribute('id');
+                // Position the clone exactly over the original
+                Object.assign(clone.style, {
+                    position: 'fixed',
+                    top: `${rect.top}px`,
+                    left: `${rect.left}px`,
+                    width: `${rect.width}px`,
+                    height: `${rect.height}px`,
+                    margin: '0',
+                    zIndex: '100000',
+                    pointerEvents: 'none',
+                    overflow: 'hidden'
+                });
+                // copy border-radius from the target so the clone looks natural
+                try {
+                    const computed = window.getComputedStyle(target);
+                    clone.style.borderRadius = computed.borderRadius;
+                    // subtle shadow to lift the clone above the mask without forcing light colors
+                    clone.style.boxShadow = '0 8px 24px rgba(0,0,0,0.45)';
+                } catch (e) {}
+                document.body.appendChild(clone);
+                this.cloneTarget = clone;
+            } catch (e) {
+                // ignore clone errors
+                this.cloneTarget = null;
+            }
+
+            // Apply temporary high-contrast class so the target is visible in dark mode
+            try {
+                target.classList.add('guide-target-highlighted');
+                this.highlightedTarget = target;
+            } catch (e) {
+                // ignore if cannot add class
+            }
         }, 300);
     }
 
@@ -230,6 +302,15 @@ class UserGuide {
         this.highlightBox.style.left = `${rect.left - padding}px`;
         this.highlightBox.style.width = `${rect.width + (padding * 2)}px`;
         this.highlightBox.style.height = `${rect.height + (padding * 2)}px`;
+        // Reveal highlight smoothly after sizing to avoid seeing it at full-viewport size
+        // Small timeout lets layout settle (use requestAnimationFrame for accuracy)
+        requestAnimationFrame(() => {
+            this.highlightBox.style.visibility = 'visible';
+            // restore transition if previously disabled
+            this.highlightBox.style.transition = this.highlightBox.style.transition || 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            // fade/animate in
+            this.highlightBox.style.opacity = '1';
+        });
     }
 
     positionTooltip(target, position) {
@@ -309,9 +390,69 @@ class UserGuide {
             left = viewport.width - tooltipRect.width - spacing;
         }
         
-        // Apply position with smooth transition
-        this.tooltipBox.style.top = `${top}px`;
-        this.tooltipBox.style.left = `${left}px`;
+        // Apply position with smooth transition. To avoid rounding/animation issues
+        // (which can leave the tooltip clipped at certain zoom levels), temporarily
+        // disable animations/transitions, measure, clamp into viewport, then restore
+        // and make visible.
+        const prevTransition = this.tooltipBox.style.transition;
+        const prevTransform = this.tooltipBox.style.transform;
+        const prevAnimation = this.tooltipBox.style.animation;
+        try {
+            this.tooltipBox.style.transition = 'none';
+            this.tooltipBox.style.animation = 'none';
+            this.tooltipBox.style.transform = 'none';
+            this.tooltipBox.style.top = `${top}px`;
+            this.tooltipBox.style.left = `${left}px`;
+
+            // Force reflow so measurements are accurate
+            // eslint-disable-next-line no-unused-expressions
+            this.tooltipBox.offsetHeight;
+
+            const finalRect = this.tooltipBox.getBoundingClientRect();
+            // clamp vertically
+            if (finalRect.top < spacing) {
+                top = spacing;
+            }
+            if (finalRect.bottom > viewport.height - bottomSafeZone) {
+                top = Math.max(spacing, viewport.height - finalRect.height - bottomSafeZone);
+            }
+            // clamp horizontally
+            let leftClamp = Math.min(Math.max(left, spacing), Math.max(spacing, viewport.width - finalRect.width - spacing));
+
+            // If computed leftClamp still causes overflow due to shadows/antialiasing,
+            // nudge it slightly left.
+            if (leftClamp + finalRect.width > viewport.width - spacing) {
+                leftClamp = Math.max(spacing, viewport.width - finalRect.width - spacing - 6);
+            }
+
+            this.tooltipBox.style.top = `${top}px`;
+            this.tooltipBox.style.left = `${leftClamp}px`;
+        } catch (e) {
+            // ignore measurement errors
+            this.tooltipBox.style.top = `${top}px`;
+            this.tooltipBox.style.left = `${left}px`;
+        } finally {
+            // restore animation/transition (small timeout so entry animation still feels smooth)
+            setTimeout(() => {
+                this.tooltipBox.style.transition = prevTransition || '';
+                this.tooltipBox.style.transform = prevTransform || '';
+                this.tooltipBox.style.animation = prevAnimation || '';
+                // Ensure tooltip is visible
+                this.tooltipBox.style.visibility = 'visible';
+                this.tooltipBox.style.opacity = '1';
+            }, 20);
+        }
+    }
+
+    positionClone(target) {
+        if (!this.cloneTarget || !target) return;
+        const rect = target.getBoundingClientRect();
+        Object.assign(this.cloneTarget.style, {
+            top: `${rect.top}px`,
+            left: `${rect.left}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`
+        });
     }
 
     nextStep() {
@@ -338,6 +479,20 @@ class UserGuide {
         if (this.overlay) {
             this.overlay.remove();
         }
+        if (this.tooltipBox) {
+            this.tooltipBox.remove();
+            this.tooltipBox = null;
+        }
+        // remove temporary highlight class if present
+        if (this.highlightedTarget) {
+            this.highlightedTarget.classList.remove('guide-target-highlighted');
+            this.highlightedTarget = null;
+        }
+        // remove clone if present
+        if (this.cloneTarget) {
+            this.cloneTarget.remove();
+            this.cloneTarget = null;
+        }
         document.body.style.overflow = '';
         this.isActive = false;
         this.currentStepIndex = 0;
@@ -363,6 +518,7 @@ window.addEventListener('resize', () => {
         if (target) {
             userGuide.positionHighlight(target);
             userGuide.positionTooltip(target, step.position);
+            userGuide.positionClone(target);
         }
     }
 });
@@ -375,6 +531,7 @@ window.addEventListener('scroll', () => {
         if (target) {
             userGuide.positionHighlight(target);
             userGuide.positionTooltip(target, step.position);
+            userGuide.positionClone(target);
         }
     }
 });

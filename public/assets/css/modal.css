@@ -320,3 +320,35 @@
     }
 }
 
+/* Ensure modal headings and labels stay readable when broad dark-mode
+   rules turn modal content dark (some global dark-mode rules target many
+   elements). These focused overrides set high-contrast colors for modal
+   titles, section headings and labels while leaving the modal background
+   alone (so we don't unintentionally change layout). */
+body.dark-mode .modal .modal-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .modal .section-title {
+    /* use the accent color for section headings so they remain visible */
+    color: var(--accent) !important;
+    font-weight: 700 !important;
+    border-bottom-color: rgba(255,255,255,0.08) !important;
+}
+
+body.dark-mode .modal .form-label {
+    color: #e6f0ec !important; /* near-white for good contrast */
+    opacity: 1 !important;
+}
+
+body.dark-mode .modal .btn-close {
+    color: #ffffff !important;
+}
+
+/* Inputs and selects inside modals should keep readable text if the
+   modal background was darkened by global rules */
+body.dark-mode .modal .form-control,
+body.dark-mode .modal .form-select {
+    color: #ffffff !important;
+}
+

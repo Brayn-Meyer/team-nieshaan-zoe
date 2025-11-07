@@ -290,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <div class="modal-header">
                 <h5 class="modal-title" id="replyModalLabel">Reply to <span id="replyEmployeeName">Employee</span></h5>
                 <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close reply modal">
-                    <i class="fa-solid fa-xmark"></i>
+                    <!-- <i class="fa-solid fa-xmark"></i> -->
                 </button>
             </div>
 
