@@ -1,10 +1,11 @@
+
 <?php
 require_once __DIR__ . '/../../includes/config.php';
 
 $pageTitle = 'Time Log - Clock It';
 $currentPage = 'timeLog';
-$additionalJS = ['/assets/js/timeLog.js'];
-$additionalCSS = ['/assets/css/timeLog.css'];
+// Load page-specific JS/CSS and the shared user guide assets used across the app
+$additionalCSS = ['/assets/css/timeLog.css', '/assets/css/userGuide.css'];
 
 require_once __DIR__ . '/../../includes/header.php';
 ?>
@@ -49,7 +50,12 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
     </div>
 </div>
-
+<!-- HELP BUTTON -->
+<div class="help-button">
+    <button onclick="showUserGuide()" class="help-btn"><i class="fa-solid fa-circle-question"></i>
+    Help Guide
+</button>
+</div>
 <!-- Time Log Table -->
 <div class="table-container">
     <div class="table-wrapper">
@@ -93,4 +99,25 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+    <script>
+        // Handler for clicking the indicator cell (keeps existing popup routing behavior)
+        function handleIndicatorClick(employeeId, employeeName, indicator, isSaved) {
+            if (indicator === 'red' && !isSaved) {
+                window.location.href = `?popup=true&employee_id=${employeeId}<?php echo !empty($searchQuery) ? '&search=' . urlencode($searchQuery) : ''; ?><?php echo !empty($activeFilter) ? '&filter=' . urlencode($activeFilter) : ''; ?><?php echo !empty($selectedWeek) ? '&week=' . urlencode($selectedWeek) : ''; ?>`;
+            }
+        }
+
+        // Clicking outside the popup should preserve filters and stay on the Time Log page
+        document.addEventListener('click', function(event) {
+            const popup = document.querySelector('.popup-overlay');
+            if (event.target === popup) {
+                window.location.href = '?<?php echo !empty($searchQuery) ? 'search=' . urlencode($searchQuery) . '&' : ''; ?><?php echo !empty($activeFilter) ? 'filter=' . urlencode($activeFilter) . '&' : ''; ?><?php echo !empty($selectedWeek) ? 'week=' . urlencode($selectedWeek) : ''; ?>';
+            }
+        });
+    </script>
+
+<?php 
+
+require_once __DIR__ . '/../components/TimeLogGuide.php';
+require_once __DIR__ . '/../../includes/footer.php'; 
+?>
