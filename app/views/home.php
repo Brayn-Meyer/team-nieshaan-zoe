@@ -85,10 +85,9 @@ $adminName = "John Doe";
                         <i class="fa-solid fa-calendar"></i>
                         Time Log
                     </button>
-                    <?php 
-                        // Include and render notification bell
-                        require_once __DIR__ . '/../components/NotificationsComponent.php';
-                    ?>
+
+                    <!-- Notifications Bell -->
+                    <?php require_once __DIR__ . '/../components/NotificationsComponent.php'; ?>
                 </div>
             </div>
             
@@ -158,7 +157,6 @@ $adminName = "John Doe";
             <div class="modal-body">
                 <form id="addEmployeeForm" onsubmit="addEmployee(event)">
                     <div class="row g-3">
-                        <!-- Personal Information -->
                         <div class="col-12">
                             <h6 class="section-title">Personal Information</h6>
                         </div>
@@ -193,7 +191,6 @@ $adminName = "John Doe";
                             <input type="text" class="form-control" id="address" required>
                         </div>
                         
-                        <!-- Employment Information -->
                         <div class="col-12">
                             <h6 class="section-title">Employment Information</h6>
                         </div>
@@ -262,7 +259,6 @@ $adminName = "John Doe";
             <div class="modal-body">
                 <form id="editEmployeeForm" onsubmit="updateEmployee(event)">
                     <input type="hidden" id="editEmployeeId">
-                    <!-- Same fields as add form -->
                     <div class="row g-3">
                         <div class="col-12"><h6 class="section-title">Personal Information</h6></div>
                         <div class="col-md-6">
