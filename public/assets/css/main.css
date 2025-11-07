@@ -12,7 +12,7 @@ body {
 }
 
 .main-container {
-    margin-top: 100px;
+    margin-top: 70px;
     padding: 20px 60px 50px;
     min-height: calc(100vh - 100px);
 }

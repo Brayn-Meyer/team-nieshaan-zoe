@@ -29,6 +29,10 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
                     <div class="card-value" id="totalEmployees">0</div>
                 </div>
             </div>
+
+
+
+
         </div>
 
         <div class="card">
@@ -61,8 +65,6 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
             </div>
         </div>
     </main>
-
-    <br><br>
 
     <!-- Employee Table Section -->
     <div class="search-add-container">
@@ -333,10 +335,11 @@ require_once __DIR__ . '/../../app/components/helpGuide.php';
 <style>
 
 .dashboard-container {
-    margin-top: 30px;
+    /* reduced top padding so dashboard sits closer under the header/navbar */
+    margin-top: 0;
     background: #f8fafc;
     min-height: 100vh;
-    padding: 120px 60px 50px;
+    padding: 24px 40px 40px;
 }
 
 /* Responsive Utilities */
