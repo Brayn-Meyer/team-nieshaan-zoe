@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../includes/config.php';
 
 $pageTitle = 'Time Log - Clock It';
 $currentPage = 'timeLog';
-// Load page-specific JS/CSS and the shared user guide assets used across the app
+$additionalJS = ['/assets/js/timeLog.js'];
 $additionalCSS = ['/assets/css/timeLog.css', '/assets/css/userGuide.css'];
 
 require_once __DIR__ . '/../../includes/header.php';
