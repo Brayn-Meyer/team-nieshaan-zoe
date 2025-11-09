@@ -97,6 +97,11 @@
     pointer-events: none;
 }
 
+/* Dark mode for search icon */
+body.dark-mode .search-container::before {
+    color: #9ca3af !important;
+}
+
 /* Buttons */
 .btn {
     padding: 10px 20px;
@@ -300,6 +305,53 @@
     justify-content: flex-end;
 }
 
+/* Dark mode for mobile employee cards */
+body.dark-mode .employee-card {
+    background: #1f2937 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .employee-card .card-header {
+    background: #374151 !important;
+    border-bottom-color: #4b5563 !important;
+}
+
+body.dark-mode .employee-info h6 {
+    color: #f9fafb !important;
+}
+
+body.dark-mode .employee-id {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .employee-card .card-body {
+    background: #1f2937 !important;
+}
+
+body.dark-mode .detail-item .label {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .detail-item .value {
+    color: #d1d5db !important;
+}
+
+body.dark-mode .employee-card .card-footer {
+    background: #374151 !important;
+    border-top-color: #4b5563 !important;
+}
+
+/* Dark mode for search-add-container */
+body.dark-mode .search-add-container {
+    background: #1f2937 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .table-responsive {
+    background: #1f2937 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 /* Header Styles */
 .dashboard-header {
     display: flex;
@@ -307,6 +359,7 @@
     align-items: center;
     padding: 15px 0;
     margin-bottom: 20px;
+    background: transparent;
 }
 
 .welcome-message h1 {
@@ -337,6 +390,28 @@
     font-size: 1rem;
     color: #666;
     margin: 5px 0 0 0;
+}
+
+/* Dark mode fixes for dashboard header and date/time */
+body.dark-mode .dashboard-header {
+    background: transparent !important;
+}
+
+body.dark-mode .welcome-message,
+body.dark-mode .date-time-display {
+    background: transparent !important;
+}
+
+body.dark-mode .welcome-message h1,
+body.dark-mode .current-date {
+    color: #f9fafb !important;
+    background: transparent !important;
+}
+
+body.dark-mode .welcome-message p,
+body.dark-mode .current-time {
+    color: #d1d5db !important;
+    background: transparent !important;
 }
 
 /* Responsive */
@@ -408,6 +483,18 @@
     background: #f8fafc;
     min-height: 100vh;
     padding: 50px 30px 30px;
+}
+
+/* Ensure dashboard container is light in light mode */
+body:not(.dark-mode) .dashboard-container {
+    background: #f8fafc !important;
+}
+
+/* Dashboard header - no background in either mode */
+body:not(.dark-mode) .dashboard-header,
+body:not(.dark-mode) .welcome-message,
+body:not(.dark-mode) .date-time-display {
+    background: transparent !important;
 }
 
 /* Responsive Utilities */

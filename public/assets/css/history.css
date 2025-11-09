@@ -533,6 +533,34 @@ p {
     }
 }
 
+/* Dark Mode Styles for History Mobile Cards */
+body.dark-mode .history-card {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .card-title {
+    color: #f9fafb !important;
+}
+
+body.dark-mode .card-employee-id,
+body.dark-mode .card-label {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .card-value {
+    color: #d1d5db !important;
+}
+
+body.dark-mode .card-times-grid {
+    background-color: transparent !important;
+}
+
+body.dark-mode .mobile-cards {
+    background-color: transparent !important;
+}
+
 /* Utility Classes */
 .d-md-none {
     display: block;

@@ -17,7 +17,7 @@
 ?>
 
 <!-- Help Button -->
-<button onclick="showUserGuide()" class="help-btn" aria-label="Open help guide">
+<button onclick="showUserGuide()" class="help-btn" aria-label="Open help guide" title="Help Guide">
     <i class="fa-solid fa-circle-question"></i>
     <span>Help Guide</span>
 </button>

@@ -1,6 +1,6 @@
-<button onclick="showUserGuide()" class="help-btn">
+<button onclick="showUserGuide()" class="help-btn" title="Help Guide">
     <i class="fa-solid fa-circle-question"></i>
-    Help Guide
+    <span>Help Guide</span>
 </button>
 
 <div id="userGuideOverlay" class="user-guide-overlay" style="display: none;">
@@ -53,7 +53,7 @@
 
 .guide-content {
     position: fixed;
-    background: var(--guide-bg, #ffffff);
+    background: white;
     border-radius: 12px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     min-width: 350px;
@@ -61,8 +61,18 @@
     /* sit above the overlay but below modals */
     z-index: 1811;
     pointer-events: all;
-    border: 1px solid var(--guide-border, #e2e8f0);
+    border: 1px solid #e2e8f0;
     transition: all 0.4s ease;
+}
+
+/* Ensure guide content always has a solid background */
+body:not(.dark-mode) .guide-content {
+    background: #ffffff !important;
+}
+
+body.dark-mode .guide-content {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
 }
 
 .guide-header {
@@ -70,15 +80,29 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 25px 0 25px;
-    border-bottom: 1px solid var(--guide-border, #e2e8f0);
+    border-bottom: 1px solid #e2e8f0;
     padding-bottom: 15px;
+    background: transparent !important;
 }
 
 .guide-header h3 {
     margin: 0;
-    color: var(--guide-title, #1a202c);
+    color: #1a202c;
     font-size: 1.3em;
     font-weight: 700;
+}
+
+/* Ensure header text is visible in both themes */
+body:not(.dark-mode) .guide-header h3 {
+    color: #1a202c !important;
+}
+
+body.dark-mode .guide-header h3 {
+    color: #f9fafb !important;
+}
+
+body.dark-mode .guide-header {
+    border-bottom-color: #374151 !important;
 }
 
 .close-btn {
@@ -86,7 +110,7 @@
     border: none;
     font-size: 1.5em;
     cursor: pointer;
-    color: var(--guide-text-secondary, #718096);
+    color: #718096;
     padding: 0;
     width: 30px;
     height: 30px;
@@ -98,19 +122,39 @@
 }
 
 .close-btn:hover {
-    background: var(--guide-hover, #f0fdf4);
-    color: var(--guide-text, #2d3748);
+    background: #f0fdf4;
+    color: #2d3748;
+}
+
+body.dark-mode .close-btn {
+    color: #6b7280 !important;
+}
+
+body.dark-mode .close-btn:hover {
+    background: #7f1d1d !important;
+    color: #fca5a5 !important;
 }
 
 .guide-body {
     padding: 20px 25px;
+    background: transparent !important;
 }
 
 .guide-body p {
     margin: 0 0 15px 0;
     line-height: 1.6;
-    color: var(--guide-text, #374151);
+    color: #374151;
     font-size: 1em;
+    background: transparent !important;
+}
+
+/* Ensure body text is visible in both themes */
+body:not(.dark-mode) .guide-body p {
+    color: #374151 !important;
+}
+
+body.dark-mode .guide-body p {
+    color: #d1d5db !important;
 }
 
 .step-indicator {

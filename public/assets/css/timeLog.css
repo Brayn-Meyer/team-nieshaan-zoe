@@ -26,12 +26,30 @@
     border-radius: 8px;
     font-size: 14px;
     transition: all 0.3s ease;
+    background-color: white;
+    color: #333;
 }
 
 .search-container .search-input:focus {
     outline: none;
     border-color: #2EB28A;
     box-shadow: 0 0 0 3px rgba(46, 178, 138, 0.1);
+}
+
+/* Dark mode styles for search input */
+body.dark-mode .search-container .search-input {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #f9fafb !important;
+}
+
+body.dark-mode .search-container .search-input:focus {
+    border-color: #2EB28A !important;
+    box-shadow: 0 0 0 3px rgba(46, 178, 138, 0.2) !important;
+}
+
+body.dark-mode .search-container::before {
+    color: #9ca3af !important;
 }
 
 .search-container {
@@ -410,6 +428,86 @@ h1 {
     margin-top: 40px;
     margin-bottom: 20px;
     font-size: 28px;
+}
+
+/* Dark mode for time log page */
+body.dark-mode .timelog-filters {
+    background-color: #1f2937 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .week-select {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #f9fafb !important;
+}
+
+body.dark-mode .week-select:focus {
+    border-color: #2EB28A !important;
+    box-shadow: 0 0 0 3px rgba(46, 178, 138, 0.2) !important;
+}
+
+body.dark-mode h1 {
+    color: #f9fafb !important;
+}
+
+body.dark-mode .table-container {
+    background-color: #1f2937 !important;
+}
+
+body.dark-mode .time-log-table {
+    background-color: #1f2937 !important;
+}
+
+body.dark-mode .time-log-table tbody td {
+    color: #d1d5db !important;
+    border-bottom-color: #374151 !important;
+}
+
+body.dark-mode .time-log-table tbody tr:hover {
+    background-color: #374151 !important;
+}
+
+body.dark-mode .no-results {
+    background-color: #1f2937 !important;
+    color: #9ca3af !important;
+}
+
+body.dark-mode .mobile-cards {
+    background-color: #1f2937 !important;
+}
+
+body.dark-mode .mobile-card {
+    border-bottom-color: #374151 !important;
+}
+
+body.dark-mode .mobile-card:hover {
+    background-color: #374151 !important;
+}
+
+body.dark-mode .mobile-card-title {
+    color: #f9fafb !important;
+}
+
+body.dark-mode .mobile-card-id,
+body.dark-mode .mobile-card-label {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .mobile-card-value {
+    color: #d1d5db !important;
+}
+
+body.dark-mode .popup-container {
+    background-color: #1f2937 !important;
+}
+
+body.dark-mode .popup-content h3 {
+    color: #f9fafb !important;
+}
+
+body.dark-mode .popup-content p {
+    color: #d1d5db !important;
 }
 
 

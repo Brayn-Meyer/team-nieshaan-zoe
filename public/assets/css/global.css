@@ -266,7 +266,7 @@ body.dark-mode .employee-table tbody tr {
 body.dark-mode .app-navbar,
 body.dark-mode .app-navbar .app-navbar-inner {
   background: #2EB28A !important; /* keep brand teal */
-  border-bottom: 1px solid #e6e9ee !important;
+  border-bottom: 1px solid #2EB28A !important; /* remove grey line */
 }
 
 /* Keep nav links readable */
@@ -389,7 +389,7 @@ body.dark-mode .table-responsive {
 
 /* If there's a white wrapper panel, dim it in dark mode */
 body.dark-mode .panel, body.dark-mode .card, body.dark-mode .search-add-container {
-    background-color: #2c3838 !important;
+    background-color: #1f2937 !important;
     box-shadow: 0 6px 20px rgba(0,0,0,0.6);
 }
 
@@ -409,7 +409,8 @@ body.dark-mode .dashboard-main {
 /* Make table row text brighter and ensure icons/buttons remain visible */
 body.dark-mode .employee-table tbody tr td { color: #e6f0ee !important; }
 body.dark-mode .employee-table thead th { color: #ffffff !important; }
-body.dark-mode .btn, body.dark-mode .btn-primary { color: #ffffff !important; background-color:#2c3838 }
+body.dark-mode .btn { color: #ffffff !important; background-color: transparent; }
+body.dark-mode .btn-primary { color: #ffffff !important; background-color: #2EB28A !important; }
 body.dark-mode .card .card-title, body.dark-mode .card .card-value { color: #ffffff !important; }
 
 /* Force dark mode on most content elements, but exclude header/navbar so the
@@ -424,7 +425,7 @@ body.dark-mode .card,
 body.dark-mode .box,
 body.dark-mode .container-fluid,
 body.dark-mode .content-section {
-  background-color: #2c3838;
+  background-color: #1f2937;
 }
 
 /* Handle form elements in dark mode */
@@ -456,7 +457,7 @@ body.dark-mode .desktop-table-container,
 body.dark-mode .mobile-cards,
 body.dark-mode .history-card,
 body.dark-mode .no-results {
-  background-color: #2c3838 !important;
+  background-color: #1f2937 !important;
   color: #e6efec !important;
   border-color: rgba(255,255,255,0.04) !important;
   box-shadow: none !important;
@@ -469,7 +470,7 @@ body.dark-mode .filter-input,
 body.dark-mode input[type="date"] {
   background-color: #1a2424 !important;
   color: #e6efec !important;
-  border: 1px solid #2c3838 !important;
+  border: 1px solid #374151 !important;
 }
 
 /* Table text/colors */
@@ -526,22 +527,47 @@ body.dark-mode .user-guide-overlay {
 }
 
 /* === Fix: targeted search input styling ===
-   Prevent the broad `body.dark-mode input` rules from greying out the search bar.
-   Make the search input keep a dark background and a green outline in dark mode. */
+   Make the search input have proper backgrounds for both light and dark modes. */
 .search-container input,
 .search-container .search-input {
-  background: #0f1720 !important;
-  color: #e6f0ee !important;
-  border: 2px solid rgba(46, 178, 138, 0.9) !important;
-  border-radius: 12px;
+  background: #ffffff !important;
+  color: #333 !important;
+  border: 1px solid #ddd !important;
+  border-radius: 8px;
   padding: 10px 14px;
 }
 
 body.dark-mode .search-container input,
 body.dark-mode .search-container .search-input {
-  background: rgba(255,255,255,0.03) !important;
-  color: #e6f0ee !important;
-  border: 2px solid rgba(46,178,138,0.85) !important;
+  background-color: #374151 !important;
+  color: #f9fafb !important;
+  border-color: #4b5563 !important;
+}
+
+/* Placeholder styling */
+.search-container input::placeholder,
+.search-container .search-input::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+body.dark-mode .search-container input::placeholder,
+body.dark-mode .search-container .search-input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1;
+}
+
+/* Focused state */
+.search-container input:focus,
+.search-container .search-input:focus {
+  border-color: #2EB28A !important;
+  box-shadow: 0 0 0 3px rgba(46, 178, 138, 0.1) !important;
+}
+
+body.dark-mode .search-container input:focus,
+body.dark-mode .search-container .search-input:focus {
+  border-color: #2EB28A !important;
+  box-shadow: 0 0 0 3px rgba(46, 178, 138, 0.2) !important;
 }
 
 /* Guide tooltip specific styles in dark mode */

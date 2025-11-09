@@ -64,3 +64,21 @@
         font-size: 1.5rem;
     }
 }
+
+/* Dark mode for KPI cards */
+body.dark-mode .card {
+    background: #1f2937 !important;
+    color: #e9f7f1;
+}
+
+body.dark-mode .card-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .card-value {
+    color: #ffffff !important;
+}
+
+body.dark-mode .card-icon {
+    color: #2EB28A !important;
+}

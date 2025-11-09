@@ -1,7 +1,7 @@
 <!-- Help Button -->
-<button onclick="showUserGuide()" class="help-btn">
+<button onclick="showUserGuide()" class="help-btn" title="Help Guide">
     <i class="fa-solid fa-circle-question"></i>
-    Help Guide
+    <span>Help Guide</span>
 </button>
 
 <!-- User Guide Overlay -->
@@ -72,6 +72,16 @@
     transition: all 0.4s ease;
 }
 
+/* Ensure guide content always has a solid background */
+body:not(.dark-mode) .guide-content {
+    background: #ffffff !important;
+}
+
+body.dark-mode .guide-content {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
 .guide-header {
     display: flex;
     justify-content: space-between;
@@ -79,6 +89,7 @@
     padding: 20px 25px 0 25px;
     border-bottom: 1px solid #e2e8f0;
     padding-bottom: 15px;
+    background: transparent !important;
 }
 
 .guide-header h3 {
@@ -86,6 +97,19 @@
     color: #000000;
     font-size: 1.3em;
     font-weight: 700;
+}
+
+/* Ensure header text is visible in both themes */
+body:not(.dark-mode) .guide-header h3 {
+    color: #000000 !important;
+}
+
+body.dark-mode .guide-header h3 {
+    color: #f9fafb !important;
+}
+
+body.dark-mode .guide-header {
+    border-bottom-color: #374151 !important;
 }
 
 .close-btn {
@@ -110,6 +134,7 @@
 
 .guide-body {
     padding: 20px 25px;
+    background: transparent !important;
 }
 
 .guide-body p {
@@ -117,6 +142,16 @@
     line-height: 1.6;
     color: #374151;
     font-size: 1em;
+    background: transparent !important;
+}
+
+/* Ensure body text is visible in both themes */
+body:not(.dark-mode) .guide-body p {
+    color: #374151 !important;
+}
+
+body.dark-mode .guide-body p {
+    color: #d1d5db !important;
 }
 
 .step-indicator {
@@ -257,6 +292,11 @@ body[data-guide-active="history"].dark-mode .highlight-overlay {
 /* Scoped dark-mode styles while the history guide is active so modal text
    remains readable. This only applies when the guide is open via the
    data-guide-active="history" attribute on <body>. */
+body[data-guide-active="history"]:not(.dark-mode) .guide-content {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
 body[data-guide-active="history"].dark-mode .guide-content,
 body[data-guide-active="history"].dark-mode .guide-header h3,
 body[data-guide-active="history"].dark-mode .guide-body p,
@@ -267,6 +307,29 @@ body[data-guide-active="history"].dark-mode .guide-header {
 }
 body[data-guide-active="history"].dark-mode .guide-content {
     background: #0b1220 !important;
+}
+
+/* Ensure buttons are visible in dark mode */
+body[data-guide-active="history"].dark-mode .btn-primary,
+body[data-guide-active="history"]:not(.dark-mode) .btn-primary {
+    background: #2EB28A !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+body[data-guide-active="history"].dark-mode .btn-secondary,
+body[data-guide-active="history"]:not(.dark-mode) .btn-secondary {
+    background: #d1fae5 !important;
+    color: #065f46 !important;
+    border: none !important;
+}
+
+body[data-guide-active="history"].dark-mode .btn-primary:hover {
+    background: #259673 !important;
+}
+
+body[data-guide-active="history"].dark-mode .btn-secondary:hover {
+    background: #a7f3d0 !important;
 }
 </style>
 
@@ -334,6 +397,8 @@ function closeGuide() {
         guideClone.remove();
         guideClone = null;
     }
+    // Clean up any orphaned clones (safety measure)
+    document.querySelectorAll('.history-guide-clone').forEach(clone => clone.remove());
     try { document.body.removeAttribute('data-guide-active'); } catch (e) {}
 }
 

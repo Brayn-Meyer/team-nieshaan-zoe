@@ -155,6 +155,18 @@ class UserGuide {
     showStep() {
         const step = this.guideSteps[this.currentStepIndex];
         
+        // Remove previous clone BEFORE creating a new one
+        if (this.cloneTarget) {
+            this.cloneTarget.remove();
+            this.cloneTarget = null;
+        }
+        
+        // Remove previous temporary highlight class if applied
+        if (this.highlightedTarget) {
+            this.highlightedTarget.classList.remove('guide-target-highlighted');
+            this.highlightedTarget = null;
+        }
+        
         // Handle multiple selectors - choose based on visibility/screen size
         let target;
         if (step.target.includes(',')) {
@@ -244,54 +256,53 @@ class UserGuide {
                 this.positionTooltip(target, step.position);
             }
 
-            // Remove any previous clone
-            if (this.cloneTarget) {
-                this.cloneTarget.remove();
-                this.cloneTarget = null;
-            }
-
             // Create a visual clone of the target and place it above the highlight so
             // dark-mode global rules or stacking contexts can't obscure its content.
-            try {
-                const rect = target.getBoundingClientRect();
-                const clone = target.cloneNode(true);
-                clone.classList.add('guide-clone');
-                // Reset ids to avoid duplicates
-                if (clone.id) clone.removeAttribute('id');
-                // Position the clone exactly over the original
-                Object.assign(clone.style, {
-                    position: 'fixed',
-                    top: `${rect.top}px`,
-                    left: `${rect.left}px`,
-                    width: `${rect.width}px`,
-                    height: `${rect.height}px`,
-                    margin: '0',
-                    zIndex: '1805',
-                    pointerEvents: 'none',
-                    overflow: 'hidden'
-                });
-                // copy border-radius from the target so the clone looks natural
+            // Delay clone creation slightly to ensure layout is stable
+            setTimeout(() => {
                 try {
-                    const computed = window.getComputedStyle(target);
-                    clone.style.borderRadius = computed.borderRadius;
-                    // subtle shadow to lift the clone above the mask without forcing light colors
-                    clone.style.boxShadow = '0 8px 24px rgba(0,0,0,0.45)';
-                } catch (e) {}
-                document.body.appendChild(clone);
-                this.cloneTarget = clone;
-            } catch (e) {
-                // ignore clone errors
-                this.cloneTarget = null;
-            }
+                    const rect = target.getBoundingClientRect();
+                    const clone = target.cloneNode(true);
+                    clone.classList.add('guide-clone');
+                    // Reset ids to avoid duplicates
+                    if (clone.id) clone.removeAttribute('id');
+                    // Remove any event listeners and interactive elements from clone
+                    clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+                    // Position the clone exactly over the original
+                    Object.assign(clone.style, {
+                        position: 'fixed',
+                        top: `${rect.top}px`,
+                        left: `${rect.left}px`,
+                        width: `${rect.width}px`,
+                        height: `${rect.height}px`,
+                        margin: '0',
+                        zIndex: '1805',
+                        pointerEvents: 'none',
+                        overflow: 'hidden'
+                    });
+                    // copy border-radius from the target so the clone looks natural
+                    try {
+                        const computed = window.getComputedStyle(target);
+                        clone.style.borderRadius = computed.borderRadius;
+                        // subtle shadow to lift the clone above the mask without forcing light colors
+                        clone.style.boxShadow = '0 8px 24px rgba(0,0,0,0.45)';
+                    } catch (e) {}
+                    document.body.appendChild(clone);
+                    this.cloneTarget = clone;
+                } catch (e) {
+                    // ignore clone errors
+                    this.cloneTarget = null;
+                }
 
-            // Apply temporary high-contrast class so the target is visible in dark mode
-            try {
-                target.classList.add('guide-target-highlighted');
-                this.highlightedTarget = target;
-            } catch (e) {
-                // ignore if cannot add class
-            }
-        }, 300);
+                // Apply temporary high-contrast class so the target is visible in dark mode
+                try {
+                    target.classList.add('guide-target-highlighted');
+                    this.highlightedTarget = target;
+                } catch (e) {
+                    // ignore if cannot add class
+                }
+            }, 50); // Small delay to ensure smooth transition
+        }, 400); // Increased delay for smoother scroll completion
     }
 
     positionHighlight(target) {
@@ -493,6 +504,9 @@ class UserGuide {
             this.cloneTarget.remove();
             this.cloneTarget = null;
         }
+        // Clean up any orphaned clones (safety measure)
+        document.querySelectorAll('.guide-clone').forEach(clone => clone.remove());
+        
         document.body.style.overflow = '';
         this.isActive = false;
         this.currentStepIndex = 0;
