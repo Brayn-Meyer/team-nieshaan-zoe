@@ -67,7 +67,7 @@
 
 /* Dark mode for KPI cards */
 body.dark-mode .card {
-    background: #1f2937 !important;
+    background: var(--card-dark-bg) !important;
     color: #e9f7f1;
 }
 

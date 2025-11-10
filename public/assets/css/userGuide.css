@@ -474,7 +474,8 @@ body[data-guide-active="history"].dark-mode .history-guide-clone {
    is active (body.dark-mode). Avoid using the system preference media
    query here so the site theme toggle controls appearance consistently. */
 body.dark-mode .guide-tooltip {
-    background: #1f2937 !important;
+    /* match the global panel background variable so guide looks consistent */
+    background: var(--card-dark-bg) !important;
     box-shadow: 
         0 20px 60px rgba(0, 0, 0, 0.6),
         0 0 0 1px rgba(255, 255, 255, 0.1);

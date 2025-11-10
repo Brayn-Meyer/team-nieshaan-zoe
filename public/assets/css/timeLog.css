@@ -432,7 +432,7 @@ h1 {
 
 /* Dark mode for time log page */
 body.dark-mode .timelog-filters {
-    background-color: #1f2937 !important;
+    background-color: var(--card-dark-bg) !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -452,11 +452,11 @@ body.dark-mode h1 {
 }
 
 body.dark-mode .table-container {
-    background-color: #1f2937 !important;
+    background-color: var(--card-dark-bg) !important;
 }
 
 body.dark-mode .time-log-table {
-    background-color: #1f2937 !important;
+    background-color: var(--card-dark-bg) !important;
 }
 
 body.dark-mode .time-log-table tbody td {
@@ -469,12 +469,12 @@ body.dark-mode .time-log-table tbody tr:hover {
 }
 
 body.dark-mode .no-results {
-    background-color: #1f2937 !important;
+    background-color: var(--card-dark-bg) !important;
     color: #9ca3af !important;
 }
 
 body.dark-mode .mobile-cards {
-    background-color: #1f2937 !important;
+    background-color: var(--card-dark-bg) !important;
 }
 
 body.dark-mode .mobile-card {
@@ -499,7 +499,7 @@ body.dark-mode .mobile-card-value {
 }
 
 body.dark-mode .popup-container {
-    background-color: #1f2937 !important;
+    background-color: var(--card-dark-bg) !important;
 }
 
 body.dark-mode .popup-content h3 {

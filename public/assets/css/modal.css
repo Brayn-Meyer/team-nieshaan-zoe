@@ -347,8 +347,46 @@ body.dark-mode .modal .btn-close {
 
 /* Inputs and selects inside modals should keep readable text if the
    modal background was darkened by global rules */
+/* Make form controls inside modals use a mid-grey background in dark mode so text is readable */
 body.dark-mode .modal .form-control,
 body.dark-mode .modal .form-select {
     color: #ffffff !important;
+    background-color: #4b4e53 !important; /* medium slate/grey */
+    border: 1px solid rgba(255,255,255,0.04) !important;
 }
+
+/* Dark mode: make modal background and inner list items dark so there is no white hover
+   and text remains readable. This targets notification/modals that used white by default. */
+body.dark-mode .modal .modal-content {
+    background: var(--card-dark-bg) !important;
+    color: #e6efec !important;
+    border-color: var(--row-dark-bg) !important;
+}
+
+/* Ensure modal body sections (rows, cards, list items) stay dark and keep text white */
+body.dark-mode .modal .modal-body .card,
+body.dark-mode .modal .modal-body .row,
+body.dark-mode .modal .modal-body .list-group-item,
+body.dark-mode .modal .modal-body .mobile-card,
+body.dark-mode .modal .modal-body .notification-item,
+body.dark-mode .modal .modal-body .notification-row {
+    background: transparent !important;
+    color: #e6efec !important;
+    border-color: rgba(255,255,255,0.04) !important;
+}
+
+/* Remove white hover effect — use the dark row color instead */
+body.dark-mode .modal .modal-body .card:hover,
+body.dark-mode .modal .modal-body .row:hover,
+body.dark-mode .modal .modal-body .list-group-item:hover,
+body.dark-mode .modal .modal-body .mobile-card:hover,
+body.dark-mode .modal .modal-body .notification-item:hover,
+body.dark-mode .modal .modal-body .notification-row:hover {
+    background: var(--row-dark-bg) !important;
+    color: #ffffff !important;
+}
+
+/* If any element inside the modal sets background to white via higher-specificity rules,
+   this will override it in dark mode. */
+body.dark-mode .modal * { color: inherit !important; }
 

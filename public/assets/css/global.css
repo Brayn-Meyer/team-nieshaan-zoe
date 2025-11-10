@@ -223,7 +223,19 @@ body.dark-mode {
   background-color: var(--bg-dark-main) !important;
   color: #e9f0ef !important;
 }
-body.dark-mode .search-container { background: rgba(255,255,255,0.02); border-color: rgba(46,178,138,0.8); }
+body.dark-mode .search-container {
+  /* keep the dark panel background but make the border clearly visible at all times */
+  background: var(--card-dark-bg) !important;
+  /* stronger always-on border per request */
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: none !important;
+}
+
+/* when input inside search container is focused, show a green-accent border/glow */
+body.dark-mode .search-container:focus-within {
+  border-color: rgba(46,178,138,0.16) !important; /* subtle green tint */
+  box-shadow: 0 4px 18px rgba(46,178,138,0.06) !important;
+}
 body.dark-mode .employee-table thead th { background: var(--accent-dark); }
 body.dark-mode .employee-table tbody tr { background: var(--row-dark-bg); color: #d7e7e3; border-bottom: 1px solid rgba(255,255,255,0.04); }
 
@@ -358,9 +370,10 @@ body.dark-mode .app-navbar #theme-toggle .fa-sun {
    the tooltip/modal appear see-through. */
 body.dark-mode .user-guide-overlay .guide-content,
 body.dark-mode .user-guide-overlay .guide-tooltip {
-  background: #1a202c !important;
+  /* Use the card dark variable so guide tooltips match panels (removes bluish tint) */
+  background: var(--card-dark-bg) !important;
   color: #e6efec !important;
-  border-color: #2d3748 !important;
+  border-color: var(--row-dark-bg) !important;
 }
 
 /* Remove the unwanted footer/banner background in light mode within the guide only */
@@ -389,8 +402,9 @@ body.dark-mode .table-responsive {
 
 /* If there's a white wrapper panel, dim it in dark mode */
 body.dark-mode .panel, body.dark-mode .card, body.dark-mode .search-add-container {
-    background-color: #1f2937 !important;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  /* Use card dark background to remove bluish-gray and use #232e2f */
+  background-color: var(--card-dark-bg) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
 }
 
 /* Force higher contrast text in dark mode */
@@ -425,16 +439,17 @@ body.dark-mode .card,
 body.dark-mode .box,
 body.dark-mode .container-fluid,
 body.dark-mode .content-section {
-  background-color: #1f2937;
+  /* Use the global card dark background variable to keep panels consistent */
+  background-color: var(--card-dark-bg);
 }
 
 /* Handle form elements in dark mode */
 body.dark-mode input,
 body.dark-mode select,
 body.dark-mode textarea {
-    background-color: #232e2f !important;
+    background-color: #222626 !important;
     color: #e6f0ee !important;
-    border-color: #263033 !important;
+    border-color: #1e2223 !important;
 }
 
 /* Theme toggle container positioning */
@@ -457,7 +472,8 @@ body.dark-mode .desktop-table-container,
 body.dark-mode .mobile-cards,
 body.dark-mode .history-card,
 body.dark-mode .no-results {
-  background-color: #1f2937 !important;
+  /* Use card dark background to remove the blue-gray panels */
+  background-color: var(--card-dark-bg) !important;
   color: #e6efec !important;
   border-color: rgba(255,255,255,0.04) !important;
   box-shadow: none !important;
@@ -530,6 +546,7 @@ body.dark-mode .user-guide-overlay {
    Make the search input have proper backgrounds for both light and dark modes. */
 .search-container input,
 .search-container .search-input {
+  /* light-mode input: white background with dark text */
   background: #ffffff !important;
   color: #333 !important;
   border: 1px solid #ddd !important;
@@ -539,9 +556,12 @@ body.dark-mode .user-guide-overlay {
 
 body.dark-mode .search-container input,
 body.dark-mode .search-container .search-input {
-  background-color: #374151 !important;
-  color: #f9fafb !important;
-  border-color: #4b5563 !important;
+  /* Input sits over the dark panel. Keep input background transparent so it matches the panel,
+     but ensure the text is light and clearly readable. Remove input border so container border is used. */
+  background-color: transparent !important;
+  color: #e6efec !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Placeholder styling */
@@ -553,7 +573,8 @@ body.dark-mode .search-container .search-input {
 
 body.dark-mode .search-container input::placeholder,
 body.dark-mode .search-container .search-input::placeholder {
-  color: #9ca3af !important;
+  /* slightly brighter placeholder for legibility */
+  color: rgba(156,163,175,0.9) !important; /* ~#9ca3af at 90% */
   opacity: 1;
 }
 
