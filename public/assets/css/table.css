@@ -307,7 +307,7 @@ body.dark-mode .search-container::before {
 
 /* Dark mode for mobile employee cards */
 body.dark-mode .employee-card {
-    background: #1f2937 !important;
+    background: var(--card-dark-bg) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -325,7 +325,7 @@ body.dark-mode .employee-id {
 }
 
 body.dark-mode .employee-card .card-body {
-    background: #1f2937 !important;
+    background: var(--card-dark-bg) !important;
 }
 
 body.dark-mode .detail-item .label {
@@ -343,12 +343,12 @@ body.dark-mode .employee-card .card-footer {
 
 /* Dark mode for search-add-container */
 body.dark-mode .search-add-container {
-    background: #1f2937 !important;
+    background: var(--card-dark-bg) !important;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .table-responsive {
-    background: #1f2937 !important;
+    background: var(--card-dark-bg) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
