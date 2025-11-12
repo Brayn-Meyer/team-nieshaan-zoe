@@ -91,31 +91,74 @@ try {
 
 // Handle form submissions for notifications
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    switch ($_POST['action']) {
-       
+    try {
+        require_once __DIR__ . '/../../includes/db.php';
+        require_once __DIR__ . '/../models/NotificationsModel.php';
+        
+        $database = Database::getInstance();
+        $conn = $database->getConnection();
+        
+        switch ($_POST['action']) {
+            case 'post_notification':
+                $title = trim($_POST['notification_title'] ?? '');
+                $message = trim($_POST['notification_message'] ?? '');
+                $employee_id = $_POST['employee_id'] ?? null;
+                
+                if ($title && $message && $employee_id) {
+                    $result = postNotification($conn, $title, $message, $employee_id);
+                    if (isset($result['success'])) {
+                        $_SESSION['notification_success'] = $result['success'];
+                    } else {
+                        $_SESSION['notification_error'] = $result['error'] ?? 'Failed to post notification';
+                    }
+                } else {
+                    $_SESSION['notification_error'] = 'Please fill in all fields';
+                }
+                break;
+                
+            case 'post_global_notification':
+                $title = trim($_POST['global_notification_title'] ?? '');
+                $message = trim($_POST['global_notification_message'] ?? '');
+                
+                if ($title && $message) {
+                    $result = postGlobalNotification($conn, $title, $message);
+                    if (isset($result['success'])) {
+                        $_SESSION['notification_success'] = $result['success'];
+                    } else {
+                        $_SESSION['notification_error'] = $result['error'] ?? 'Failed to post global notification';
+                    }
+                } else {
+                    $_SESSION['notification_error'] = 'Please fill in all fields';
+                }
+                break;
             
-        case 'send_group_message':
-            $message = trim($_POST['group_message'] ?? '');
-            if ($message) {
-                $_SESSION['group_messages'][] = ['sender' => 'Admin', 'text' => $message];
-            }
-            break;
-            
-        case 'send_reply':
-            $replyMessage = trim($_POST['reply_message'] ?? '');
-            $employee = $_POST['employee'] ?? '';
-            if ($replyMessage && $employee) {
-                $_SESSION['group_messages'][] = [
-                    'sender' => 'Admin (reply)', 
-                    'text' => "Reply to $employee: $replyMessage"
-                ];
-                $_SESSION['reply_success'] = "Reply sent to $employee";
-            }
-            break;
+            case 'send_group_message':
+                $message = trim($_POST['group_message'] ?? '');
+                if ($message) {
+                    $_SESSION['group_messages'][] = ['sender' => 'Admin', 'text' => $message];
+                }
+                break;
+                
+            case 'send_reply':
+                $replyMessage = trim($_POST['reply_message'] ?? '');
+                $employee = $_POST['employee'] ?? '';
+                if ($replyMessage && $employee) {
+                    $_SESSION['group_messages'][] = [
+                        'sender' => 'Admin (reply)', 
+                        'text' => "Reply to $employee: $replyMessage"
+                    ];
+                    $_SESSION['reply_success'] = "Reply sent to $employee";
+                }
+                break;
+        }
+        
+        // Set a flag to indicate we need to refresh via JavaScript
+        $_SESSION['should_refresh'] = true;
+        
+    } catch (Throwable $e) {
+        error_log("Error handling notification post: " . $e->getMessage());
+        $_SESSION['notification_error'] = 'An error occurred while posting notification';
     }
-    
-    header('Location: ' . $_SERVER['PHP_SELF']);
-    exit;
 }
 
 
@@ -134,6 +177,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <div class="modal-header d-flex justify-content-between align-items-center modal-header-custom">
                 <h5 class="modal-title mb-0 fw-semibold" id="notificationsModalLabel">Notifications</h5>
                 <div class="d-flex align-items-center gap-2 ms-auto">
+                    <button class="btn btn-sm btn-icon" 
+                        data-bs-toggle="modal" data-bs-target="#postNotificationModal"
+                        aria-label="Post new notification" title="Post new notification">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
                     <button class="btn btn-sm btn-icon" 
                         data-bs-toggle="modal" data-bs-target="#groupChatModal"
                         aria-label="Open group chat" title="Open group chat">
@@ -224,12 +272,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                     <div class="d-flex gap-2 align-items-center">
                                         
 
-                                        <button class="btn btn-sm btn-outline-secondary" 
+                                        <!-- <button class="btn btn-sm btn-outline-secondary" 
                                                 data-bs-toggle="modal" data-bs-target="#replyModal"
                                                 onclick="setReplyEmployee('<?php echo addslashes($note['employee']); ?>', '<?php echo addslashes($note['message']); ?>')"
                                                 title="Reply to employee">
                                             <i class="fa-solid fa-message"></i>
-                                        </button>
+                                        </button> -->
                                     </div>
                                     <small class="text-muted"><?php echo htmlspecialchars($note['time']); ?></small>
                                 </div>
@@ -251,15 +299,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
 </div>
 
+<!-- Post Notification Modal -->
+<div class="modal fade" id="postNotificationModal" tabindex="-1" aria-labelledby="postNotificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3">
+            <div class="modal-header">
+                <h5 class="modal-title" id="postNotificationModalLabel">Post New Notification</h5>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="action" value="post_notification">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="notification_title" class="form-label">Title</label>
+                        <input type="text" name="notification_title" class="form-control" id="notification_title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notification_message" class="form-label">Message</label>
+                        <textarea name="notification_message" class="form-control" id="notification_message" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="employee_id" class="form-label">Employee ID</label>
+                        <input type="number" name="employee_id" class="form-control" id="employee_id" required>
+                        <div class="form-text">Enter the employee ID to send notification to specific employee</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Post Notification</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Post Global Notification Modal -->
+<div class="modal fade" id="postGlobalNotificationModal" tabindex="-1" aria-labelledby="postGlobalNotificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3">
+            <div class="modal-header">
+                <h5 class="modal-title" id="postGlobalNotificationModalLabel">Post Global Notification</h5>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="action" value="post_global_notification">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="global_notification_title" class="form-label">Title</label>
+                        <input type="text" name="global_notification_title" class="form-control" id="global_notification_title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="global_notification_message" class="form-label">Message</label>
+                        <textarea name="global_notification_message" class="form-control" id="global_notification_message" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fa-solid fa-info-circle"></i>
+                        This notification will be sent to all employees as a broadcast message.
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Post Global Notification</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Group Chat Modal -->
 <div class="modal fade" id="groupChatModal" tabindex="-1" aria-labelledby="groupChatModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title" id="groupChatModalLabel">Group Chat</h5>
-                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close group chat">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <div class="d-flex gap-2 ms-auto">
+                    <button class="btn btn-sm btn-success" 
+                        data-bs-toggle="modal" data-bs-target="#postGlobalNotificationModal"
+                        aria-label="Post global notification" title="Post global notification">
+                        <i class="fa-solid fa-bullhorn"></i> Global Notification
+                    </button>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close group chat">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
             </div>
             <div class="modal-body">
                 <div class="chat-box mb-3">
@@ -284,13 +418,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 </div>
 
 <!-- Reply Modal -->
-<div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title" id="replyModalLabel">Reply to <span id="replyEmployeeName">Employee</span></h5>
                 <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close reply modal">
-                    <!-- <i class="fa-solid fa-xmark"></i> -->
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
@@ -309,7 +443,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             </form>
         </div>
     </div>
-</div>
+</div> -->
+
+<?php if (isset($_SESSION['notification_success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        <?php echo $_SESSION['notification_success']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <?php unset($_SESSION['notification_success']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['notification_error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        <?php echo $_SESSION['notification_error']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <?php unset($_SESSION['notification_error']); ?>
+<?php endif; ?>
 
 <?php if (isset($_SESSION['reply_success'])): ?>
     <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
@@ -735,6 +885,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     border-color: #27a87c;
 }
 </style>
+
 <script>
 function setReplyEmployee(employee, message) {
     document.getElementById('replyEmployeeName').textContent = employee;
@@ -742,4 +893,35 @@ function setReplyEmployee(employee, message) {
     document.getElementById('originalMessage').textContent = message;
 }
 
+// Check if we need to refresh the page after form submission
+<?php if (isset($_SESSION['should_refresh'])): ?>
+    // Remove the flag
+    <?php unset($_SESSION['should_refresh']); ?>
+    
+    // Close any open modals and refresh the page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Close all open Bootstrap modals
+        var modals = document.querySelectorAll('.modal');
+        modals.forEach(function(modal) {
+            var bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            }
+        });
+        
+        // Remove modal backdrops
+        var backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(function(backdrop) {
+            backdrop.remove();
+        });
+        
+        // Remove modal-open class from body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        
+        // Scroll to top to show success/error messages
+        window.scrollTo(0, 0);
+    });
+<?php endif; ?>
 </script>

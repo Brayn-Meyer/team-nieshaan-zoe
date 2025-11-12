@@ -30,3 +30,37 @@ function getNotificationsWithEmployees($conn) {
     
     return $notifications;
 }
+
+function postNotification($conn, $title, $message, $employee_id) {
+    $stmt = $conn->prepare("INSERT INTO notifications_records (title, message, employee_id, date_created) VALUES (?, ?, ?, NOW())");
+    if ($stmt === false) {
+        error_log("Prepare failed: " . $conn->error);
+        return array('error' => 'Prepare failed: ' . $conn->error);
+    }
+    
+    $stmt->bind_param("ssi", $title, $message, $employee_id);
+    
+    if ($stmt->execute()) {
+        return array('success' => 'Notification posted successfully.');
+    } else {
+        error_log("Execute failed: " . $stmt->error);
+        return array('error' => 'Execute failed: ' . $stmt->error);
+    }
+}
+
+function postGlobalNotification($conn, $title, $message) {
+    $stmt = $conn->prepare("INSERT INTO notifications_records (title, message, employee_id, date_created, is_broadcast) VALUES (?, ?, NULL, NOW(), 1)");
+    if ($stmt === false) {
+        error_log("Prepare failed: " . $conn->error);
+        return array('error' => 'Prepare failed: ' . $conn->error);
+    }
+    
+    $stmt->bind_param("ss", $title, $message);
+    
+    if ($stmt->execute()) {
+        return array('success' => 'Global notification posted successfully.');
+    } else {
+        error_log("Execute failed: " . $stmt->error);
+        return array('error' => 'Execute failed: ' . $stmt->error);
+    }
+}
