@@ -38,7 +38,8 @@
     width: 100%;
     height: 100%;
     /* keep overlay below modals (modal.css uses z-index:2000) */
-    z-index: 1800;
+    /* raise overlay stacking base to avoid page stacking context issues */
+    z-index: 99980;
     pointer-events: none;
 }
 
@@ -50,6 +51,8 @@
     pointer-events: none;
     transition: all 0.4s ease;
     animation: pulse 2s infinite;
+    /* ensure highlight sits below the guide content but above page content */
+    z-index: 99990 !important;
 }
 
 @keyframes pulse {
@@ -66,7 +69,8 @@
     min-width: 350px;
     max-width: 450px;
     /* sit above overlay but below modals */
-    z-index: 1811;
+    /* make guide content the top-most element for the guide */
+    z-index: 99999 !important;
     pointer-events: all;
     border: 1px solid #e2e8f0;
     transition: all 0.4s ease;
@@ -188,19 +192,23 @@ body.dark-mode .guide-body p {
 }
 
 .btn-secondary {
-    background: #d1fae5;
-    color: #065f46;
+    /* Match the dashboard tooltip back button color and remove hover effect */
+    background: #22543D;
+    color: #ffffff;
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: none; /* disable hover transition */
+    box-shadow: 0 4px 10px rgba(34,84,61,0.18);
 }
 
 .btn-secondary:hover {
-    background: #a7f3d0;
-    color: #064e3b;
+    /* No color change on hover; keep same appearance */
+    background: #22543D;
+    color: #ffffff;
+    transform: none;
 }
 
 @media (max-width: 768px) {
@@ -256,7 +264,7 @@ body.dark-mode .guide-body p {
     transform-origin: top left;
     pointer-events: none;
     /* ensure clone visually sits above overlay mask but below modal/dialog layers */
-    z-index: 1805 !important;
+    z-index: 99990 !important;
 }
 .history-guide-clone img,
 .history-guide-clone svg {
@@ -274,7 +282,7 @@ body[data-guide-active="history"].dark-mode .highlight-overlay {
     box-shadow: 0 0 0 4px rgba(46, 178, 138, 0.3) !important, 0 0 0 9999px rgba(0,0,0,0.6) !important;
     background: transparent !important;
     animation: none !important;
-    z-index: 1802 !important;
+    z-index: 99990 !important;
 }
 /* Ensure clones render normally even when site-wide dark-mode rules apply
    and place them above any overlay mask. */
@@ -286,7 +294,7 @@ body[data-guide-active="history"].dark-mode .highlight-overlay {
     color: inherit !important;
 }
 .history-guide-clone {
-    z-index: 1805 !important;
+    z-index: 99990 !important;
 }
 
 /* Scoped dark-mode styles while the history guide is active so modal text
@@ -319,9 +327,11 @@ body[data-guide-active="history"]:not(.dark-mode) .btn-primary {
 
 body[data-guide-active="history"].dark-mode .btn-secondary,
 body[data-guide-active="history"]:not(.dark-mode) .btn-secondary {
-    background: #d1fae5 !important;
-    color: #065f46 !important;
+    /* Force same green back button for history guide in both themes */
+    background: #22543D !important;
+    color: #ffffff !important;
     border: none !important;
+    box-shadow: 0 4px 10px rgba(34,84,61,0.18) !important;
 }
 
 body[data-guide-active="history"].dark-mode .btn-primary:hover {
@@ -329,7 +339,9 @@ body[data-guide-active="history"].dark-mode .btn-primary:hover {
 }
 
 body[data-guide-active="history"].dark-mode .btn-secondary:hover {
-    background: #a7f3d0 !important;
+    /* Keep hover identical to base to remove hover effect */
+    background: #22543D !important;
+    color: #ffffff !important;
 }
 </style>
 
@@ -364,7 +376,8 @@ const guideSteps = [
         title: "Active Filters Display",
         content: "This area shows which filters are currently active. You can clear individual filters or use the 'Clear All' button to remove all filters at once.",
         element: "activeFiltersContainer",
-        position: 'auto'
+        // place the tooltip at the left-bottom of the viewport for better visibility
+        position: 'left-bottom'
     },
     {
         title: "Download Records",
@@ -488,12 +501,15 @@ function calculateSmartPosition(elementRect, guideContentHeight) {
             position.left = 'auto';
             position.top = Math.max(padding, elementMiddle - (guideContentHeight / 2)) + 'px';
             position.transform = 'none';
-        } else if (spaceBelow > guideContentHeight + padding && spaceBelow > spaceAbove) {
-            position.top = (elementRect.bottom + padding) + 'px';
+        }
+        // Prefer placing tooltip above the highlight when possible so it "rises"
+        // above the highlighted area instead of overlapping it.
+        else if (spaceAbove > guideContentHeight + padding) {
+            position.top = (elementRect.top - guideContentHeight - padding) + 'px';
             position.left = '50%';
             position.transform = 'translateX(-50%)';
-        } else if (spaceAbove > guideContentHeight + padding) {
-            position.top = (elementRect.top - guideContentHeight - padding) + 'px';
+        } else if (spaceBelow > guideContentHeight + padding) {
+            position.top = (elementRect.bottom + padding) + 'px';
             position.left = '50%';
             position.transform = 'translateX(-50%)';
         } else {
@@ -556,7 +572,7 @@ function updateGuide() {
                     height: rect.height + 'px',
                     margin: '0',
                     // make sure clone sits above the overlay mask
-                    zIndex: '1805',
+                    zIndex: '99990',
                     pointerEvents: 'none',
                     overflow: 'hidden'
                 });
@@ -582,11 +598,37 @@ function updateGuide() {
                 guideContent.style.bottom = smartPosition.bottom || 'auto';
                 guideContent.style.transform = smartPosition.transform || 'none';
             } else if (step.position) {
-                guideContent.style.top = step.position.top || 'auto';
-                guideContent.style.left = step.position.left || 'auto';
-                guideContent.style.right = step.position.right || 'auto';
-                guideContent.style.bottom = step.position.bottom || 'auto';
-                guideContent.style.transform = step.position.transform || 'none';
+                // Allow string positions like 'left-bottom' for screen-anchored placements
+                if (typeof step.position === 'string') {
+                    if (step.position === 'left-bottom' || step.position === 'bottom-left') {
+                        // anchor to bottom-left of the viewport with a small margin
+                        guideContent.style.left = '20px';
+                        guideContent.style.bottom = '20px';
+                        guideContent.style.top = 'auto';
+                        guideContent.style.right = 'auto';
+                        guideContent.style.transform = 'none';
+                    } else if (step.position === 'center') {
+                        guideContent.style.top = '50%';
+                        guideContent.style.left = '50%';
+                        guideContent.style.right = 'auto';
+                        guideContent.style.bottom = 'auto';
+                        guideContent.style.transform = 'translate(-50%, -50%)';
+                    } else {
+                        // unknown string — fall back to auto
+                        guideContent.style.top = 'auto';
+                        guideContent.style.left = 'auto';
+                        guideContent.style.right = 'auto';
+                        guideContent.style.bottom = 'auto';
+                        guideContent.style.transform = 'none';
+                    }
+                } else {
+                    // existing object-based positioning
+                    guideContent.style.top = step.position.top || 'auto';
+                    guideContent.style.left = step.position.left || 'auto';
+                    guideContent.style.right = step.position.right || 'auto';
+                    guideContent.style.bottom = step.position.bottom || 'auto';
+                    guideContent.style.transform = step.position.transform || 'none';
+                }
             }
         } else {
             if (step.highlight) {
@@ -615,7 +657,7 @@ function updateGuide() {
                                 width: rect.width + 'px',
                                 height: rect.height + 'px',
                                 margin: '0',
-                                zIndex: '1805',
+                                zIndex: '99990',
                                 pointerEvents: 'none',
                                 overflow: 'hidden'
                             });
