@@ -176,15 +176,24 @@ function filterTimeLog() {
 function renderTimeLog() {
     const tbody = document.getElementById('timeLogTableBody');
     const noResults = document.getElementById('noResults');
-    
+    const mobileCards = document.getElementById('mobileCards'); // 👈 added for mobile
+
     if (filteredTimeLogData.length === 0) {
         tbody.innerHTML = '';
         noResults.style.display = 'block';
+        if (mobileCards) {
+            mobileCards.innerHTML = `
+                <div class="mobile-card text-center text-muted p-4">
+                    No employees found for this week.
+                </div>
+            `;
+        }
         return;
     }
-    
+
     noResults.style.display = 'none';
-    
+
+    // ✅ DESKTOP TABLE RENDER
     tbody.innerHTML = filteredTimeLogData.map(employee => {
         const fullName = employee.name || 'Unknown';
         const hoursWorked = parseFloat(employee.hoursWorked || 0).toFixed(2);
@@ -193,7 +202,6 @@ function renderTimeLog() {
         const indicator = employee.indicator || 'green';
         const indicatorClass = indicator === 'red' ? 'indicator-red' : 'indicator-green';
         
-        // Check if hours are balanced (clickable for confirmation)
         const isBalanced = Math.abs(hoursOwed) < 0.01 && overtime > 0;
         const rowStyle = isBalanced ? 'cursor: pointer;' : '';
         const rowOnClick = isBalanced ? `onclick="showConfirmPopup('${escapeHtml(fullName)}', ${employee.id})"` : '';
@@ -209,7 +217,37 @@ function renderTimeLog() {
             </tr>
         `;
     }).join('');
+
+    // ✅ MOBILE CARDS RENDER
+    if (mobileCards) {
+        mobileCards.innerHTML = filteredTimeLogData.map(employee => {
+            const fullName = employee.name || 'Unknown';
+            const hoursWorked = parseFloat(employee.hoursWorked || 0).toFixed(2);
+            const hoursOwed = parseFloat(employee.hoursOwed || 0).toFixed(2);
+            const overtime = parseFloat(employee.overtime || 0).toFixed(2);
+            const indicator = employee.indicator || 'green';
+            const indicatorClass = indicator === 'red' ? 'indicator-red' : 'indicator-green';
+            
+            return `
+                <div class="mobile-card">
+                    <div class="mobile-card-header">
+                        <div>
+                            <div class="mobile-card-title">${escapeHtml(fullName)}</div>
+                            <div class="mobile-card-subtitle">ID: ${escapeHtml(employee.id || 'N/A')}</div>
+                        </div>
+                        <span class="indicator-circle ${indicatorClass}"></span>
+                    </div>
+                    <div class="mobile-card-body">
+                        <div><strong>Hours Owed:</strong> ${hoursOwed}</div>
+                        <div><strong>Hours Worked:</strong> ${hoursWorked}</div>
+                        <div><strong>Overtime:</strong> ${overtime}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
 }
+
 
 // Toggle filter
 function toggleFilter(color) {
