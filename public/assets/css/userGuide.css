@@ -258,6 +258,13 @@
     color: #1f2937;
 }
 
+/* Ensure tooltip Back button keeps the same green in dark mode across pages */
+body.dark-mode .guide-tooltip .guide-btn-secondary {
+    background: #22543D !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(34,84,61,0.18) !important;
+}
+
 /* Scoped transparent overlay + transparent highlight for History guide in dark mode */
 body[data-guide-active="history"].dark-mode .user-guide-overlay {
     /* history guide: make overlay transparent as requested */

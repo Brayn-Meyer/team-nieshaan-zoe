@@ -11,8 +11,9 @@ class UserGuide {
             {
                 title: "Dashboard Overview",
                 content: "Welcome to your Employee Attendance Dashboard! This is your main hub for tracking employee attendance in real-time.",
-                target: ".dashboard-main",
-                position: "center"
+                // Highlight the entire header area so both the welcome message and date/time are included
+                target: ".dashboard-header",
+                position: "bottom"
             },
             {
                 title: "Total Employees",
@@ -47,7 +48,8 @@ class UserGuide {
             {
                 title: "Search Employees",
                 content: "Search for employees by name, ID, department, or role using this search bar.",
-                target: ".search-container",
+                // target the search input inside the search-add container (matches home.php)
+                target: ".search-add-container input.search-input",
                 position: "bottom"
             },
             {
@@ -69,6 +71,7 @@ class UserGuide {
         this.tooltipBox = null;
         this.highlightedTarget = null;
         this.cloneTarget = null;
+        this.isTransitioning = false; // prevent rapid double-navigation causing race conditions
     }
 
     start() {
@@ -112,6 +115,8 @@ class UserGuide {
         // Create tooltip
         this.tooltipBox = document.createElement('div');
         this.tooltipBox.className = 'guide-tooltip';
+    // Ensure tooltip sits above the overlay even if CSS ordering changes
+    this.tooltipBox.style.zIndex = '2000';
         this.tooltipBox.innerHTML = `
             <div class="guide-tooltip-inner">
                 <div class="guide-header">
@@ -153,6 +158,10 @@ class UserGuide {
     }
 
     showStep() {
+        // Prevent re-entrancy while a previous step is still animating/positioning
+        if (this.isTransitioning) return;
+        this.isTransitioning = true;
+
         const step = this.guideSteps[this.currentStepIndex];
         
         // Remove previous clone BEFORE creating a new one
@@ -205,8 +214,47 @@ class UserGuide {
             target = document.querySelector(step.target);
         }
         
-        if (!target) {
+        const missingTarget = !target;
+        if (missingTarget) {
+            // If target not found, don't abort the guide — show the tooltip centered
+            // and skip highlight/clone operations. This prevents the guide from
+            // silently stopping when a selector is not present on the current page.
             console.warn('Target not found for step:', step.target);
+            // hide highlight if present
+            if (this.highlightBox) {
+                this.highlightBox.style.visibility = 'hidden';
+                this.highlightBox.style.opacity = '0';
+            }
+            // Update tooltip content early so positioning can use it
+            this.tooltipBox.querySelector('.guide-title').textContent = step.title;
+            this.tooltipBox.querySelector('.guide-content').textContent = step.content;
+            this.tooltipBox.querySelector('.current-step').textContent = this.currentStepIndex + 1;
+            this.tooltipBox.querySelector('.total-steps').textContent = this.guideSteps.length;
+            const backBtn = this.tooltipBox.querySelector('.guide-btn-secondary');
+            backBtn.style.display = this.currentStepIndex === 0 ? 'none' : 'inline-flex';
+            const nextText = this.tooltipBox.querySelector('.next-text');
+            const finishText = this.tooltipBox.querySelector('.finish-text');
+            const isLastStep = this.currentStepIndex === this.guideSteps.length - 1;
+            nextText.style.display = isLastStep ? 'none' : 'inline';
+            finishText.style.display = isLastStep ? 'inline' : 'none';
+
+            // Position tooltip centered on screen so the user still sees the step
+            // even if the related element is missing.
+            setTimeout(() => {
+                this.positionTooltip(document.body, 'center');
+                // make tooltip visible
+                this.tooltipBox.style.visibility = 'visible';
+                this.tooltipBox.style.opacity = '1';
+                // end transition state
+                this.isTransitioning = false;
+                // ensure buttons reflect enabled state
+                const nextBtn = this.tooltipBox.querySelector('.guide-btn-primary');
+                const backBtn = this.tooltipBox.querySelector('.guide-btn-secondary');
+                if (nextBtn) nextBtn.disabled = false;
+                if (backBtn) backBtn.disabled = false;
+            }, 50);
+
+            // Skip clone/highlight creation for missing targets
             return;
         }
 
@@ -233,17 +281,45 @@ class UserGuide {
         nextText.style.display = isLastStep ? 'none' : 'inline';
         finishText.style.display = isLastStep ? 'inline' : 'none';
         
-        // Scroll target into view with offset for navbar
-        const navbarHeight = 80; // Approximate navbar height
+        // Scroll target into view with offset for navbar, but avoid jumping
+        // on 'center' steps (we center the tooltip instead) and skip scrolling
+        // when the target is already visible to prevent the header from hiding.
+        // Determine navbar/header height dynamically if available to avoid
+        // scrolling too far and hiding the welcome header.
+        let navbarHeight = 80; // fallback
+        try {
+            const headerEl = document.querySelector('.dashboard-header') || document.querySelector('header');
+            if (headerEl) {
+                navbarHeight = headerEl.getBoundingClientRect().height || navbarHeight;
+            }
+        } catch (e) {}
         const targetRect = target.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const extraPadding = 40; // Extra space above component
-        const targetTop = targetRect.top + scrollTop - navbarHeight - extraPadding;
-        
-        window.scrollTo({
-            top: Math.max(0, targetTop), // Don't scroll negative
-            behavior: 'smooth'
-        });
+
+        // If the step prefers centering, don't scroll - center the tooltip instead
+        // This prevents the initial start from auto-scrolling past the header.
+        let shouldScroll = step.position !== 'center';
+
+        // If the target is already mostly visible within the viewport, skip scrolling
+        try {
+            const viewportHeight = window.innerHeight;
+            const visibleTop = targetRect.top >= (navbarHeight + 8);
+            const visibleBottom = targetRect.bottom <= (viewportHeight - 8);
+            if (visibleTop && visibleBottom) {
+                shouldScroll = false;
+            }
+        } catch (e) {
+            // if measurement fails, fall back to scrolling
+        }
+
+        if (shouldScroll) {
+            const targetTop = targetRect.top + scrollTop - navbarHeight - extraPadding;
+            window.scrollTo({
+                top: Math.max(0, targetTop), // Don't scroll negative
+                behavior: 'smooth'
+            });
+        }
         
         // Wait for scroll to complete before positioning
         setTimeout(() => {
@@ -301,24 +377,45 @@ class UserGuide {
                 } catch (e) {
                     // ignore if cannot add class
                 }
+                // finished transitions/positioning for this step
+                this.isTransitioning = false;
+                // re-enable tooltip buttons if they were disabled
+                const nextBtn = this.tooltipBox.querySelector('.guide-btn-primary');
+                const backBtn = this.tooltipBox.querySelector('.guide-btn-secondary');
+                if (nextBtn) nextBtn.disabled = false;
+                if (backBtn) backBtn.disabled = false;
             }, 50); // Small delay to ensure smooth transition
         }, 400); // Increased delay for smoother scroll completion
     }
 
     positionHighlight(target) {
         const rect = target.getBoundingClientRect();
-        const padding = 10;
+        // Use a slightly larger padding for the main header so the outline looks balanced
+        const padding = (target && target.classList && target.classList.contains('dashboard-header')) ? 18 : 10;
         
         this.highlightBox.style.top = `${rect.top - padding}px`;
         this.highlightBox.style.left = `${rect.left - padding}px`;
         this.highlightBox.style.width = `${rect.width + (padding * 2)}px`;
         this.highlightBox.style.height = `${rect.height + (padding * 2)}px`;
+        // Ensure the highlight uses inline styles so CSS load/order issues don't
+        // accidentally override the box-shadow (which creates the dimming mask).
+        try {
+            this.highlightBox.style.boxShadow = '0 0 0 4px rgba(46, 178, 138, 0.3), 0 0 0 9999px rgba(0,0,0,0.6)';
+            this.highlightBox.style.border = '3px solid #2EB28A';
+            this.highlightBox.style.borderRadius = '12px';
+            this.highlightBox.style.background = 'transparent';
+            this.highlightBox.style.zIndex = '1801';
+            this.highlightBox.style.pointerEvents = 'none';
+        } catch (e) {
+            // ignore if styling fails
+        }
+
         // Reveal highlight smoothly after sizing to avoid seeing it at full-viewport size
-        // Small timeout lets layout settle (use requestAnimationFrame for accuracy)
+        // Use rAF to let layout settle and then show with a transition
         requestAnimationFrame(() => {
             this.highlightBox.style.visibility = 'visible';
             // restore transition if previously disabled
-            this.highlightBox.style.transition = this.highlightBox.style.transition || 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            this.highlightBox.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
             // fade/animate in
             this.highlightBox.style.opacity = '1';
         });
@@ -326,6 +423,22 @@ class UserGuide {
 
     positionTooltip(target, position) {
         const rect = target.getBoundingClientRect();
+        // Ensure we measure the tooltip after temporarily disabling animations so
+        // its true size is available (tooltip may be hidden/opacity:0 earlier).
+        const prevTransition = this.tooltipBox.style.transition;
+        const prevTransform = this.tooltipBox.style.transform;
+        const prevAnimation = this.tooltipBox.style.animation;
+        try {
+            this.tooltipBox.style.transition = 'none';
+            this.tooltipBox.style.animation = 'none';
+            this.tooltipBox.style.transform = 'none';
+            // Keep it invisible but let it size itself
+            this.tooltipBox.style.visibility = 'hidden';
+            this.tooltipBox.style.opacity = '0';
+            // Force reflow so measurements are accurate
+            // eslint-disable-next-line no-unused-expressions
+            this.tooltipBox.offsetHeight;
+        } catch (e) {}
         const tooltipRect = this.tooltipBox.getBoundingClientRect();
         const viewport = {
             width: window.innerWidth,
@@ -336,7 +449,7 @@ class UserGuide {
         const spacing = 20;
         const bottomSafeZone = 80; // Extra space at bottom for mobile
         
-        // Remove previous position classes
+    // Remove previous position classes
         this.tooltipBox.classList.remove('position-top', 'position-bottom', 'position-left', 'position-right', 'position-center');
         
         if (position === 'center') {
@@ -402,16 +515,9 @@ class UserGuide {
         }
         
         // Apply position with smooth transition. To avoid rounding/animation issues
-        // (which can leave the tooltip clipped at certain zoom levels), temporarily
-        // disable animations/transitions, measure, clamp into viewport, then restore
-        // and make visible.
-        const prevTransition = this.tooltipBox.style.transition;
-        const prevTransform = this.tooltipBox.style.transform;
-        const prevAnimation = this.tooltipBox.style.animation;
+        // temporarily position the tooltip, measure final rect, clamp into viewport,
+        // then restore transitions and make it visible.
         try {
-            this.tooltipBox.style.transition = 'none';
-            this.tooltipBox.style.animation = 'none';
-            this.tooltipBox.style.transform = 'none';
             this.tooltipBox.style.top = `${top}px`;
             this.tooltipBox.style.left = `${left}px`;
 
@@ -467,6 +573,14 @@ class UserGuide {
     }
 
     nextStep() {
+        // ignore navigation while transitioning
+        if (this.isTransitioning) return;
+        const nextBtn = this.tooltipBox ? this.tooltipBox.querySelector('.guide-btn-primary') : null;
+        const backBtn = this.tooltipBox ? this.tooltipBox.querySelector('.guide-btn-secondary') : null;
+        // disable buttons to avoid double clicks while we animate
+        if (nextBtn) nextBtn.disabled = true;
+        if (backBtn) backBtn.disabled = true;
+
         if (this.currentStepIndex < this.guideSteps.length - 1) {
             this.currentStepIndex++;
             this.showStep();
@@ -476,6 +590,13 @@ class UserGuide {
     }
 
     prevStep() {
+        // ignore navigation while transitioning
+        if (this.isTransitioning) return;
+        const nextBtn = this.tooltipBox ? this.tooltipBox.querySelector('.guide-btn-primary') : null;
+        const backBtn = this.tooltipBox ? this.tooltipBox.querySelector('.guide-btn-secondary') : null;
+        if (nextBtn) nextBtn.disabled = true;
+        if (backBtn) backBtn.disabled = true;
+
         if (this.currentStepIndex > 0) {
             this.currentStepIndex--;
             this.showStep();
@@ -510,6 +631,7 @@ class UserGuide {
         document.body.style.overflow = '';
         this.isActive = false;
         this.currentStepIndex = 0;
+        this.isTransitioning = false;
         this.showHelpButton();
     }
 }
