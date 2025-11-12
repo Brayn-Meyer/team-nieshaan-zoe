@@ -77,11 +77,11 @@ $adminName = "John Doe";
         <div class="row g-3 align-items-center">
             <div class="col-auto">
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-primary small-btn" onclick="window.location.href='history.php'">
+                    <button class="btn btn-primary small-btn" onclick="window.location.href='?page=history'">
                         <i class="fa-solid fa-clock-rotate-left"></i>
                         History
                     </button>
-                    <button class="btn btn-primary small-btn" onclick="window.location.href='timeLog.php'">
+                    <button class="btn btn-primary small-btn" onclick="window.location.href='?page=timeLog'">
                         <i class="fa-solid fa-calendar"></i>
                         Time Log
                     </button>
@@ -136,12 +136,52 @@ $adminName = "John Doe";
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination Controls -->
+        <div class="pagination-container" id="paginationControls" style="display: none;">
+            <div class="pagination-info">
+                <span id="paginationInfo">Showing 0 of 0 employees</span>
+            </div>
+            <div class="pagination-buttons">
+                <button class="pagination-btn" id="firstPageBtn" onclick="goToPage(1)" title="First page">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button class="pagination-btn" id="prevPageBtn" onclick="goToPage(currentPage - 1)" title="Previous page">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="pagination-pages" id="paginationPages">
+                    <!-- Page numbers will be inserted here -->
+                </div>
+                <button class="pagination-btn" id="nextPageBtn" onclick="goToPage(currentPage + 1)" title="Next page">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button class="pagination-btn" id="lastPageBtn" onclick="goToPage(totalPages)" title="Last page">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Mobile Cards -->
     <div class="d-md-none mobile-employees-container" id="mobileEmployees">
         <div class="text-center text-muted py-4">
             <i class="fa-solid fa-spinner fa-spin"></i> Loading employees...
+        </div>
+    </div>
+    
+    <!-- Mobile Pagination -->
+    <div class="d-md-none pagination-container-mobile" id="paginationControlsMobile" style="display: none;">
+        <div class="pagination-info-mobile">
+            <span id="paginationInfoMobile">Showing 0 of 0 employees</span>
+        </div>
+        <div class="pagination-buttons-mobile">
+            <button class="pagination-btn-mobile" onclick="goToPage(currentPage - 1)" id="prevPageBtnMobile">
+                <i class="fa-solid fa-chevron-left"></i> Previous
+            </button>
+            <span class="pagination-current-mobile" id="currentPageDisplay">Page 1 of 1</span>
+            <button class="pagination-btn-mobile" onclick="goToPage(currentPage + 1)" id="nextPageBtnMobile">
+                Next <i class="fa-solid fa-chevron-right"></i>
+            </button>
         </div>
     </div>
 </div>

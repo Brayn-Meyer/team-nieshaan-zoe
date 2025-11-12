@@ -9,11 +9,22 @@ require_once __DIR__ . '/../../includes/db.php';
 class EmployeeModel {
 
     /**
-     * Get all employees with their classification data
+     * Get all employees with their classification data (paginated)
      */
-    public static function getAllEmployees() {
+    public static function getAllEmployees($page = 1, $limit = 10, $search = '') {
         try {
-            $query = "
+            $offset = ($page - 1) * $limit;
+            
+            // Base query for counting total
+            $countQuery = "
+                SELECT COUNT(DISTINCT e.employee_id) as total
+                FROM employees e
+                LEFT JOIN emp_classification c 
+                    ON e.classification_id = c.classification_id
+            ";
+            
+            // Base query for fetching data
+            $dataQuery = "
                 SELECT 
                     e.employee_id,
                     e.first_name,
@@ -28,6 +39,36 @@ class EmployeeModel {
                     ON e.classification_id = c.classification_id
                 LEFT JOIN record_backups rb 
                     ON rb.employee_id = e.employee_id
+            ";
+            
+            $params = [];
+            $types = '';
+            
+            // Add search filter if provided
+            if (!empty($search)) {
+                $searchCondition = " WHERE (
+                    e.first_name LIKE ? OR 
+                    e.last_name LIKE ? OR 
+                    CONCAT(e.first_name, ' ', e.last_name) LIKE ? OR
+                    e.employee_id LIKE ? OR
+                    c.role LIKE ? OR
+                    c.department LIKE ?
+                )";
+                
+                $searchTerm = "%{$search}%";
+                $countQuery .= $searchCondition;
+                $dataQuery .= $searchCondition;
+                
+                $params = [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm];
+                $types = 'ssssss';
+            }
+            
+            // Get total count
+            $countResult = db()->query($countQuery, $params, $types);
+            $total = $countResult[0]['total'] ?? 0;
+            
+            // Add grouping, ordering, and pagination to data query
+            $dataQuery .= "
                 GROUP BY 
                     e.employee_id, 
                     e.first_name, 
@@ -35,9 +76,20 @@ class EmployeeModel {
                     c.role, 
                     c.department, 
                     DATE(rb.clockin_time)
-                ORDER BY e.employee_id;
+                ORDER BY e.employee_id
+                LIMIT ? OFFSET ?
             ";
-            return db()->query($query);
+            
+            $params[] = $limit;
+            $params[] = $offset;
+            $types .= 'ii';
+            
+            $employees = db()->query($dataQuery, $params, $types);
+            
+            return [
+                'employees' => $employees,
+                'total' => $total
+            ];
         } catch (Exception $e) {
             error_log("Error in getAllEmployees: " . $e->getMessage());
             throw $e;

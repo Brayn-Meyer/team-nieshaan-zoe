@@ -43,8 +43,13 @@ const AdminAPI = {
 
 // Employee API
 const EmployeeAPI = {
-    async getEmployees() {
-        const response = await fetch(`${API_BASE_URL}/employees/getEmployees`);
+    async getEmployees(page = 1, limit = 10, search = '') {
+        const params = new URLSearchParams({
+            page: page,
+            limit: limit,
+            search: search
+        });
+        const response = await fetch(`${API_BASE_URL}/employees/getEmployees?${params}`);
         return handleResponse(response);
     },
     

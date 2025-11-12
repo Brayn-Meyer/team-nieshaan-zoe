@@ -69,13 +69,17 @@ try {
     foreach ($dbNotifications as $dbNote) {
         $id = $dbNote['notification_id'] ?? $dbNote['id'] ?? null;
         $date = $dbNote['date_created'] ?? null;
+        $isRead = isset($dbNote['is_read']) ? (bool)$dbNote['is_read'] : false;
 
       $notification = [
     'id' => $id,
     'employee' => $dbNote['employee_name'] ?? 'Unknown',
+    'title' => $dbNote['title'] ?? '',
     'message' => $dbNote['message'] ?? '',
     'time' => $date ? formatTimeAgo($date) : '',
-    'section' => $date ? determineSection($date) : 'earlier'
+    'section' => $date ? determineSection($date) : 'earlier',
+    'read' => $isRead,
+    'is_broadcast' => isset($dbNote['is_broadcast']) ? (bool)$dbNote['is_broadcast'] : false
 ];
         if ($notification['section'] === 'today') {
             $todayNotifications[] = $notification;
@@ -99,6 +103,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $conn = $database->getConnection();
         
         switch ($_POST['action']) {
+            case 'toggle_read':
+                $notification_id = $_POST['notification_id'] ?? null;
+                if ($notification_id) {
+                    $result = toggleNotificationRead($conn, $notification_id);
+                    if (isset($result['success'])) {
+                        $_SESSION['notification_success'] = $result['success'];
+                    } else {
+                        $_SESSION['notification_error'] = $result['error'] ?? 'Failed to update notification';
+                    }
+                }
+                break;
+                
             case 'post_notification':
                 $title = trim($_POST['notification_title'] ?? '');
                 $message = trim($_POST['notification_message'] ?? '');
@@ -175,19 +191,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content rounded-3">
             <div class="modal-header d-flex justify-content-between align-items-center modal-header-custom">
-                <h5 class="modal-title mb-0 fw-semibold" id="notificationsModalLabel">Notifications</h5>
+                <h5 class="modal-title mb-0 fw-semibold" id="notificationsModalLabel">
+                    <i class="fa-solid fa-bell me-2"></i>Notifications
+                </h5>
                 <div class="d-flex align-items-center gap-2 ms-auto">
                     <button class="btn btn-sm btn-icon" 
                         data-bs-toggle="modal" data-bs-target="#postNotificationModal"
-                        aria-label="Post new notification" title="Post new notification">
+                        aria-label="Post individual notification" title="Post Individual Notification">
                         <i class="fa-solid fa-plus"></i>
                     </button>
                     <button class="btn btn-sm btn-icon" 
                         data-bs-toggle="modal" data-bs-target="#groupChatModal"
-                        aria-label="Open group chat" title="Open group chat">
+                        aria-label="Group chat and global notifications" title="Group Chat & Global Notifications">
                         <i class="fa-solid fa-comments"></i>
                     </button>
-                    <button type="button" class="btn btn-close-icon" data-bs-dismiss="modal" aria-label="Close" title="Close modal">
+                    <button type="button" class="btn btn-close-icon" data-bs-dismiss="modal" aria-label="Close" title="Close">
                         <i class="fa-solid fa-xmark fs-5"></i>
                     </button>
                 </div>
@@ -205,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                        <?php foreach ($todayNotifications as $note): ?>
     <div class="list-group-item d-flex align-items-start gap-3 py-3 <?php echo !$note['read'] ? 'bg-light-unread unread-hover' : ''; ?>">
     <div class="avatar-bell flex-shrink-0">
-        <i class="fa-solid fa-bell"></i>
+        <i class="fa-solid fa-<?php echo $note['is_broadcast'] ? 'bullhorn' : 'bell'; ?>"></i>
     </div>
     
     <div class="notification-content flex-grow-1">
@@ -213,6 +231,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <div>
                 <span class="<?php echo !$note['read'] ? 'unread-indicator' : 'read-indicator'; ?>"></span>
                 <span class="employee-name"><?php echo htmlspecialchars($note['employee']); ?></span>
+                <?php if ($note['is_broadcast']): ?>
+                    <span class="badge bg-success ms-2">Global</span>
+                <?php endif; ?>
                 <?php if (!empty($note['title'])): ?>
                     <span class="notification-title ms-2"><?php echo htmlspecialchars($note['title']); ?></span>
                 <?php endif; ?>
@@ -233,12 +254,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             </button>
         </form>
 
+        <?php if (!$note['is_broadcast']): ?>
         <button class="btn btn-action btn-outline-secondary" 
                 data-bs-toggle="modal" data-bs-target="#replyModal"
                 onclick="setReplyEmployee('<?php echo addslashes($note['employee']); ?>', '<?php echo addslashes($note['message']); ?>')"
                 title="Reply to employee">
             <i class="fa-solid fa-reply"></i>
         </button>
+        <?php endif; ?>
     </div>
 </div>
 <?php endforeach; ?>
@@ -255,31 +278,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 <div>
                     <div class="list-group list-group-flush">
                         <?php foreach ($earlierNotifications as $note): ?>
-                            <div class="list-group-item d-flex align-items-center justify-content-between py-3 >">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="avatar-bell flex-shrink-0">
-                                        <i class="fa-solid fa-bell"></i>
-                                    </div>
-                                    <div class="d-flex flex-column gap-1">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="fw-bold text-success"><?php echo htmlspecialchars($note['employee']); ?>:</div>
-                                            <div class="text-muted small"><?php echo htmlspecialchars($note['message']); ?></div>
-                                        </div>
-                                    </div>
+                            <div class="list-group-item d-flex align-items-start gap-3 py-3 <?php echo !$note['read'] ? 'bg-light-unread unread-hover' : ''; ?>">
+                                <div class="avatar-bell flex-shrink-0">
+                                    <i class="fa-solid fa-<?php echo $note['is_broadcast'] ? 'bullhorn' : 'bell'; ?>"></i>
                                 </div>
-
-                                <div class="d-flex flex-column align-items-end gap-2">
-                                    <div class="d-flex gap-2 align-items-center">
-                                        
-
-                                        <!-- <button class="btn btn-sm btn-outline-secondary" 
-                                                data-bs-toggle="modal" data-bs-target="#replyModal"
-                                                onclick="setReplyEmployee('<?php echo addslashes($note['employee']); ?>', '<?php echo addslashes($note['message']); ?>')"
-                                                title="Reply to employee">
-                                            <i class="fa-solid fa-message"></i>
-                                        </button> -->
+                                
+                                <div class="notification-content flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <span class="<?php echo !$note['read'] ? 'unread-indicator' : 'read-indicator'; ?>"></span>
+                                            <span class="employee-name"><?php echo htmlspecialchars($note['employee']); ?></span>
+                                            <?php if ($note['is_broadcast']): ?>
+                                                <span class="badge bg-success ms-2">Global</span>
+                                            <?php endif; ?>
+                                            <?php if (!empty($note['title'])): ?>
+                                                <span class="notification-title ms-2"><?php echo htmlspecialchars($note['title']); ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <small class="notification-time"><?php echo htmlspecialchars($note['time']); ?></small>
                                     </div>
-                                    <small class="text-muted"><?php echo htmlspecialchars($note['time']); ?></small>
+                                    
+                                    <p class="notification-message mb-0"><?php echo htmlspecialchars($note['message']); ?></p>
+                                </div>
+                                
+                                <div class="notification-actions flex-shrink-0">
+                                    <form method="POST" class="d-inline">
+                                        <input type="hidden" name="action" value="toggle_read">
+                                        <input type="hidden" name="notification_id" value="<?php echo $note['id']; ?>">
+                                        <button class="btn btn-action <?php echo $note['read'] ? 'btn-outline-secondary' : 'btn-outline-success'; ?>" 
+                                                title="<?php echo $note['read'] ? 'Mark as unread' : 'Mark as read'; ?>">
+                                            <i class="fa-solid fa-<?php echo $note['read'] ? 'envelope' : 'envelope-open'; ?>"></i>
+                                        </button>
+                                    </form>
+
+                                    <?php if (!$note['is_broadcast']): ?>
+                                    <button class="btn btn-action btn-outline-secondary" 
+                                            data-bs-toggle="modal" data-bs-target="#replyModal"
+                                            onclick="setReplyEmployee('<?php echo addslashes($note['employee']); ?>', '<?php echo addslashes($note['message']); ?>')"
+                                            title="Reply to employee">
+                                        <i class="fa-solid fa-reply"></i>
+                                    </button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -597,10 +636,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     flex-shrink: 0;
 }
 
+/* Global notification styling */
+.fa-bullhorn {
+    animation: pulse-global 2s infinite;
+}
+
+@keyframes pulse-global {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, #2EB28A, #27a87c) !important;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    font-weight: 600;
+}
+
 /* Notification Content */
 .notification-content {
     flex: 1;
-    text-align: center;
 }
 
 .employee-name {
@@ -612,10 +668,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 .notification-message {
     color: #4a5568;
     font-size: 0.9rem;
-    line-height: 1.4;
-    margin: 0.25rem 0;
-    text-align: center;
-
+    line-height: 1.5;
+    margin: 0;
 }
 
 .notification-title {
@@ -627,8 +681,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     border-radius: 12px;
     display: inline-block;
     border: 1px solid #c6f6e4;
-    text-align: center;
-
 }
 
 /* Action Buttons */
@@ -636,6 +688,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .btn-action {
@@ -648,6 +701,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     justify-content: center;
     transition: all 0.3s ease;
     font-size: 0.85rem;
+    flex-shrink: 0;
 }
 
 .btn-action:hover {
@@ -682,7 +736,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     color: #718096;
     font-size: 0.8rem;
     font-weight: 500;
-    margin-top: 0.5rem;
+    white-space: nowrap;
 }
 
 /* Empty State */
@@ -800,8 +854,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
     .list-group-item {
         padding: 1rem;
-        flex-direction: column;
-        gap: 1rem;
     }
     
     .avatar-bell {
@@ -811,11 +863,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
     
     .notification-actions {
-        align-self: flex-end;
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
     }
     
     .notification-content {
         width: 100%;
+    }
+    
+    .employee-name {
+        font-size: 0.9rem;
+    }
+    
+    .notification-message {
+        font-size: 0.85rem;
+    }
+    
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+    
+    .modal-footer .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .notification-time {
+        font-size: 0.7rem;
+    }
+    
+    .notification-title {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+    }
+    
+    .badge {
+        font-size: 0.65rem;
     }
 }
 

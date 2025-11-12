@@ -6,6 +6,10 @@
 let allEmployees = [];
 let roles = [];
 let departments = [];
+let currentPage = 1;
+let totalPages = 1;
+let totalEmployees = 0;
+let perPage = 10;
 
 // Initialize dashboard on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -34,16 +38,28 @@ async function fetchKpiData() {
     }
 }
 
-// Fetch all employees
-async function fetchEmployees() {
+// Fetch all employees with pagination
+async function fetchEmployees(page = 1) {
     try {
-        const data = await EmployeeAPI.getEmployees();
+        const searchQuery = document.getElementById('searchInput').value.trim();
+        const data = await EmployeeAPI.getEmployees(page, perPage, searchQuery);
+        
         allEmployees = data.employees || [];
+        
+        // Update pagination variables
+        if (data.pagination) {
+            currentPage = data.pagination.current_page;
+            totalPages = data.pagination.total_pages;
+            totalEmployees = data.pagination.total_employees;
+            perPage = data.pagination.per_page;
+        }
+        
         renderEmployees(allEmployees);
+        updatePaginationUI();
     } catch (error) {
         console.error('Error fetching employees:', error);
         document.getElementById('employeeTableBody').innerHTML = `
-            <tr><td colspan="6" class="text-center text-danger">Error loading employees</td></tr>
+            <tr><td colspan="7" class="text-center text-danger">Error loading employees</td></tr>
         `;
         document.getElementById('mobileEmployees').innerHTML = `
             <div class="text-center text-danger py-4">Error loading employees</div>
@@ -57,7 +73,7 @@ function renderEmployees(employees) {
     const tableBody = document.getElementById('employeeTableBody');
     if (employees.length === 0) {
         tableBody.innerHTML = `
-            <tr><td colspan="6" class="text-center text-muted">No employees found</td></tr>
+            <tr><td colspan="7" class="text-center text-muted">No employees found</td></tr>
         `;
     } else {
         tableBody.innerHTML = employees.map(emp => `
@@ -66,8 +82,8 @@ function renderEmployees(employees) {
                 <td>${emp.employeeId}</td>
                 <td>${escapeHtml(emp.department)}</td>
                 <td>${escapeHtml(emp.roles)}</td>
-                <td>${escapeHtml(emp.lastClockIn)}</td>
-                <td>${escapeHtml(emp.lastClockOut)}</td>
+                <td>${emp.lastClockIn || '-'}</td>
+                <td>${emp.lastClockOut || '-'}</td>
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" data-employee-id="${emp.id}">
@@ -95,10 +111,10 @@ function renderEmployees(employees) {
                 <div class="card-header">
                     <div class="employee-info">
                         <h6 class="employee-name">${escapeHtml(emp.name)}</h6>
-                        <span class="employee-id">${emp.employeeId}</span>
+                        <span class="employee-id">ID: ${emp.employeeId}</span>
                     </div>
                     <div class="status-indicator">
-                        <i class="fa-solid fa-circle-dot" style="color: ${emp.status === 'Active' ? '#00ffb3' : '#6c757d'}"></i>
+                        <i class="fa-solid fa-circle-dot" style="color: ${emp.status === 'Active' ? '#2EB28A' : '#6c757d'}"></i>
                     </div>
                 </div>
                 <div class="card-body">
@@ -112,18 +128,22 @@ function renderEmployees(employees) {
                             <span class="value">${escapeHtml(emp.department)}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="label">Status:</span>
-                            <span class="value">${escapeHtml(emp.status)}</span>
+                            <span class="label">Clock In:</span>
+                            <span class="value">${emp.lastClockIn || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Clock Out:</span>
+                            <span class="value">${emp.lastClockOut || '-'}</span>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer">
                     <div class="action-buttons">
                         <button class="btn btn-sm btn-outline-primary" onclick="openEditModal(${emp.id})">
-                            <i class="fa-solid fa-pen"></i>
+                            <i class="fa-solid fa-pen"></i> Edit
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete(${emp.id}, '${escapeHtml(emp.name)}')">
-                            <i class="fa-solid fa-trash"></i>
+                            <i class="fa-solid fa-trash"></i> Delete
                         </button>
                     </div>
                 </div>
@@ -137,14 +157,90 @@ function renderEmployees(employees) {
 
 // Filter employees based on search
 function filterEmployees() {
-    const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allEmployees.filter(emp => 
-        emp.name.toLowerCase().includes(searchQuery) ||
-        String(emp.employeeId).includes(searchQuery) ||
-        emp.department.toLowerCase().includes(searchQuery) ||
-        emp.roles.toLowerCase().includes(searchQuery)
-    );
-    renderEmployees(filtered);
+    // Reset to page 1 when searching
+    currentPage = 1;
+    fetchEmployees(currentPage);
+}
+
+// Pagination functions
+function goToPage(page) {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    currentPage = page;
+    fetchEmployees(currentPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updatePaginationUI() {
+    const paginationControls = document.getElementById('paginationControls');
+    const paginationControlsMobile = document.getElementById('paginationControlsMobile');
+    
+    // Show/hide pagination based on results
+    if (totalEmployees === 0) {
+        paginationControls.style.display = 'none';
+        paginationControlsMobile.style.display = 'none';
+        return;
+    }
+    
+    paginationControls.style.display = 'flex';
+    paginationControlsMobile.style.display = 'flex';
+    
+    // Update pagination info
+    const start = (currentPage - 1) * perPage + 1;
+    const end = Math.min(currentPage * perPage, totalEmployees);
+    const infoText = `Showing ${start}-${end} of ${totalEmployees} employees`;
+    
+    document.getElementById('paginationInfo').textContent = infoText;
+    document.getElementById('paginationInfoMobile').textContent = infoText;
+    document.getElementById('currentPageDisplay').textContent = `Page ${currentPage} of ${totalPages}`;
+    
+    // Update button states
+    const firstBtn = document.getElementById('firstPageBtn');
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+    const lastBtn = document.getElementById('lastPageBtn');
+    const prevBtnMobile = document.getElementById('prevPageBtnMobile');
+    const nextBtnMobile = document.getElementById('nextPageBtnMobile');
+    
+    firstBtn.disabled = currentPage === 1;
+    prevBtn.disabled = currentPage === 1;
+    prevBtnMobile.disabled = currentPage === 1;
+    
+    nextBtn.disabled = currentPage === totalPages;
+    lastBtn.disabled = currentPage === totalPages;
+    nextBtnMobile.disabled = currentPage === totalPages;
+    
+    // Generate page numbers
+    generatePageNumbers();
+}
+
+function generatePageNumbers() {
+    const paginationPages = document.getElementById('paginationPages');
+    const maxVisiblePages = 5;
+    let pages = [];
+    
+    if (totalPages <= maxVisiblePages) {
+        // Show all pages
+        for (let i = 1; i <= totalPages; i++) {
+            pages.push(i);
+        }
+    } else {
+        // Show pages with ellipsis
+        if (currentPage <= 3) {
+            pages = [1, 2, 3, 4, '...', totalPages];
+        } else if (currentPage >= totalPages - 2) {
+            pages = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+        } else {
+            pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+        }
+    }
+    
+    paginationPages.innerHTML = pages.map(page => {
+        if (page === '...') {
+            return '<span class="pagination-ellipsis">...</span>';
+        }
+        return `<button class="pagination-page-btn ${page === currentPage ? 'active' : ''}" 
+                        onclick="goToPage(${page})">${page}</button>`;
+    }).join('');
 }
 
 // Load roles and departments for dropdowns

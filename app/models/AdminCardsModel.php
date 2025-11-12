@@ -74,15 +74,7 @@ class AdminCardsModel {
     public static function getTotalAbsent() {
         try {
             $today = date('Y-m-d');
-            $query = "SELECT 
-                        COUNT(DISTINCT e.employee_id) AS total_absent
-                    FROM employees e
-                    LEFT JOIN record_backups rb 
-                        ON rb.employee_id = e.employee_id
-                    WHERE DATE(rb.clockin_time) = ?
-                        AND rb.clockin_time IS NULL
-                        AND rb.clockout_time IS NULL;
-                    ";
+            $query = "SELECT ((SELECT COUNT(DISTINCT(employee_id)) FROM employees))-(SELECT COUNT(DISTINCT(employee_id)) FROM record_backups WHERE (clockin_time IS NULL AND date = ?) AND clockout_time IS NULL) AS total_absent;";
             $result = db()->query($query, [$today], 's');
             return $result[0]['total_absent'] ?? 0;
         } catch (Exception $e) {
