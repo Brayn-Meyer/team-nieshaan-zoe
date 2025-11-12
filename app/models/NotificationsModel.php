@@ -7,7 +7,6 @@ function getNotificationsWithEmployees($conn) {
                 nr.title,
                 nr.message,
                 nr.date_created,
-                nr.is_read,
                 nr.is_broadcast,
                 CASE 
                     WHEN nr.is_broadcast = 1 THEN 'All Employees'

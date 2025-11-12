@@ -229,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <div class="notification-content flex-grow-1">
         <div class="d-flex justify-content-between align-items-start mb-2">
             <div>
-                <span class="<?php echo !$note['read'] ? 'unread-indicator' : 'read-indicator'; ?>"></span>
+                <!-- <span class="<?php echo !$note['read'] ? 'unread-indicator' : 'read-indicator'; ?>"></span> -->
                 <span class="employee-name"><?php echo htmlspecialchars($note['employee']); ?></span>
                 <?php if ($note['is_broadcast']): ?>
                     <span class="badge bg-success ms-2">Global</span>
@@ -248,19 +248,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         <form method="POST" class="d-inline">
             <input type="hidden" name="action" value="toggle_read">
             <input type="hidden" name="notification_id" value="<?php echo $note['id']; ?>">
-            <button class="btn btn-action <?php echo $note['read'] ? 'btn-outline-secondary' : 'btn-outline-success'; ?>" 
+            <!-- <button class="btn btn-action <?php echo $note['read'] ? 'btn-outline-secondary' : 'btn-outline-success'; ?>" 
                     title="<?php echo $note['read'] ? 'Mark as unread' : 'Mark as read'; ?>">
                 <i class="fa-solid fa-<?php echo $note['read'] ? 'envelope' : 'envelope-open'; ?>"></i>
-            </button>
+            </button> -->
         </form>
 
         <?php if (!$note['is_broadcast']): ?>
-        <button class="btn btn-action btn-outline-secondary" 
+        <!-- <button class="btn btn-action btn-outline-secondary" 
                 data-bs-toggle="modal" data-bs-target="#replyModal"
                 onclick="setReplyEmployee('<?php echo addslashes($note['employee']); ?>', '<?php echo addslashes($note['message']); ?>')"
                 title="Reply to employee">
             <i class="fa-solid fa-reply"></i>
-        </button>
+        </button> -->
         <?php endif; ?>
     </div>
 </div>
@@ -305,19 +305,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                     <form method="POST" class="d-inline">
                                         <input type="hidden" name="action" value="toggle_read">
                                         <input type="hidden" name="notification_id" value="<?php echo $note['id']; ?>">
-                                        <button class="btn btn-action <?php echo $note['read'] ? 'btn-outline-secondary' : 'btn-outline-success'; ?>" 
+                                        <!-- <button class="btn btn-action <?php echo $note['read'] ? 'btn-outline-secondary' : 'btn-outline-success'; ?>" 
                                                 title="<?php echo $note['read'] ? 'Mark as unread' : 'Mark as read'; ?>">
                                             <i class="fa-solid fa-<?php echo $note['read'] ? 'envelope' : 'envelope-open'; ?>"></i>
-                                        </button>
+                                        </button> -->
                                     </form>
 
                                     <?php if (!$note['is_broadcast']): ?>
-                                    <button class="btn btn-action btn-outline-secondary" 
+                                    <!-- <button class="btn btn-action btn-outline-secondary" 
                                             data-bs-toggle="modal" data-bs-target="#replyModal"
                                             onclick="setReplyEmployee('<?php echo addslashes($note['employee']); ?>', '<?php echo addslashes($note['message']); ?>')"
                                             title="Reply to employee">
                                         <i class="fa-solid fa-reply"></i>
-                                    </button>
+                                    </button> -->
                                     <?php endif; ?>
                                 </div>
                             </div>
