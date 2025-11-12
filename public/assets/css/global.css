@@ -59,6 +59,23 @@ body.dark-mode {
     color: #ffffff !important;
 }
 
+/* Theme variables — centralize palette for light/dark mode */
+:root {
+  --accent: #2EB28A;
+  --accent-dark: #259673;
+  --card-dark-bg: #232E2F; /* default dark card background (replaces #374151 usage) */
+  --muted-dark: #374151;   /* legacy muted/dark slate color (centralized) */
+  --row-dark-bg: #2b3b3b;
+  --card-dark-text: #e6efec;
+}
+
+/* Dark mode variable overrides (if needed) */
+body.dark-mode {
+  --card-dark-bg: #232E2F;
+  --row-dark-bg: #2b3b3b;
+  --card-dark-text: #e6efec;
+}
+
 body.dark-mode h1 {
     color: #fff !important;
 }
@@ -286,6 +303,66 @@ body.dark-mode .app-navbar .nav-link {
   color: #ffffff !important;
 }
 
+/* ------------------------------------------------------------------
+   Enforce consistent table header styling across all device sizes
+   and prevent any responsive media queries from changing the table
+   header color (avoids unexpected blue/alternate colors on small screens)
+   ------------------------------------------------------------------ */
+.employee-table thead th {
+  background: #2EB28A !important; /* brand teal */
+  color: #ffffff !important;
+}
+
+/* Also force the same color in dark-mode so the header remains consistent */
+body.dark-mode .employee-table thead th {
+  background: #2EB28A !important;
+  color: #ffffff !important;
+}
+
+/* ------------------------------------------------------------------
+   Force consistent table and card colors across all media queries
+   This prevents any responsive rules from unintentionally changing
+   table or card colors on smaller devices.
+   ------------------------------------------------------------------ */
+/* Desktop / Light mode defaults */
+.employee-table thead th {
+  background: #2EB28A !important;
+  color: #ffffff !important;
+}
+.employee-table tbody tr {
+  background: #f1f5f5 !important;
+  color: #2c3838 !important;
+}
+
+/* Dark mode defaults */
+body.dark-mode .employee-table tbody tr {
+  background: var(--row-dark-bg) !important;
+  color: #d7e7e3 !important;
+}
+
+/* Ensure employee card headers stay consistent */
+.employee-card .card-header,
+body.dark-mode .employee-card .card-header {
+  background: #f8fafc !important; /* default light header */
+  color: inherit !important;
+}
+
+/* In dark mode keep the card header darker but consistent (no blue tints) */
+body.dark-mode .employee-card .card-header {
+  background: var(--card-dark-bg) !important;
+  color: #f9fafb !important;
+}
+
+/* Prevent media queries from overriding the table/card palette */
+@media (max-width: 1024px) {
+  .employee-table thead th,
+  .employee-table tbody tr,
+  .employee-card .card-header {
+    background: unset !important; /* allow the rules above to win */
+    color: inherit !important;
+  }
+}
+
 /* Remove any pseudo-elements that might be drawing a dark panel behind nav items */
 .app-navbar .app-navbar-inner::before,
 .app-navbar .app-navbar-inner::after,
@@ -484,9 +561,9 @@ body.dark-mode .search-container .search-input,
 body.dark-mode .week-select,
 body.dark-mode .filter-input,
 body.dark-mode input[type="date"] {
-  background-color: #1a2424 !important;
+  background-color: var(--card-dark-bg) !important;
   color: #e6efec !important;
-  border: 1px solid #374151 !important;
+  border: 1px solid var(--card-dark-bg) !important;
 }
 
 /* Table text/colors */

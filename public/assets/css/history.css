@@ -536,7 +536,7 @@ p {
 /* Dark Mode Styles for History Mobile Cards */
 body.dark-mode .history-card {
     background-color: var(--card-dark-bg) !important;
-    border-color: #374151 !important;
+    border-color: var(--card-dark-bg) !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 

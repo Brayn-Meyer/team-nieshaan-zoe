@@ -117,7 +117,7 @@
 .guide-body p {
     margin: 0 0 15px 0;
     line-height: 1.6;
-    color: #374151;
+    color: var(--muted-dark);
     font-size: 1em;
 }
 
