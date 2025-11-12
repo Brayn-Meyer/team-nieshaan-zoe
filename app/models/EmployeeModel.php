@@ -296,7 +296,14 @@ class EmployeeModel {
      */
     public static function deleteEmployee($employeeId) {
         try {
-            $query = "DELETE FROM employees WHERE employee_id = ?";
+            $query = "DELETE e, r, n, no, a, h
+                FROM employees e
+                LEFT JOIN record_backups r ON e.employee_id = r.employee_id
+                LEFT JOIN nfctag_storage n ON e.employee_id = n.employee_id
+                LEFT JOIN notifications_records no ON e.employee_id = no.employee_id
+                LEFT JOIN account_auth a ON e.employee_id = a.employee_id
+                LEFT JOIN hours_management h ON e.employee_id = h.employee_id
+                WHERE e.employee_id = ?;";
             $success = db()->execute($query, [$employeeId], 'i');
             
             return [
