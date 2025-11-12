@@ -312,7 +312,7 @@ body.dark-mode .employee-card {
 }
 
 body.dark-mode .employee-card .card-header {
-    background: #374151 !important;
+    background: var(--card-dark-bg) !important;
     border-bottom-color: #4b5563 !important;
 }
 
@@ -337,7 +337,7 @@ body.dark-mode .detail-item .value {
 }
 
 body.dark-mode .employee-card .card-footer {
-    background: #374151 !important;
+    background: var(--card-dark-bg) !important;
     border-top-color: #4b5563 !important;
 }
 

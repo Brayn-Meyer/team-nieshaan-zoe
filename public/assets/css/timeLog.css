@@ -38,7 +38,7 @@
 
 /* Dark mode styles for search input */
 body.dark-mode .search-container .search-input {
-    background-color: #374151 !important;
+    background-color: var(--card-dark-bg) !important;
     border-color: #4b5563 !important;
     color: #f9fafb !important;
 }
@@ -437,7 +437,7 @@ body.dark-mode .timelog-filters {
 }
 
 body.dark-mode .week-select {
-    background-color: #374151 !important;
+    background-color: var(--card-dark-bg) !important;
     border-color: #4b5563 !important;
     color: #f9fafb !important;
 }
@@ -461,11 +461,11 @@ body.dark-mode .time-log-table {
 
 body.dark-mode .time-log-table tbody td {
     color: #d1d5db !important;
-    border-bottom-color: #374151 !important;
+    border-bottom-color: var(--card-dark-bg) !important;
 }
 
 body.dark-mode .time-log-table tbody tr:hover {
-    background-color: #374151 !important;
+    background-color: var(--card-dark-bg) !important;
 }
 
 body.dark-mode .no-results {
@@ -478,11 +478,11 @@ body.dark-mode .mobile-cards {
 }
 
 body.dark-mode .mobile-card {
-    border-bottom-color: #374151 !important;
+    border-bottom-color: var(--card-dark-bg) !important;
 }
 
 body.dark-mode .mobile-card:hover {
-    background-color: #374151 !important;
+    background-color: var(--card-dark-bg) !important;
 }
 
 body.dark-mode .mobile-card-title {

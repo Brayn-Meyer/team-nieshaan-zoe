@@ -72,7 +72,7 @@ body:not(.dark-mode) .guide-content {
 
 body.dark-mode .guide-content {
     background: #1f2937 !important;
-    border-color: #374151 !important;
+    border-color: var(--card-dark-bg) !important;
 }
 
 .guide-header {
@@ -102,7 +102,7 @@ body.dark-mode .guide-header h3 {
 }
 
 body.dark-mode .guide-header {
-    border-bottom-color: #374151 !important;
+    border-bottom-color: var(--card-dark-bg) !important;
 }
 
 .close-btn {
@@ -143,14 +143,14 @@ body.dark-mode .close-btn:hover {
 .guide-body p {
     margin: 0 0 15px 0;
     line-height: 1.6;
-    color: #374151;
+    color: var(--muted-dark);
     font-size: 1em;
     background: transparent !important;
 }
 
 /* Ensure body text is visible in both themes */
 body:not(.dark-mode) .guide-body p {
-    color: #374151 !important;
+    color: var(--muted-dark) !important;
 }
 
 body.dark-mode .guide-body p {
@@ -332,7 +332,7 @@ body.dark-mode .guide-footer {
 }
 
 .guide-body p {
-    color: #374151;
+    color: var(--muted-dark);
 }
 
 .close-btn {

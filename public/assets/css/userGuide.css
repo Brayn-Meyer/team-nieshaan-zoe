@@ -497,7 +497,7 @@ body.dark-mode .guide-content {
 }
 
 body.dark-mode .guide-footer {
-    border-top-color: #374151 !important;
+    border-top-color: var(--card-dark-bg) !important;
     background: transparent !important;
 }
 
@@ -510,7 +510,7 @@ body.dark-mode .guide-buttons {
 }
 
 body.dark-mode .guide-btn-secondary {
-    background: #374151 !important;
+    background: var(--card-dark-bg) !important;
     color: #d1d5db !important;
 }
 
@@ -538,7 +538,7 @@ body.dark-mode .guide-body p {
 /* Fix tooltip header in dark mode */
 body.dark-mode .guide-header {
     background: transparent !important;
-    border-bottom-color: #374151 !important;
+    border-bottom-color: var(--card-dark-bg) !important;
 }
 
 /* Temporary high-contrast styles applied to the target element while the guide is active.
