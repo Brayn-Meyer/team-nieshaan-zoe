@@ -74,14 +74,21 @@ class AdminCardsModel {
     public static function getTotalAbsent() {
         try {
             $today = date('Y-m-d');
-            $query = "SELECT ((SELECT COUNT(DISTINCT(employee_id)) FROM employees))-(SELECT COUNT(DISTINCT(employee_id)) FROM record_backups WHERE (clockin_time IS NULL AND date = ?) AND clockout_time IS NULL) AS total_absent;";
+            $query = "SELECT 
+                        COUNT(DISTINCT e.employee_id) AS total_absent
+                    FROM employees e
+                    LEFT JOIN record_backups rb 
+                        ON rb.employee_id = e.employee_id
+                        AND DATE(rb.clockin_time) = ?
+                    WHERE rb.employee_id IS NULL;";
             $result = db()->query($query, [$today], 's');
             return $result[0]['total_absent'] ?? 0;
         } catch (Exception $e) {
-            error_log("Error in getTotalAbsent: " . $e->getMessage());
+            error_log('Error in getTotalAbsent: ' . $e->getMessage());
             return 0;
         }
     }
+
 
     /**
      * Get all KPI data at once
