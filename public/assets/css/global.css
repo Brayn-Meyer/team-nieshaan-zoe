@@ -370,10 +370,10 @@ body.dark-mode .app-navbar #theme-toggle .fa-sun {
    the tooltip/modal appear see-through. */
 body.dark-mode .user-guide-overlay .guide-content,
 body.dark-mode .user-guide-overlay .guide-tooltip {
-  /* Use the card dark variable so guide tooltips match panels (removes bluish tint) */
-  background: var(--card-dark-bg) !important;
+  /* Force the modal and tooltip background to the requested dark panel color */
+  background: #232E2F !important;
   color: #e6efec !important;
-  border-color: var(--row-dark-bg) !important;
+  border-color: #263033 !important;
 }
 
 /* Remove the unwanted footer/banner background in light mode within the guide only */
@@ -555,13 +555,17 @@ body.dark-mode .user-guide-overlay {
 }
 
 body.dark-mode .search-container input,
+body.dark-mode .search-container input,
 body.dark-mode .search-container .search-input {
-  /* Input sits over the dark panel. Keep input background transparent so it matches the panel,
-     but ensure the text is light and clearly readable. Remove input border so container border is used. */
-  background-color: transparent !important;
-  color: #e6efec !important;
-  border: none !important;
-  box-shadow: none !important;
+  /* Make the search input clearly visible in dark mode while keeping
+     the same layout, padding and rounded corners as light mode. */
+  background-color: #232E2F !important; /* slightly lighter dark background */
+  color: #ffffff !important;            /* white text */
+  border: 1px solid rgba(255,255,255,0.08) !important; /* thin, soft border */
+  border-radius: 8px !important;        /* match light-mode corners */
+  padding: 10px 14px !important;        /* match light-mode padding */
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.25) !important;
+  outline: none !important;
 }
 
 /* Placeholder styling */
@@ -572,10 +576,11 @@ body.dark-mode .search-container .search-input {
 }
 
 body.dark-mode .search-container input::placeholder,
+body.dark-mode .search-container input::placeholder,
 body.dark-mode .search-container .search-input::placeholder {
-  /* slightly brighter placeholder for legibility */
-  color: rgba(156,163,175,0.9) !important; /* ~#9ca3af at 90% */
-  opacity: 1;
+  /* light gray placeholder for legibility in dark mode */
+  color: #bfc6c7 !important;
+  opacity: 1 !important;
 }
 
 /* Focused state */
@@ -587,9 +592,65 @@ body.dark-mode .search-container .search-input::placeholder {
 
 body.dark-mode .search-container input:focus,
 body.dark-mode .search-container .search-input:focus {
-  border-color: #2EB28A !important;
-  box-shadow: 0 0 0 3px rgba(46, 178, 138, 0.2) !important;
+  /* subtle green accent on focus */
+  border-color: rgba(46,178,138,0.18) !important;
+  box-shadow: 0 0 0 4px rgba(46,178,138,0.06) !important;
 }
+
+/* Final strong override: target the actual input by id and by class to force readable text
+   and caret color across browsers. Keeps layout/padding the same but ensures the
+   content is visible even if other styles try to dim it. */
+body.dark-mode #searchEmployee,
+body.dark-mode input#searchEmployee,
+body.dark-mode .search-container input.search-input,
+body.dark-mode .search-container input[type="text"],
+body.dark-mode .search-container input[type="search"] {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  caret-color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important; /* Safari */
+  background-color: #232E2F !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+
+/* Ensure no parent opacity or filter hides the input text -- if a parent has opacity,
+   it's harder to override with CSS; this helps but if issue persists inspect parent rules. */
+body.dark-mode .search-container,
+body.dark-mode .search-container * {
+  opacity: 1 !important;
+}
+
+/* Emergency override: if the input text is still not visible this block forces
+   readable text and disables blending/filtering that can dim text on some themes
+   or browser heuristics. Targets known IDs/classes used in the project. */
+body.dark-mode input#searchEmployee,
+body.dark-mode input#searchInput,
+body.dark-mode input.search-input,
+body.dark-mode .search-container input.search-input,
+body.dark-mode .search-container input[type="text"],
+body.dark-mode .search-container input[type="search"] {
+  color: #ffffff !important;                    /* visible text */
+  -webkit-text-fill-color: #ffffff !important;  /* safari */
+  caret-color: #ffffff !important;               /* caret */
+  opacity: 1 !important;                         /* remove accidental dimming */
+  mix-blend-mode: normal !important;             /* prevent blend modes */
+  filter: none !important;                       /* remove CSS filters */
+  text-shadow: none !important;                  /* clear any shadow that masks text */
+  background-color: #232E2F !important;
+  border-color: rgba(255,255,255,0.14) !important;
+}
+
+/* Make sure placeholder stays light gray even after stronger overrides */
+body.dark-mode input#searchEmployee::placeholder,
+body.dark-mode input#searchInput::placeholder,
+body.dark-mode .search-container input::placeholder,
+body.dark-mode .search-container .search-input::placeholder {
+  color: #bfc6c7 !important;
+  opacity: 1 !important;
+}
+
+/* If the input is still hidden, a parent may use a color with higher specificity
+   — inspecting computed styles in DevTools will show the offender. */
 
 /* Guide tooltip specific styles in dark mode */
 body.dark-mode .guide-tooltip {
@@ -662,4 +723,137 @@ body[data-guide-active="history"] #userGuideOverlay {
   /* show the green outline and dim the rest of the page */
   box-shadow: 0 0 0 4px rgba(46,178,138,0.3), 0 0 0 9999px rgba(0,0,0,0.6) !important;
   background: transparent !important;
+}
+
+/* Strong override: ensure search input is visible in dark mode even if other rules conflict.
+   Placed at the end of the file so it has highest priority (uses multiple specific selectors).
+   If the input still appears hidden, try a hard refresh (Ctrl+F5) or check markup for a different
+   class/selector. */
+body.dark-mode .search-container input.search-input,
+body.dark-mode .search-container input[type="text"],
+body.dark-mode .search-container input[type="search"],
+body.dark-mode .search-container .search-input,
+body.dark-mode .search-add-container .search-input {
+  background-color: #2b2f31 !important; /* slightly lighter dark background */
+  color: #ffffff !important;            /* white text */
+  border: 1px solid rgba(255,255,255,0.12) !important; /* slightly stronger thin border */
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.02) !important;
+  background-image: none !important;
+  opacity: 1 !important;
+}
+
+/* FINAL EMERGENCY OVERRIDE FOR USER-GUIDE MODAL BACKGROUND IN DARK MODE
+   Some guide styles are defined in `userGuide.css` and may load after this file.
+   To guarantee the modal and its inner panels use #232E2F, apply a very high-specificity
+   rule that targets the overlay, tooltip, inner, header and footer. This uses
+   an explicit `html body.dark-mode` prefix to increase specificity above other rules. */
+html body.dark-mode .user-guide-overlay .guide-tooltip,
+html body.dark-mode .guide-tooltip,
+html body.dark-mode .user-guide-overlay .guide-content,
+html body.dark-mode .guide-tooltip-inner,
+html body.dark-mode .guide-header,
+html body.dark-mode .guide-footer,
+html body.dark-mode .guide-body,
+html body.dark-mode .guide-content {
+  background: #232E2F !important;
+  color: #e6efec !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important;
+  border-color: #263033 !important;
+}
+
+/* Also ensure the tooltip arrows (before/after) don't create a navy seam */
+html body.dark-mode .guide-tooltip.position-bottom::before,
+html body.dark-mode .guide-tooltip.position-top::before {
+  border-bottom-color: #232E2F !important;
+  border-top-color: #232E2F !important;
+}
+
+/* Force titles to be bright white in dark mode (history page, guides, cards, headings) */
+html body.dark-mode .history-title,
+html body.dark-mode .history-subtitle,
+html body.dark-mode .guide-title,
+html body.dark-mode h1,
+html body.dark-mode .card-title {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/* Also ensure header/subtitle contrast isn't reduced by parent opacity or filters */
+html body.dark-mode .history-header,
+html body.dark-mode .guide-header,
+html body.dark-mode .card {
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Force filter labels and small form labels to be white in dark mode */
+html body.dark-mode .filter-label,
+html body.dark-mode .filters-card .filter-label,
+html body.dark-mode .filter-group label,
+html body.dark-mode .filter-input::placeholder {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/* Placeholder color variations for different browsers */
+body.dark-mode .search-container input::placeholder,
+body.dark-mode .search-container input::-webkit-input-placeholder,
+body.dark-mode .search-container input:-ms-input-placeholder,
+body.dark-mode .search-container .search-input::placeholder,
+body.dark-mode .search-container .search-input::-webkit-input-placeholder,
+body.dark-mode .search-container .search-input:-ms-input-placeholder {
+  color: #bfc6c7 !important; /* light gray placeholder */
+  opacity: 1 !important;
+}
+
+body.dark-mode .search-container input:focus,
+body.dark-mode .search-container .search-input:focus {
+  border-color: rgba(46,178,138,0.22) !important;
+  box-shadow: 0 0 0 4px rgba(46,178,138,0.06) !important;
+}
+
+/* Fix: ensure context menus / popups inside tables are not clipped at the bottom
+   and always render above table content. This prevents the white menu from being
+   cut off when it appears near the bottom of a scrolled container. */
+.table-container,
+.table-wrapper,
+.table-responsive,
+.dashboard-main,
+.main-container,
+.content-wrapper {
+  overflow: visible !important; /* allow child popups to overflow outside */
+}
+
+/* Force popups/menus to render above other content and ensure they are positioned
+   correctly. Add common menu/dropdown selectors used across the app. */
+.popup-overlay,
+.popup-container,
+.popup-content,
+.dropdown-menu,
+.context-menu,
+.action-menu,
+.menu,
+.menu-content {
+  z-index: 99999 !important;
+  position: absolute !important;
+}
+
+/* Style for dropdowns/menus so they remain visible and readable */
+.dropdown-menu,
+.context-menu,
+.action-menu {
+  background: #ffffff !important;
+  color: #222 !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
+  border-radius: 8px !important;
+}
+
+/* If menus are still partially off-screen, this helps anchor them inside viewport. */
+.popup-container[style],
+.dropdown-menu[style],
+.context-menu[style] {
+  overflow: visible !important;
 }
