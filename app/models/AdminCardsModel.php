@@ -79,17 +79,16 @@ class AdminCardsModel {
                     FROM employees e
                     LEFT JOIN record_backups rb 
                         ON rb.employee_id = e.employee_id
-                    WHERE DATE(rb.clockin_time) = ?
-                        AND rb.clockin_time IS NULL
-                        AND rb.clockout_time IS NULL;
-                    ";
+                        AND DATE(rb.clockin_time) = ?
+                    WHERE rb.employee_id IS NULL;";
             $result = db()->query($query, [$today], 's');
             return $result[0]['total_absent'] ?? 0;
         } catch (Exception $e) {
-            error_log("Error in getTotalAbsent: " . $e->getMessage());
+            error_log('Error in getTotalAbsent: ' . $e->getMessage());
             return 0;
         }
     }
+
 
     /**
      * Get all KPI data at once

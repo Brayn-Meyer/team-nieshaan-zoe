@@ -73,7 +73,15 @@ class EmployeeController {
     
     private static function getEmployees() {
         try {
-            $employees = EmployeeModel::getAllEmployees();
+            // Get pagination parameters
+            $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+            $limit = isset($_GET['limit']) ? max(1, min(100, intval($_GET['limit']))) : 10;
+            $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+            
+            $result = EmployeeModel::getAllEmployees($page, $limit, $search);
+            $employees = $result['employees'];
+            $totalEmployees = $result['total'];
+            $totalPages = ceil($totalEmployees / $limit);
             
             // Map to frontend expected format
             $formattedEmployees = array_map(function($emp) {
@@ -94,7 +102,15 @@ class EmployeeController {
                 ];
             }, $employees);
             
-            echo json_encode(['employees' => $formattedEmployees]);
+            echo json_encode([
+                'employees' => $formattedEmployees,
+                'pagination' => [
+                    'current_page' => $page,
+                    'total_pages' => $totalPages,
+                    'total_employees' => $totalEmployees,
+                    'per_page' => $limit
+                ]
+            ]);
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode(['error' => $e->getMessage()]);
