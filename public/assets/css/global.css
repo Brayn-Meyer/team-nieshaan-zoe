@@ -1026,3 +1026,51 @@ html body.dark-mode .kpi * {
   -webkit-text-fill-color: #ffffff !important;
 }
 
+/* ----------------------- ICON COLOR OVERRIDE -----------------------
+   Quick test/fix: ensure icons render the brand accent instead of appearing
+   white due to broad white/text-fill/mix-blend rules. This is intentionally
+   placed at the end for highest priority. Remove after root cause fix.
+   ------------------------------------------------------------------ */
+/* Font icons and generic <i> icons */
+html body i[class*="fa"],
+html body i[class*="icon"],
+html body i[class*="ico"],
+html body .fa,
+html body .icon,
+html body .ico {
+  color: var(--accent) !important;
+  -webkit-text-fill-color: var(--accent) !important;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* KPI/card icons should be accent green */
+.card i, .card .fa, .card .card-icon, .kpi i { color: var(--accent) !important; }
+
+/* Keep help and logout icons white for contrast on green/white pills */
+.help-btn i {
+  /* keep the floating help icon white for contrast */
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+.app-navbar .nav-right .logout-btn i,
+.logout-btn i {
+  /* show logout icon in brand accent (green) so it matches the text */
+  color: var(--accent) !important;
+  -webkit-text-fill-color: var(--accent) !important;
+}
+
+/* Table header icons remain white for contrast */
+.employee-table thead th i { color: #ffffff !important; }
+
+/* Ensure the logout button label text itself remains the brand accent
+   even after the dark-mode broad overrides that set many buttons to white. */
+html body .app-navbar .nav-right .logout-btn,
+html body .logout-btn {
+  color: var(--accent) !important;
+  -webkit-text-fill-color: var(--accent) !important;
+}
+
+
+

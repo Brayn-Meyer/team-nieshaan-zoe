@@ -225,11 +225,20 @@ require_once __DIR__ . '/../../includes/header.php';
         --shadow-panel: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
     }
 
-    body.dark {
-        --color-bg-panel: #2D3748;
-        --color-text-subtle: #A0AEC0;
-        --color-border: #4A5568;
+    /* Support both 'dark-mode' (site toggle) and 'dark' just in case */
+    body.dark-mode, body.dark {
+        /* Deep, desaturated background for the page (matches screenshot) */
+        --color-bg-panel: #0b1620; /* panel background */
+        --color-text-subtle: #9CA3AF; /* subtle text */
+        --color-border: #12202a; /* panel border */
         --shadow-panel: none;
+        background-color: #07101a; /* page background */
+        color: #E6EEF3;
+    }
+
+    /* Ensure primary icons stay green in both light and dark modes */
+    .text-primary {
+        color: <?php echo $primary_color; ?> !important;
     }
 
     .container-wrapper { max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
