@@ -1,18 +1,22 @@
 <?php
-// --- 1. CONFIGURATION ---
-// Define BASE_URL to prevent the Fatal Error in header.php
-// UPDATE THIS: If your project is in a folder like localhost/clock-it, set this to '/clock-it'
-// If you are on the root (localhost), keep it as '' or '/'
-if (!defined('BASE_URL')) {
-    define('BASE_URL', ''); 
+// --- 1. SETUP & CONFIGURATION ---
+
+// Include the central configuration file
+// This loads .env, defines BASE_URL, DB credentials, and starts the session.
+require_once __DIR__ . '/../../includes/config.php'; 
+
+// Establish Database Connection using constants from config.php
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
 $pageTitle = 'Reports & Analytics Dashboard';
 $page = 'analytics'; // Used for navbar highlighting
 
 // --- 2. DATA FETCHING ---
-// Include database connection
-require_once 'db.php';
 
 // General Info
 $user_info = [
@@ -208,6 +212,7 @@ $secondary_color = '#059669';
 
 // --- 3. INCLUDE HEADER ---
 // This includes the <!DOCTYPE>, <html>, <head>, <body>, and <nav>
+// BASE_URL is already defined by config.php, so the header will work correctly.
 require_once __DIR__ . '/../../includes/header.php'; 
 ?>
 

@@ -9,7 +9,7 @@ $additionalJS = ['/assets/js/dashboard.js', '/assets/js/userGuide.js', '/assets/
 require_once __DIR__ . '/../../includes/header.php';
 require_once __DIR__ . '/../../app/components/helpGuide.php';
 
-$adminName = "John Doe"; 
+$adminName = "Ben Dover"; 
 ?>
 
 <!-- Dashboard Container -->
