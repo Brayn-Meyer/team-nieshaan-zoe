@@ -41,6 +41,9 @@
         <a href="<?php echo BASE_URL; ?>?page=history" class="nav-link <?php echo ($page ?? '') === 'history' ? 'active' : ''; ?>">
             History
         </a>
+        <a href="<?php echo BASE_URL; ?>?page=analytics" class="nav-link <?php echo ($page ?? '') === 'analytics' ? 'active' : ''; ?>">
+            Analytics
+        </a>
 
         <!-- 🌙 Moved dark mode button here -->
         <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">

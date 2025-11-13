@@ -21,6 +21,9 @@ switch ($page) {
 	case 'userGuide':
 		require_once __DIR__ . '/../app/views/userGuide.php';
 		break;
+	case 'analytics':
+		require_once __DIR__ . '/../app/views/analytics.php';
+		break;
 	case 'home':
 	default:
 		require_once __DIR__ . '/../app/views/home.php';
