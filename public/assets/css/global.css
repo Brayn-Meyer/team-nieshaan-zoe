@@ -934,3 +934,95 @@ body.dark-mode .search-container .search-input:focus {
 .context-menu[style] {
   overflow: visible !important;
 }
+
+/* ------------------------------------------------------------------
+   Strong dark-mode text color overrides
+   Ensure all readable text becomes white when dark mode is active. This
+   block is intentionally specific and placed at the end so it overrides
+   other color rules that may be applied elsewhere.
+   ------------------------------------------------------------------ */
+html body.dark-mode,
+html body.dark-mode .main-container,
+html body.dark-mode .app-content,
+html body.dark-mode .content-wrapper,
+html body.dark-mode .dashboard-main,
+html body.dark-mode .card,
+html body.dark-mode .panel,
+html body.dark-mode .modal-content,
+html body.dark-mode .filters-card,
+html body.dark-mode .time-log-table,
+html body.dark-mode .history-table,
+html body.dark-mode .employee-table,
+html body.dark-mode .table-container,
+html body.dark-mode .table-responsive,
+html body.dark-mode .popup-content,
+html body.dark-mode .dropdown-menu,
+html body.dark-mode .context-menu {
+  color: #ffffff !important;                       /* readable white text */
+  -webkit-text-fill-color: #ffffff !important;    /* Safari */
+}
+
+/* Make anchors and nav links white too */
+html body.dark-mode a,
+html body.dark-mode .nav-link,
+html body.dark-mode .app-navbar .nav-right .nav-link {
+  color: #ffffff !important;
+}
+
+/* Ensure table cells, headers and small text use white color */
+html body.dark-mode table,
+html body.dark-mode table td,
+html body.dark-mode table th,
+html body.dark-mode .employee-table td,
+html body.dark-mode .employee-table th {
+  color: #ffffff !important;
+}
+
+/* Form controls and placeholders */
+html body.dark-mode input,
+html body.dark-mode textarea,
+html body.dark-mode select,
+html body.dark-mode .form-control,
+html body.dark-mode .form-select {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html body.dark-mode input::placeholder,
+html body.dark-mode textarea::placeholder,
+html body.dark-mode .form-control::placeholder,
+html body.dark-mode .search-container input::placeholder {
+  color: #bfc6c7 !important; /* keep placeholder slightly muted */
+}
+
+/* Keep important buttons readable (logout button kept white background intentionally) */
+html body.dark-mode .logout-btn,
+html body.dark-mode .logout-btn * {
+  color: inherit !important;
+}
+
+/* Targeted fallback: common text elements to ensure visibility in dark mode.
+   This keeps borders and background colors untouched while forcing text to
+   a readable white where needed. Avoids the heavy-handed universal selector. */
+html body.dark-mode h1,
+html body.dark-mode h2,
+html body.dark-mode h3,
+html body.dark-mode h4,
+html body.dark-mode h5,
+html body.dark-mode h6,
+html body.dark-mode p,
+html body.dark-mode span,
+html body.dark-mode li,
+html body.dark-mode label,
+html body.dark-mode small,
+html body.dark-mode .card-title,
+html body.dark-mode .card-value,
+html body.dark-mode .card .card-content,
+html body.dark-mode .btn,
+html body.dark-mode .btn *,
+html body.dark-mode .kpi,
+html body.dark-mode .kpi * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+

@@ -2,7 +2,7 @@
     // Declare settings
     $host = 'localhost';
     $username = 'root';
-    $password = 'MySQL15B4d#00';
+    $password = 'A.i.s.h.a123#';
     $database = 'tracker_db';
 
     // Create connection

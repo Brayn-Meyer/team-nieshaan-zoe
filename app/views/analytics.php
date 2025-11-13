@@ -387,8 +387,8 @@ require_once __DIR__ . '/../../includes/header.php';
     }
 
     function updateChartColors(chart, isDark) {
-        // If isDark arg isn't passed, check body class
-        isDark = isDark !== undefined ? isDark : bodyElement.classList.contains('dark');
+    // If isDark arg isn't passed, check body class (support both class names)
+    isDark = isDark !== undefined ? isDark : (bodyElement.classList.contains('dark-mode') || bodyElement.classList.contains('dark'));
         const styles = getChartStyle(isDark);
 
         const scales = chart.options.scales;
@@ -416,7 +416,7 @@ require_once __DIR__ . '/../../includes/header.php';
 
     function createChart(id, config) {
         const chart = new Chart(document.getElementById(id), config);
-        updateChartColors(chart, bodyElement.classList.contains('dark'));
+        updateChartColors(chart, (bodyElement.classList.contains('dark-mode') || bodyElement.classList.contains('dark')));
         window.charts[id] = chart;
         return chart;
     }
@@ -427,7 +427,7 @@ require_once __DIR__ . '/../../includes/header.php';
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.attributeName === "class") {
-                const isDark = bodyElement.classList.contains('dark');
+                const isDark = (bodyElement.classList.contains('dark-mode') || bodyElement.classList.contains('dark'));
                 Object.values(window.charts).forEach(chart => {
                     updateChartColors(chart, isDark);
                     chart.update();
@@ -616,7 +616,7 @@ require_once __DIR__ . '/../../includes/header.php';
     // Update charts immediately after load
     window.onload = () => {
          Object.values(window.charts).forEach(chart => {
-            updateChartColors(chart, bodyElement.classList.contains('dark'));
+            updateChartColors(chart, (bodyElement.classList.contains('dark-mode') || bodyElement.classList.contains('dark')));
             chart.update('none');
         });
     };
